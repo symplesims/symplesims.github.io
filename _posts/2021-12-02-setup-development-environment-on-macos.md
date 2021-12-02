@@ -35,6 +35,8 @@ D2Coding
 Droid Sans Mono Dotted for Powerline
 ```
 
+<br/>
+
 ### 개발 관련 오픈 소스
 
 #### git 
@@ -57,8 +59,6 @@ tfswitch -l
 terraform --version
 ln -s /usr/local/bin/terraform /usr/local/bin/tf
 ```
-
-<br/>
 
 #### sdkman 패키지 매니저
 Java 및 관련 오픈소스 버전들을 관리 합니다.
@@ -88,7 +88,8 @@ export NVM_DIR="$HOME/.nvm"
 nvm -v
 ```
 
-- Node 버전 관리 예시 
+- Node 버전 관리 예시
+
 ```shell
 # node & npm 설치 
 nvm install node
@@ -103,26 +104,29 @@ yarn -v
 ```
 
 #### python 개발 환경을 위한 pyenv 패키지 매니저
+
 ```shell
 brew install pyenv
 ```
+
 - [pyenv](https://www.daleseo.com/python-pyenv/) 을 통한 python 버전 관리 예시
 ```shell
 pyenv install 3.10.0
 pyenv install 3.6.9
-python3 —version
+python3 -version
 pyenv versions
 pyenv global 3.10.0
-python3 —version
+python3 -version
 # 참고로 python-2 버전은 2020 에 EOS 되었습니다.
 pyenv install 2.7.18
 ```
 
-#### go-lang 설치
+#### go-lang
 ```shell
 brew install go
 ```
 
+<br>
 
 ### AWS 관련 툴
 
@@ -133,6 +137,8 @@ https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/install-cliv2.html
 # aws-iam-authenticator for AWS EKS
 brew install aws-iam-authenticator
 ```
+
+<br>
 
 ### Kubernetes 관련 툴
 
