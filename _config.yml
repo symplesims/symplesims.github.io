@@ -58,3 +58,7 @@ theme: plainwhite
 plugins:
   - jekyll-seo-tag
 #  - jekyll-feed
+
+# Highlightjs
+highlightjs_version: "11.0.1"
+highlightjs_theme: "tomorrow-night-bright"
