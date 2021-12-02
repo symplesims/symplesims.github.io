@@ -1,5 +1,16 @@
+# jekyll
 _site
 .sass-cache
 .jekyll-cache
 .jekyll-metadata
 vendor
+
+# Gem
+*.gem
+.bundle
+Gemfile.lock
+.DS_Store
+tags
+
+# IDE Tools
+.idea
