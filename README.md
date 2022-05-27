@@ -31,6 +31,7 @@ toc_sticky: true
 sudo gem install jekyll bundler
 sudo gem update
 bundle update --all
+sudo gem install plainwhite
 ```
 
 #### Jekyll serve
