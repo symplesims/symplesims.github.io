@@ -12,9 +12,11 @@ categories:
 Automation Building AWS Fargate & Deploy application  
 ---------
 
-DevOps 의 중심에는 언제나 서비스가 자리잡고 서비스는 사용자 원하는 기능을 구현햔 애플리케이션이 있습니다.  
+DevOps 의 중심에는 언제나 서비스가 자리잡고 서비스는 사용자 원하는 기능을 구현한 애플리케이션이 있습니다.  
 여기서는 로또 645 번호를 추천하는 아주 단순한 백엔드 애플리케이션(API)을 ECS Fargate 로 배포하는 과정을 진행 합니다.  
 중요한건 애플리케이션 서비스를 신속하게 출시하여 인터넷을 이용하는 사용자에게 서비스를 경험 하게 한다는 것 입니다.  
+
+이를 위해 도메인을 발급 하고 DNS 서비스를 사전에 구성 해야 하는데 이 과정은 [AWS Route 53 을 통한 도메인 서비스 관리](https://symplesims.github.io/devops/route53/acm/hosting/2022/01/11/aws-route53.html) 컨텐츠를 참고 하기 바랍니다. 
 
 <br>
 
@@ -26,7 +28,7 @@ DevOps 가속화하는 기술 중 하나로 [AWS ECS Fargate](https://docs.aws.a
 
 ## Fargate 서비스 주요 구성 단계
 
-ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 영역으로 구분 됩니다. 
+ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있습니다.   
 
 ![](/assets/images/22q1/aws-fargate-0001.png)
 
@@ -50,8 +52,8 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 영역으로 �
 
 <br>
 
-물론 그림과 같이 AWS 관리 콘솔에서 리소스를 구성 하려면 상당히 많은 양의 정보를 세심하게 서로 연관하여 설정 해야 합니다.  
-구성 과정에서 실수가 있을 수 있고 잘못된 구성이 있는 경우 그것을 식별하고 교정하기 위해 많은 시간이 걸릴 수 있습니다.  
+물론 위 그림과 같이 AWS 관리 콘솔에서 리소스를 구성 하려면 상당히 많은 양의 정보를 세심하게 서로 연관하여 설정 해야 합니다.  
+여기서는 애플리케이션을 빌드 하고 테라폼을 통해 자동화된 프로비저닝 방식으로 서비스를 배포하도록 하겠습니다.  
 
 <br>
 
@@ -61,7 +63,8 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 영역으로 �
 
 Cloud Native Application 을 위한 애플리케이션 프레임워크로 [spring-boot](https://spring.io/projects/spring-boot) 를 선택하고 비교적 현대적인 트랜드를 쫓아서 kotlin 기반의 reactive 스타일로 구현 하도록 하겠습니다.
 
-6 개의 로또 숫자를 추천하는 핵심 로직은 아래와 같이 간단하게 기술할 수 있습니다. 
+6 개의 로또 숫자를 추천하는 핵심 로직은 아래와 같이 간단하게 기술 할 수 있습니다.  
+
 ```kotlin
 {
     val numbers = (1..45).toList()
@@ -75,7 +78,8 @@ Cloud Native Application 을 위한 애플리케이션 프레임워크로 [sprin
 ### 애플리케이션 빌드 
 [spring-lotto-router-handler](https://github.com/chiwoo-samples/spring-lotto-router-handler.git) github 프로젝트를 checkout 하여 애플리케이션을 빌드 합니다.
 
-- git clone & packing 
+#### git clone & packing 
+
 ```
 git clone https://github.com/chiwoo-samples/spring-lotto-router-handler.git
 
@@ -83,32 +87,32 @@ cd spring-lotto-router-handler
 mvn clean package -DskipTests=true
 ```
 
-- container(도커) 이미지 빌드 
+#### container(도커) 이미지 빌드 
 ```
 docker build -t "symplesims/lotto-service:0.0.1" -f ./docker/Dockerfile .
 ```
 
-- 로컬 환경에서 서비스 구동 및 기능 검증
+#### 로컬 환경에서 서비스 구동 및 기능 검증
 ```
 docker run -d --name lotto-service --publish "0.0.0.0:8080:8080" symplesims/lotto-service:0.0.1
 ```
 
-- 로컬 환경에서 기능 테스트
+#### 로컬 환경에서 기능 테스트
 ```
 curl --location -X GET 'http://localhost:8080/api/lotto/lucky' -H 'Content-Type: application/json'
 ```
 
 기능이 정상적으로 동작하는 것을 확인 하였다면 본격적으로 ECS Fargate 로 서비스를 합니다. 
 
-<br>
+<br><br>
 
-## Cloud Architecture for Application
+## ECS Fargate 프로비저닝 
 
-먼저 로또 번호를 추천하는 애플리케이션 서비스를 위한 클라우드 아키텍처를 설계 합니다.  
+애플리케이션 서비스를 위한 클라우드 아키텍처를 다음과 같이 설계 합니다.  
  
 ![](/assets/images/22q1/aws-fargate-1001.png)
 
-### 주요 리소스 설명 
+### 주요 리소스 개요  
 - Route 53: 인터넷 사용자가 도메인 이름을 통해 서비스에 접근 합니다. 
 - VPC: 컴퓨팅 리소스를 배치하는 공간으로 네트워크 구성 및 네트워크 연결 리소스로 서로 통합 되어 있습니다.  
 - ALB: Route 53 으로부터 유입되는 트래픽을 요청에 대응하는 애플리케이션 서비스로 라우팅 합니다.
@@ -125,6 +129,7 @@ curl --location -X GET 'http://localhost:8080/api/lotto/lucky' -H 'Content-Type:
 ### 서비스 플랫폼을 위한 애플리케이션 주요 속성
 
 애플리케이션 서비스 플랫폼(Project)의 이름을 `magiclub` 으로 하고, 네이밍 및 태깅 규칙 등 일관된 정책을 적용하기 위해 아래와 같이 주요 속성을 정의 합니다.   
+
 ```
 Project : magiclub
 Region  : ap-northeast-2
