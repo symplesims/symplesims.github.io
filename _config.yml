@@ -53,7 +53,7 @@ plainwhite:
 # - about.md
 
 # Build settings
-theme: plainwhite
+theme: architect
 
 plugins:
   - jekyll-seo-tag
