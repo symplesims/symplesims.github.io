@@ -7,6 +7,8 @@
   }
 }
 
+
+
 /**
  * Code block.
  */
@@ -17,7 +19,7 @@
 }
 
 pre.highlight {
-  padding: 8px 12px;
+  /* padding: 5px 10px; */
   position: relative;
 
   // override skeleton styles
@@ -37,8 +39,8 @@ pre.highlight {
 
     &,
     code {
-      background-color: #222;
-      font-size: 18px;
+      background-color: #222222;
+      font-size: 12px;
     }
   }
 
@@ -46,8 +48,8 @@ pre.highlight {
   .copy {
     color: #FEFEFE;
     position: absolute;
-    right: 1.2rem;
-    top: 1.2rem;
+    right: 1.0rem;
+    top: 1.0rem;
     opacity: 0;
 
     &:active,
