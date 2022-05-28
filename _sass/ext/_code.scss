@@ -40,7 +40,7 @@ pre.highlight {
     &,
     code {
       background-color: #222222;
-      font-size: 12px;
+      font-size: 18px;
     }
   }
 
@@ -49,8 +49,9 @@ pre.highlight {
     color: #FEFEFE;
     position: absolute;
     right: 1.0rem;
-    top: 1.0rem;
+    top: 0.1rem;
     opacity: 0;
+    font-size: 12px;
 
     &:active,
     &:focus,
