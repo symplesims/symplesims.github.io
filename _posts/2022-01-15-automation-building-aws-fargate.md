@@ -83,41 +83,78 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있�
 ### 애플리케이션 빌드 
 [spring-lotto-router-handler](https://github.com/chiwoo-samples/spring-lotto-router-handler.git) github 프로젝트를 checkout 하여 애플리케이션을 빌드 합니다.
 
-#### git clone & packing 
+로컬 환경에 [Java 11](https://www.azul.com/downloads/?package=jdk) 버전과 [Maven](https://maven.apache.org/) 이 설치 / 구성 되어 있어야 합니다.
+
+Mac 사용자라면 [Mac OS 개발자를 위한 로컬 개발 환경 구성](https://symplesims.github.io/development/setup/macos/2021/12/02/setup-development-environment-on-macos.html) 을 참고하여 편리하게 구성 가능 합니다.  
+
+#### Git clone 
 
 ```
 git clone https://github.com/chiwoo-samples/spring-lotto-router-handler.git
-
-cd spring-lotto-router-handler
-mvn clean package -DskipTests=true
 ```
 
-#### container(도커) 이미지 빌드 
+#### Build
+```
+cd spring-lotto-router-handler; mvn clean package -DskipTests=true
+```
+
+#### Build Container Image 
 
 ```
 docker build -t "lotto-service:1" -f ./docker/Dockerfile .
 ```
 
-나중에는 ECR 저장소에 맞게 도커 이미지 태깅을 다시 하도록 하겠습니다.    
+컨테이너 이미지를 빌드하는 `Dockerfile` 파일은 다음과 같습니다.  
 
+```
+FROM amazoncorretto:11-alpine
 
-#### 로컬 환경에서 서비스 구동 및 기능 검증
+ENV JAVA_OPTS="-server -Xverify:none"
+ENV JAVA_OPTS="$JAVA_OPTS -Dsun.misc.URLClassPath.disableJarChecking=true"
+
+WORKDIR /app
+
+COPY ./target/*.jar /app/springApp.jar
+COPY ./docker/entrypoint.sh /app/
+
+RUN chmod +x /app/entrypoint.sh
+EXPOSE 8080
+ENTRYPOINT ["/app/entrypoint.sh"]
+```
+
+OpenJDK 기반의 AWS 프로덕션용 JVM 배포판인 [amazoncorretto](https://aws.amazon.com/ko/corretto/) 를 베이스 이미지로 사용 합니다.  
+
+#### Container Image 확인
+docker images 명령어로 빌드된 컨테이너 이미지 및 버전을 확인 합니다. 
+
+```
+docker images | grep lotto-service
+```
+
+![](/assets/images/22q1/aws-fargate-0005.png)
+
+#### Run Container
+docker run 명령어로 컨테이너를 실행하고 ps 명령어로 프로세서를 확인해 봅시다.  
 ```
 docker run -d --name lotto-service --publish "0.0.0.0:8080:8080" lotto-service:1
+
+docker ps
+CONTAINER ID   IMAGE             COMMAND                CREATED         STATUS         PORTS                    NAMES
+79d6f647dae8   lotto-service:1   "/app/entrypoint.sh"   6 seconds ago   Up 7 seconds   0.0.0.0:8080->8080/tcp   lotto-service
 ```
 
 #### 로컬 환경에서 기능 테스트
 ```
-curl --location -X GET 'http://localhost:8080/api/lotto/lucky' -H 'Content-Type: application/json'
+curl -v -X GET 'http://localhost:8080/api/lotto/lucky' -H 'Content-Type: application/json'
 ```
 
-기능이 정상적으로 동작하는 것을 확인 하였다면 본격적으로 ECS Fargate 로 서비스를 합니다. 
+기능이 정상적으로 동작하는 것을 확인 하였다면 ECS Fargate 에 배포해 봅시다. 
 
 <br><br>
 
-## ECS Fargate 프로비저닝 
+## AWS Cloud 아키텍처
 
-애플리케이션 서비스를 위한 클라우드 아키텍처를 다음과 같이 설계 합니다.  
+애플리케이션 서비스를 위한 AWS Cloud 아키텍처를 다음과 같이 설계 하였습니다.  
  
 ![](/assets/images/22q1/aws-fargate-1001.png)
 
@@ -157,8 +194,10 @@ Apps    : lotto
 
 테라폼의 주요 모듈을 이용하여 One-Step 자동화 빌드를 구현 하고자 합니다. 
 
-이를 위해 프로그램 방식의 IAM 어카운트를 생성 하고, 관련 리소스를 생성 관리 할 수 있는 충분한 권한을 할당 하고 AccessKey 를 발급 하되,   
-AccessKey 는 외부에 유출되게 되면 바로 보안 사고로 이어지며 심각한 해킹 피해를 가져올 수 있으니 특별히 주의하여 관리 하기를 당부 합니다.   
+이를 위해 프로그램 방식의 IAM 어카운트를 생성 하고, 관련 리소스를 생성 관리 할 수 있는 권한을 할당 하고 AccessKey 를 발급 합니다.    
+정말로 중요한 건 발급 받은 AccessKey 는 외부에 유출되면 바로 보안 사고로 이어지며 해킹과 같은 심각한 피해를 가져올 수 있으니 아주 아주 주의해야 합니다.  
+
+[AWS Profile 구성 및 자격 증명 파일 설정](https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/cli-configure-files.html) 을 참고 하여 테라폼을 실행할 수 있도록 준비 합니다.   
 
 ### Checkout 
 
@@ -166,7 +205,8 @@ AccessKey 는 외부에 유출되게 되면 바로 보안 사고로 이어지며
 git clone https://github.com/chiwoo-cloud-native/aws-fargate-magiclub.git
 ```
 
-### Build
+## Build
+
 ```
 terraform init
 
@@ -175,3 +215,135 @@ terraform plan
 terraform apply
 ```
 
+## 테라폼 코드 개요
+테라폼은 디렉토리 단위로 프로비저닝을 실행 합니다. REAL 인프라스트럭처의 상태를 `terraform.tfstate` 파일로 관리 합니다.  
+작성한 테라폼 코드와 terraform.tfstate 파일을 비교하여 리소스를 추가, 삭제, 갱신 작업을 통해 REAL 인프라스트럭처를 프로비저닝 및 동기화 하게 됩니다. 
+
+### providers.tf
+
+테라폼 버전과 AWS 프로바이서 및 인증 정보를 정의 합니다.  
+여기서는 `active-stack` 프로파일을 통해 AWS 리소스를 액세스 하게 됩니다.
+
+```
+terraform {
+  required_version = ">= 1.0.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.75.1"
+    }
+  }
+}
+
+provider "aws" {
+  region  = "ap-northeast-2"
+  profile = "active-stack"
+}
+```
+
+### vpc/main.tf
+
+terraform-aws-modules 커뮤니티의 [vpc](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) 모듈을 사용 하여 Cloud 아키텍처 설계서의 VPC 를 구현 합니다.
+
+[vpc/main.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/vpc/main.tf) 파일의 주요 구성 내역으로 VPC 및 관련 리소스의 이름과, CIDR 블럭, AvailAbility Zone, Subnet 등을 간편하게 정의 하고 있습니다. 
+
+```
+locals {
+  name_prefix = "magiclub-an2p"
+}
+
+module "vpc" {
+  source = "registry.terraform.io/terraform-aws-modules/vpc/aws"
+
+  name = local.name_prefix # VPC 및 VPC 관련 리소스의 이름
+  cidr = "172.76.0.0/16"   # VPC 의 CIDR 블럭 
+
+  azs                  = ["apne2-az1", "apne2-az3"] # 두개의 AvailAbility Zone 
+  public_subnets       = ["172.76.11.0/24", "172.76.12.0/24"] # public 서브넷의 CIDR 
+  public_subnet_suffix = "pub"
+
+  private_subnets       = ["172.76.21.0/24", "172.76.22.0/24"] # Fargate 컨테이너를 위한 서브넷의 CIDR 
+  private_subnet_suffix = "apps"
+
+  enable_dns_hostnames = true
+
+  # Fargate 컨테이너가 외부 인터넷 리소스에 액세스 하기위해선 NAT 게이트웨이를 설정 필요 
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
+
+  # VPC 및 관련 리소스의 태그 설정 정보
+  tags = {
+    Owner       = "opsmaster@your.company.com"
+    Environment = "PoC"
+    Team        = "DevOps"
+  }
+
+  vpc_tags         = { Name = format("%s-vpc", local.name_prefix) }
+  igw_tags         = { Name = format("%s-igw", local.name_prefix) }
+  nat_gateway_tags = { Name = format("%s-nat", local.name_prefix) }
+
+}
+```
+
+
+### alb/main.tf
+terraform-aws-modules 커뮤니티의 [alb](https://registry.terraform.io/modules/terraform-aws-modules/alb/aws/latest) 모듈을 사용 하여 Application Load Balancer 를 구현 합니다.
+
+[alb/main.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/alb/main.tf) 파일의 주요 구성 내역으로 ALB 및 HTTP 와 HTTPS 리스너를 구성 하고 있습니다.
+
+ALB 리스너 구성에서, HTTP 는 80 프로토콜로 트래픽이 유입되면 443 포트로 리-다이렉트 하도록 구성 되어 있습니다.  
+인터넷 사용자의 접근을 허용하는 Load Balancer 이므로 80 포트는 안전하지 않은 통신이므로 TLS 보안 프롵토콜로 통신 하도록 리-다이렉트 하게 됩니다.  
+TLS 보안 프로토콜에 사용되는 공인 인증서(ACM Certificate)를 포함하고 있습니다. 
+
+```
+locals {
+  name_prefix = "magiclub-an2p"
+}
+
+module "alb" {
+  source = "registry.terraform.io/terraform-aws-modules/alb/aws"
+
+  name               = "magiclub-an2p-alb"          # 로드 밸런서 이름
+  load_balancer_type = "application"                # 로드 밸런서 타입 - Application 
+  vpc_id             = data.aws_vpc.this.id         # ALB 개 배치될 VPC 
+  security_groups    = [aws_security_group.this.id] # ALB 의 보안 그룹 
+  subnets            = data.aws_subnet_ids.pub.ids  # ALB 는 public 서브넷에 배포 하게 됩니다.  
+
+  # HTTP 80 리스너를 정의 하며, 443 포트로 전달 합니다. 
+  http_tcp_listeners = [
+    {
+      protocol    = "HTTP"
+      port        = 80
+      action_type = "redirect"
+      redirect    = {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+  ]
+
+  # HTTPS 리스너를 정의 하며 기본은 200 OK 메시지를 반환 합니다.  
+  https_listeners = [
+    {
+      protocol        = "HTTPS"
+      port            = 443
+      certificate_arn = data.aws_acm_certificate.this.arn
+      action_type     = "fixed-response"
+      fixed_response  = {
+        content_type = "text/plain"
+        message_body = "OK"
+        status_code  = "200"
+      }
+    },
+  ]
+
+  tags = {
+    Owner       = "opsmaster@your.company.com"
+    Environment = "PoC"
+    Team        = "DevOps"
+  }
+
+}
+```
