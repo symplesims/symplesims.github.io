@@ -61,5 +61,5 @@ plugins:
 #  - jekyll-feed
 
 # Highlightjs
-highlightjs_version: "11.0.1"
+highlightjs_version: "11.5.1"
 highlightjs_theme: "tomorrow-night-bright"
