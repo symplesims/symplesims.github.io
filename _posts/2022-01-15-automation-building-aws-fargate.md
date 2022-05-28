@@ -53,16 +53,17 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있�
 
 <br>
 
-물론 위 그림과 같이 AWS 관리 콘솔에서 리소스를 구성 하려면 상당히 많은 양의 정보를 세심하게 서로 연관하여 설정 해야 합니다.  
-여기서는 애플리케이션을 빌드 하고 테라폼을 통해 자동화된 프로비저닝 방식으로 서비스를 배포하도록 하겠습니다.  
+위 그림과 같이 AWS 관리 콘솔을 통해 AWS Fargate 를 구성 할 수 있지만, 여기서는 Terraform 을 통해 진행 하도록 하겠습니다.
+
+먼저 애플리케이션부터 구현 하고 컨테이너로 배포할 준비를 하도록 합니다. 
 
 <br>
 
 ## 서비스 제공을 위한 애플리케이션 개요   
 
-로또 서비스를 하는 애플리케이션 기능은 1 부터 45번 까지의 숫자 중 랜덤으로 6개의 숫자를 중복되지 않게 반환하는 간단한 애플리케이션 입니다. 
+컨테이너 환경으로 애플리케이션을 배포 하려면 동작하는 컨테이너 이미지를 빌드하여 테스트 해 보면 됩니다.  
 
-Cloud Native Application 을 위한 애플리케이션 프레임워크로 [spring-boot](https://spring.io/projects/spring-boot) 를 선택하고 비교적 현대적인 트랜드를 쫓아서 kotlin 기반의 reactive 스타일로 구현 하도록 하겠습니다.
+애플리케이션 기능 요건은 1 부터 45번 까지의 숫자 중 랜덤으로 6개의 숫자를 중복되지 않게 반환하는 간단한 애플리케이션 입니다.
 
 6 개의 로또 숫자를 추천하는 핵심 로직은 아래와 같이 간단하게 기술 할 수 있습니다.  
 
@@ -73,6 +74,9 @@ Cloud Native Application 을 위한 애플리케이션 프레임워크로 [sprin
     numbers.stream().limit(6).sorted().collect(Collectors.toList())
 }
 ```
+
+참고로, Cloud Native Application 을 위한 애플리케이션 프레임워크로 [spring-boot](https://spring.io/projects/spring-boot) 를 선택하고 비교적 현대적인 트랜드를 쫓아서 kotlin 기반의 reactive 스타일로 구현 하도록 하겠습니다.
+
 
 <br>
 
@@ -89,13 +93,17 @@ mvn clean package -DskipTests=true
 ```
 
 #### container(도커) 이미지 빌드 
+
 ```
-docker build -t "symplesims/lotto-service:0.0.1" -f ./docker/Dockerfile .
+docker build -t "lotto-service:1" -f ./docker/Dockerfile .
 ```
+
+나중에는 ECR 저장소에 맞게 도커 이미지 태깅을 다시 하도록 하겠습니다.    
+
 
 #### 로컬 환경에서 서비스 구동 및 기능 검증
 ```
-docker run -d --name lotto-service --publish "0.0.0.0:8080:8080" symplesims/lotto-service:0.0.1
+docker run -d --name lotto-service --publish "0.0.0.0:8080:8080" lotto-service:1
 ```
 
 #### 로컬 환경에서 기능 테스트
