@@ -9,15 +9,18 @@ categories:
   - Automation
 ---
 
-서비스 중심의 DevOps 문화를 기능적 관점에서 빠르게 시작할 수 있는 수단으로 AWS Fargate 는 훌륭한 대안입니다.  
+[AWS ECS Fargate](https://docs.aws.amazon.com/AmazonECS/latest/userguide/what-is-fargate.html)  는 서비스 중심의 DevOps 문화를 기능적 관점에서 빠르게 시작할 수 있는 수단으로 훌륭한 대안입니다.  
 
-이것으로 애플리케이션을 컨테이너 환경으로 빠르게 배포함은 물론, 경량화된 워크로드와 트래픽에 대응하는 탄력적인 확장 및 운영의 자동화 등 다양한 잇점을 가져올 수 있습니다.   
+애플리케이션을 컨테이너 환경으로 빠르게 구성함은 물론, 경량화된 워크로드로 효율적인 트래픽에 대응하는 탄력적인 확장, 운영의 자동화 등 다양한 잇점을 가져올 수 있습니다.   
 
 DevOps 에서 중요한 것 중 하나로 고객의 피드백의 빠른 확인 인데, 결국 애플리케이션 서비스를 신속하게 출시해서 인터넷 사용자에게 서비스를 경험 하도록 열어 주는 것 입니다.    
 
-이를 위해 도메인을 발급 하고 DNS 서비스를 사전에 구성 해야 하는데 이 과정은 [AWS Route 53 을 통한 도메인 서비스 관리](https://symplesims.github.io/devops/route53/acm/hosting/2022/01/11/aws-route53.html) 컨텐츠를 참고 하기 바랍니다. 
+야기서는 인터넷 사용자에게 아주 간단한 API 를 서비스를 경험 하도록 AWS Fargate 로 배포하는 연습해 보겠습니다. 
 
-튜토리얼의 목적은 AWS Fargate 경험이지만 중심엔 서비스가 있어야 하므로 여기서는 사용자에게 로또 645 게임에서 6개의 번호를 추천하는 아주 간단한 API 를 서비스 하는 것을 목표로 하겠습니다.
+## Pre-Requisite
+- 인터넷 사용자의 접근을 위해 DNS 서비스를 사전에 구성 해야 하는데 이 과정은 [AWS Route 53 을 통한 도메인 서비스 관리](https://symplesims.github.io/devops/route53/acm/hosting/2022/01/11/aws-route53.html) 를 참고 하기 바랍니다. 
+- 애플리케이션 서비스의 기능은 로또 645 게임에서 6개의 번호를 추천하는 아주 간단한 API 를 서비스 하는 것을 목표로 하겠습니다.  
+  참고로, DevOps 는 서비스 중심의 개발 문화이므로 Life Cycle 을 `서비스 기획` > `애플리케이션 구현` > `애플리케이션 출시 및 돌봄` 의 흐름과도 같습니다.  
 
 <br>
 
@@ -35,29 +38,29 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있�
 
 <br>
 
-1. ECS Fargate 클러스터 생성
+#### 1. ECS Fargate 클러스터 생성
  
 ![ecs-cluster](/assets/images/22q1/aws-fargate-0002.png)
 
 <br>
 
-2. ECS 작업 정의 생성  
+#### 2. ECS 작업 정의 생성  
 
 ![ecs-dd](/assets/images/22q1/aws-fargate-0003.png)
 
 <br>
 
-4. ECS 서비스 생성  
+#### 3. ECS 서비스 생성  
 
 ![ecs-ss](/assets/images/22q1/aws-fargate-0004.png)  
-
-<br>
 
 위 그림과 같이 AWS 관리 콘솔을 통해 AWS Fargate 를 구성 할 수 있지만, 여기서는 Terraform 을 통해 진행 하도록 하겠습니다.
 
 먼저 애플리케이션부터 구현 하고 컨테이너로 배포할 준비를 하도록 합니다. 
 
-<br>
+<br><br>
+
+
 
 ## 서비스 제공을 위한 애플리케이션 개요   
 
@@ -83,7 +86,7 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있�
 ### 애플리케이션 빌드 
 [spring-lotto-router-handler](https://github.com/chiwoo-samples/spring-lotto-router-handler.git) github 프로젝트를 checkout 하여 애플리케이션을 빌드 합니다.
 
-로컬 환경에 [Java 11](https://www.azul.com/downloads/?package=jdk) 버전과 [Maven](https://maven.apache.org/) 이 설치 / 구성 되어 있어야 합니다.
+사전에 [Java 11](https://www.azul.com/downloads/?package=jdk) 버전과 [Maven](https://maven.apache.org/) 이 설치 및 구성 되어 있어야 합니다.
 
 Mac 사용자라면 [Mac OS 개발자를 위한 로컬 개발 환경 구성](https://symplesims.github.io/development/setup/macos/2021/12/02/setup-development-environment-on-macos.html) 을 참고하여 편리하게 구성 가능 합니다.  
 
@@ -162,10 +165,10 @@ curl -v -X GET 'http://localhost:8080/api/lotto/lucky' -H 'Content-Type: applica
 - Route 53: 인터넷 사용자가 도메인 이름을 통해 서비스에 접근 합니다. 
 - VPC: 컴퓨팅 리소스를 배치하는 공간으로 네트워크 구성 및 네트워크 연결 리소스로 서로 통합 되어 있습니다.  
 - ALB: Route 53 으로부터 유입되는 트래픽을 요청에 대응하는 애플리케이션 서비스로 라우팅 합니다.
-- ECS Fargate: 클러스터, 작업 정의, 서비스로 생성된 컨테이너 기반 애플리케이션 서비스를 제공 하는 컨테이너 서비스 입니다.  
+- ECS Fargate: 클러스터, 작업 정의, 서비스로 생성된 컨테이너 기반 애플리케이션 서비스를 제공 하는 컨테이너 서비스 입니다.
 - CloudWatch: ECS 애플리케이션 서비스의 로그를 수집 관리하는 로거 드라이브로 작업 정의를 통해 구성 합니다. 
-- IAM Role: 태스크를 정의하는 Role과 ECS 서비스를 실행하는 Role 을 작업 정의에서 설정 됩니다. 
-- ECR: 컨테이너 (도커) 이미지를 등록 관리하는 레지스트리 서비스로 작업 정의에서 설정 됩니다.  
+- IAM Role: 태스크를 정의하는 Role과 ECS 서비스를 실행하는 Role 을 작업 정의에서 설정 됩니다.
+- ECR: 컨테이너 (도커) 이미지를 등록 관리하는 레지스트리 서비스로 작업 정의에서 설정 됩니다.
 - Cloud Map: 컨테이너 애플리케이션을 위한 디스커버리 서비스로 Route 53 의 호스팅 정보가 사전에 구성되어 있어야 합니다.
 
 * [drawio-desktop](https://github.com/jgraph/drawio-desktop/releases/tag/v18.0.6) 툴을 사용하면 좀 더 편라하게 아키텍처를 설계 할 수 있습니다.  
@@ -187,17 +190,20 @@ Apps    : lotto
 
 위 정보를 기반으로 [Terraform](https://www.terraform.io/) 을 통해 자동화된 방식으로 프로비저닝 하도록 합니다. 
 
-<br>
+<br><br>
 
 
-## AWS Fargate 프로비저닝 
+## Terraform 을 통한 AWS Fargate 프로비저닝 
 
-테라폼의 주요 모듈을 이용하여 One-Step 자동화 빌드를 구현 하고자 합니다. 
+테라폼의 주요 모듈을 이용하여 One-Step 자동화 빌드를 구현 합니다.  
 
 이를 위해 프로그램 방식의 IAM 어카운트를 생성 하고, 관련 리소스를 생성 관리 할 수 있는 권한을 할당 하고 AccessKey 를 발급 합니다.    
-정말로 중요한 건 발급 받은 AccessKey 는 외부에 유출되면 바로 보안 사고로 이어지며 해킹과 같은 심각한 피해를 가져올 수 있으니 아주 아주 주의해야 합니다.  
+발급 받은 AccessKey 는 외부에 유출되면 바로 보안 사고로 이어지며 해킹과 같은 심각한 피해를 가져올 수 있으므로 아주 아주 주의해야 합니다.  
 
 [AWS Profile 구성 및 자격 증명 파일 설정](https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/cli-configure-files.html) 을 참고 하여 테라폼을 실행할 수 있도록 준비 합니다.   
+
+테라폼 프로젝트는 [aws-fargate-magiclub](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub.git) 를 참고 합니다. 
+
 
 ### Checkout 
 
@@ -207,21 +213,55 @@ git clone https://github.com/chiwoo-cloud-native/aws-fargate-magiclub.git
 
 ## Build
 
+aws-fargate-magiclub 프로젝트엔 vpc, alb, fargate, lotto 애플리케이션 으로 각 폴더로 구분이 되어 있습니다.  
+순서대로 각 프로젝트를 한번에 프로비저닝 할 수 있습니다.  
 ```
-terraform init
+cd aws-fargate-magiclub 
 
-terraform plan
-
-terraform apply
+# aws-fargate-magiclub 폴더에서 아래 명령들을 한번에 실행하세요. 
+terraform -chdir=vpc init && terraform -chdir=alb init && terraform -chdir=fargate init  && terraform -chdir=services/lotto \
+terraform -chdir=vpc apply -auto-approve && \
+terraform -chdir=alb apply -auto-approve && \
+terraform -chdir=fargate apply -auto-approve && \
+terraform -chdir=services/lotto apply -auto-approve
 ```
+프로비저닝이 완료될 때까지 다소 시간이 걸리게 됩니다. 프로비저닝이 완료된 후에도 lotto 서비스가 running 상태로 전환되기까지 얼마간 시간이 걸립니다. 
+
+<br>
+
+## Test
+우리가 배포한 lotto 애플리케이션 서비스가 동작하는지 cURL 명령을 통해 확인 합니다. 
+```
+curl --location -X GET 'http://lotto.mystarcraft.ml/api/lotto/lucky' -H 'Content-Type: application/json'
+```
+
+<br>
+
+## 결론
+
+과거엔 인터넷 서비스로 애플리케이션을 배포 하기 위한 주요 활동을 간단히만 정리 하더라도 수개월이 걸렸습니다. 
+
+장비 구입을 위한 품의, 발주, 운송, IDC 와 관련된 유지 보수 업체와의 계약, 인터넷 서비스 가입, 네트워크 및 서버 설정, 애플리케이션 구현과 배포 등 수 많은 일들을 순서대로 처리하여야 왔습니다.  
+
+지금 경험한 것과 같이 이제는 DevOps 의 가치 중심인 고객이 원하는 서비스를 빠르게 제공 하여 경험하게 하고 고객의 피드백 수렴을 통해 서비스의 가치를 높이는 활동을 할 수 있게 되었습니다.  
+
+
+<br><br>
 
 ## 테라폼 코드 개요
-테라폼은 디렉토리 단위로 프로비저닝을 실행 합니다. REAL 인프라스트럭처의 상태를 `terraform.tfstate` 파일로 관리 합니다.  
+
+[Terraform]() 은 디렉토리 단위로 프로비저닝을 실행 합니다. REAL 인프라스트럭처의 상태를 `terraform.tfstate` 파일로 관리 합니다.  
 작성한 테라폼 코드와 terraform.tfstate 파일을 비교하여 리소스를 추가, 삭제, 갱신 작업을 통해 REAL 인프라스트럭처를 프로비저닝 및 동기화 하게 됩니다. 
 
-### providers.tf
+<br>
 
-테라폼 버전과 AWS 프로바이서 및 인증 정보를 정의 합니다.  
+### 프로바이더와 모듈 
+
+- 프로바이더
+  클라우드를 프로비저닝 하기 위해 클라우드 벤더가 제공 하고 있는 API 를 액세스하여 프로비저닝을 할 수 있도록 도와줍니다. 프로바이더를 제공 하는 주요 클라우드 벤더는 AWS, GPC, Azure 등이 있습니다. 
+
+[providers.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/vpc/providers.tf) 파일엔 프로바이더와 버전을 정의 하고, 특히 AWS 를 액세스할 접속 정보를 포함 합니다. 
+
 여기서는 `active-stack` 프로파일을 통해 AWS 리소스를 액세스 하게 됩니다.
 
 ```
@@ -238,13 +278,28 @@ terraform {
 
 provider "aws" {
   region  = "ap-northeast-2"
-  profile = "active-stack"
+  profile = "active-stack" # AWS 클라우드에 액세스할 프로파일 명
 }
 ```
 
-### vpc/main.tf
+- 모듈  
+  복잡한 리소스 구성을 단순화 하여 편리하게 코드를 작성할 수 템플릿화 하였습니다.
 
-terraform-aws-modules 커뮤니티의 [vpc](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) 모듈을 사용 하여 Cloud 아키텍처 설계서의 VPC 를 구현 합니다.
+모듈은 'module' 과 'source' 를 통해 정의 합니다.   
+아래는 VPC 를 구성하기 위해 모듈을 정의하는 예시 입니다.      
+
+```
+module "vpc" {
+  source = "registry.terraform.io/terraform-aws-modules/vpc/aws"
+
+}
+```
+
+<br>
+
+### VPC 구성
+
+terraform-aws-modules 커뮤니티의 [테라폼 VPC](https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest) 모듈을 사용 하여 Cloud 아키텍처 설계서의 [VPC](https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/what-is-amazon-vpc.html) 를 구현 합니다.
 
 [vpc/main.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/vpc/main.tf) 파일의 주요 구성 내역으로 VPC 및 관련 리소스의 이름과, CIDR 블럭, AvailAbility Zone, Subnet 등을 간편하게 정의 하고 있습니다. 
 
@@ -286,9 +341,11 @@ module "vpc" {
 }
 ```
 
+<br>
 
-### alb/main.tf
-terraform-aws-modules 커뮤니티의 [alb](https://registry.terraform.io/modules/terraform-aws-modules/alb/aws/latest) 모듈을 사용 하여 Application Load Balancer 를 구현 합니다.
+### ALB 구성 
+
+terraform-aws-modules 커뮤니티의 [테라폼 ALB](https://registry.terraform.io/modules/terraform-aws-modules/alb/aws/latest) 모듈을 사용 하여 [Application Load Balancer](https://docs.aws.amazon.com/ko_kr/elasticloadbalancing/latest/application/introduction.html) 를 구현 합니다.
 
 [alb/main.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/alb/main.tf) 파일의 주요 구성 내역으로 ALB 및 HTTP 와 HTTPS 리스너를 구성 하고 있습니다.
 
@@ -347,3 +404,78 @@ module "alb" {
 
 }
 ```
+
+<br>
+
+### ECS 구성
+
+terraform-aws-modules 커뮤니티의 [테라폼 ECS](https://registry.terraform.io/modules/terraform-aws-modules/ecs/aws/latest) 모듈을 사용 하여 AWS [ECS 클러스터](https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/Welcome.html)를 구현 합니다.
+
+[fargate/main.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/fargate/main.tf) 파일의 주요 구성 내역으로 ECS 클러스터를 구성 하고 있습니다.
+
+```
+module "ecs" {
+  source  = "registry.terraform.io/terraform-aws-modules/ecs/aws"
+  version = "3.5.0"
+
+  name               = format("%s-ecs", var.name_prefix)
+  container_insights = false
+  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+
+  tags = merge(var.tags, {
+    Name = format("%s-ecs", var.name_prefix)
+  })
+}
+```
+
+<br>
+
+### 애플리케이션 Service 구성
+
+[services/lotto/main.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/services/lotto/main.tf) 파일의 주요 구성 내역으로 lotto 애플리케이션 서비스 구성 하고 있습니다.
+
+애플리케이션은 frontend, backend 등 다양한 유형으로 정의 될 수 있으며 lotto 는 그 중 하나일 뿐 입니다.  
+
+여기엔 ecs-service 라는 커스텀 모듈을 사용하여 ECS 서비스를 구성하는 task definition, ecs service, cloudwatch 로그 그룹, cloud map 등의 주료 리소스를 구성 합니다.   
+
+```
+locals {
+  region             = data.aws_region.current.name
+  ecr_repository_url = format("%s", aws_ecr_repository.this.repository_url)
+}
+
+module "lotto" {
+  source = "../ecs-service/"
+
+  project         = var.project
+  region          = local.region
+  name_prefix     = var.name_prefix
+  container_name  = var.container_name
+  container_port  = var.container_port
+  container_image = local.ecr_repository_url
+  cpu             = 512
+  memory          = 1024
+  desired_count   = 1
+  port_mappings   = [
+    {
+      "protocol" : "tcp",
+      "containerPort" : 8080
+    },
+  ]
+
+  vpc_id                 = data.aws_vpc.this.id
+  cluster_id             = data.aws_ecs_cluster.this.id
+  task_role_arn          = data.aws_iam_role.ecs_task_ssm_role.arn
+  execution_role_arn     = data.aws_iam_role.ecs_task_execution_role.arn
+  subnets                = data.aws_subnets.apps.ids
+  security_group_ids     = [aws_security_group.container_sg.id]
+  target_group_arn       = aws_lb_target_group.tg8080.arn
+  cloud_map_namespace_id = data.aws_service_discovery_dns_namespace.this.id
+
+  depends_on = [aws_ecr_repository.this]
+}
+```
+
+ecs-service 모듈의 [main.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/services/ecs-service/main.tf) 참조 
+
+
