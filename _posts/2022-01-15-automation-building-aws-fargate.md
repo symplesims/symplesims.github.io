@@ -239,11 +239,11 @@ curl --location -X GET 'http://lotto.mystarcraft.ml/api/lotto/lucky' -H 'Content
 
 ## 결론
 
-과거엔 인터넷 서비스로 애플리케이션을 배포 하기 위한 주요 활동을 간단히만 정리 하더라도 수개월이 걸렸습니다. 
+과거엔 애플리케이션을 인터넷 서비스로 배포 하려면 수 개월에 걸쳐서 많은 작업을 해야 했습니다.   
 
-장비 구입을 위한 품의, 발주, 운송, IDC 와 관련된 유지 보수 업체와의 계약, 인터넷 서비스 가입, 네트워크 및 서버 설정, 애플리케이션 구현과 배포 등 수 많은 일들을 순서대로 처리하여야 왔습니다.  
+장비 구입을 위한 품의, 발주, 운송, IDC 와 관련된 유지 보수 업체와의 계약, 인터넷 서비스 가입, 네트워크 및 서버 설정, 애플리케이션 구현과 배포 등 수 많은 일들이 있었습니다.   
 
-지금 경험한 것과 같이 이제는 DevOps 의 가치 중심인 고객이 원하는 서비스를 빠르게 제공 하여 경험하게 하고 고객의 피드백 수렴을 통해 서비스의 가치를 높이는 활동을 할 수 있게 되었습니다.  
+하지만 클라우드 에서는, 지금 경험한 것과 같이 DevOps 의 중심 가치인 `고객`이 `원하는 서비스`를 빠르게 제공 하여 경험 하게 하고 `고객의 피드백 수렴`을 통해 `서비스의 가치를 지속적으로 높이는` 활동을 할 수 있게 되었습니다.  
 
 
 <br><br>
@@ -476,6 +476,6 @@ module "lotto" {
 }
 ```
 
-ecs-service 모듈의 [main.tf](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/services/ecs-service/main.tf) 참조 
+ecs-service 모듈은 [/ecs-service](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub/blob/main/services/ecs-service/) 를 기준으로 main.tf 등 리소스 구성 내역을 참고할 수 있습니다.  
 
 
