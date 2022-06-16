@@ -17,18 +17,24 @@ DevOps 에서 중요한 것 중 하나로 고객의 피드백의 빠른 확인 �
 
 야기서는 인터넷 사용자에게 아주 간단한 API 를 서비스를 경험 하도록 AWS Fargate 로 배포하는 연습해 보겠습니다. 
 
+
+<br><br>
+
+
 ## Pre-Requisite
 - 인터넷 사용자의 접근을 위해 DNS 서비스를 사전에 구성 해야 하는데 이 과정은 [AWS Route 53 을 통한 도메인 서비스 관리](https://symplesims.github.io/devops/route53/acm/hosting/2022/01/11/aws-route53.html) 를 참고 하기 바랍니다. 
 - 애플리케이션 서비스의 기능은 로또 645 게임에서 6개의 번호를 추천하는 아주 간단한 API 를 서비스 하는 것을 목표로 하겠습니다.  
   참고로, DevOps 는 서비스 중심의 개발 문화이므로 Life Cycle 을 `서비스 기획` > `애플리케이션 구현` > `애플리케이션 출시 및 돌봄` 의 흐름과도 같습니다.  
 
-<br>
+
+<br><br>
+
 
 ## AWS ECS Fargate
 
 DevOps 가속화하는 기술 중 하나로 [AWS ECS Fargate](https://docs.aws.amazon.com/AmazonECS/latest/userguide/what-is-fargate.html) 는 컨테이너 기반으로 애플리케이션을 쉽게 배포하고 자동화된 관리 환경을 제공 합니다.    
 
-<br>
+<br><br>
 
 ## Fargate 서비스 주요 구성 단계
 
@@ -38,19 +44,19 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있�
 
 <br>
 
-#### 1. ECS Fargate 클러스터 생성
+### 1. ECS Fargate 클러스터 생성
  
 ![ecs-cluster](/assets/images/22q1/aws-fargate-0002.png)
 
 <br>
 
-#### 2. ECS 작업 정의 생성  
+### 2. ECS 작업 정의 생성  
 
 ![ecs-dd](/assets/images/22q1/aws-fargate-0003.png)
 
 <br>
 
-#### 3. ECS 서비스 생성  
+### 3. ECS 서비스 생성  
 
 ![ecs-ss](/assets/images/22q1/aws-fargate-0004.png)  
 
@@ -58,15 +64,13 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있�
 
 먼저 애플리케이션부터 구현 하고 컨테이너로 배포할 준비를 하도록 합니다. 
 
-<br><br>
 
+<br><br>
 
 
 ## 서비스 제공을 위한 애플리케이션 개요   
 
-컨테이너 환경으로 애플리케이션을 배포 하려면 동작하는 컨테이너 이미지를 빌드하여 테스트 해 보면 됩니다.  
-
-애플리케이션 기능 요건은 1 부터 45번 까지의 숫자 중 랜덤으로 6개의 숫자를 중복되지 않게 반환하는 간단한 애플리케이션 입니다.
+여기서는 애플리케이션 기능으로 1 부터 45번 까지의 숫자 중 랜덤으로 6개의 숫자를 중복 되지 않게 반환하는 간단한 로또 서비스를 목표로 해 보겠습니다.
 
 6 개의 로또 숫자를 추천하는 핵심 로직은 아래와 같이 간단하게 기술 할 수 있습니다.  
 
@@ -78,8 +82,7 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있�
 }
 ```
 
-참고로, Cloud Native Application 을 위한 애플리케이션 프레임워크로 [spring-boot](https://spring.io/projects/spring-boot) 를 선택하고 비교적 현대적인 트랜드를 쫓아서 kotlin 기반의 reactive 스타일로 구현 하도록 하겠습니다.
-
+애플리케이션 구현을 위한 프레임워크로 [spring-boot](https://spring.io/projects/spring-boot) 를 선택하고 Cloud Native Application 를 위해 클라우드 환경에 이식하기 쉽고 대부분의 OS 에서 동작 하도록 서비스를 컨테이너 이미지(Docker)로 빌드 및 구동 하도록 하겠습니다. 
 
 <br>
 
@@ -90,18 +93,24 @@ ECS Fargate 서비스로의 애플리케이션 배포는 크게 3 가지가 있�
 
 Mac 사용자라면 [Mac OS 개발자를 위한 로컬 개발 환경 구성](https://symplesims.github.io/development/setup/macos/2021/12/02/setup-development-environment-on-macos.html) 을 참고하여 편리하게 구성 가능 합니다.  
 
-#### Git clone 
+<br>
+
+### Git clone 
 
 ```
 git clone https://github.com/chiwoo-samples/spring-lotto-router-handler.git
 ```
 
-#### Build
+<br>
+
+### Build
 ```
 cd spring-lotto-router-handler; mvn clean package -DskipTests=true
 ```
 
-#### Build Container Image 
+<br>
+
+### Build Container Image 
 
 ```
 docker build -t "lotto-service:1" -f ./docker/Dockerfile .
@@ -125,9 +134,11 @@ EXPOSE 8080
 ENTRYPOINT ["/app/entrypoint.sh"]
 ```
 
+<br>
+
 OpenJDK 기반의 AWS 프로덕션용 JVM 배포판인 [amazoncorretto](https://aws.amazon.com/ko/corretto/) 를 베이스 이미지로 사용 합니다.  
 
-#### Container Image 확인
+### Container Image 확인
 docker images 명령어로 빌드된 컨테이너 이미지 및 버전을 확인 합니다. 
 
 ```
@@ -136,7 +147,9 @@ docker images | grep lotto-service
 
 ![](/assets/images/22q1/aws-fargate-0005.png)
 
-#### Run Container
+<br>
+
+### Run Container
 docker run 명령어로 컨테이너를 실행하고 ps 명령어로 프로세서를 확인해 봅시다.  
 ```
 docker run -d --name lotto-service --publish "0.0.0.0:8080:8080" lotto-service:1
@@ -146,20 +159,26 @@ CONTAINER ID   IMAGE             COMMAND                CREATED         STATUS  
 79d6f647dae8   lotto-service:1   "/app/entrypoint.sh"   6 seconds ago   Up 7 seconds   0.0.0.0:8080->8080/tcp   lotto-service
 ```
 
-#### 로컬 환경에서 기능 테스트
+<br>
+
+### 로컬 환경에서 기능 테스트
 ```
 curl -v -X GET 'http://localhost:8080/api/lotto/lucky' -H 'Content-Type: application/json'
 ```
 
 기능이 정상적으로 동작하는 것을 확인 하였다면 ECS Fargate 에 배포해 봅시다. 
 
+
 <br><br>
+
 
 ## AWS Cloud 아키텍처
 
 애플리케이션 서비스를 위한 AWS Cloud 아키텍처를 다음과 같이 설계 하였습니다.  
  
 ![](/assets/images/22q1/aws-fargate-1001.png)
+
+<br>
 
 ### 주요 리소스 개요  
 - Route 53: 인터넷 사용자가 도메인 이름을 통해 서비스에 접근 합니다. 
@@ -190,6 +209,7 @@ Apps    : lotto
 
 위 정보를 기반으로 [Terraform](https://www.terraform.io/) 을 통해 자동화된 방식으로 프로비저닝 하도록 합니다. 
 
+
 <br><br>
 
 
@@ -204,6 +224,7 @@ Apps    : lotto
 
 테라폼 프로젝트는 [aws-fargate-magiclub](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub.git) 를 참고 합니다. 
 
+<br>
 
 ### Checkout 
 
@@ -211,7 +232,9 @@ Apps    : lotto
 git clone https://github.com/chiwoo-cloud-native/aws-fargate-magiclub.git
 ```
 
-## Build
+<br>
+
+### Build
 
 aws-fargate-magiclub 프로젝트엔 vpc, alb, fargate, lotto 애플리케이션 으로 각 폴더로 구분이 되어 있습니다.  
 순서대로 각 프로젝트를 한번에 프로비저닝 할 수 있습니다.  
@@ -229,28 +252,31 @@ terraform -chdir=services/lotto apply -auto-approve
 
 <br>
 
-## Test
+### Test
 우리가 배포한 lotto 애플리케이션 서비스가 동작하는지 cURL 명령을 통해 확인 합니다. 
 ```
 curl --location -X GET 'http://lotto.mystarcraft.ml/api/lotto/lucky' -H 'Content-Type: application/json'
 ```
 
-<br>
+<br><br>
 
-## 결론
+## Conclusion
 
 과거엔 애플리케이션을 인터넷 서비스로 배포 하려면 수 개월에 걸쳐서 많은 작업을 해야 했습니다.   
 
 장비 구입을 위한 품의, 발주, 운송, IDC 와 관련된 유지 보수 업체와의 계약, 인터넷 서비스 가입, 네트워크 및 서버 설정, 애플리케이션 구현과 배포 등 수 많은 일들이 있었습니다.   
 
-하지만 클라우드 에서는, 지금 경험한 것과 같이 DevOps 의 중심 가치인 `고객`이 `원하는 서비스`를 빠르게 제공 하여 경험 하게 하고 `고객의 피드백 수렴`을 통해 `서비스의 가치를 지속적으로 높이는` 활동을 할 수 있게 되었습니다.  
+하지만 클라우드 에서는, 지금 경험한 것과 같이 DevOps 의 중심 가치인 `고객`이 `원하는 서비스`를 빠르게 제공 하여 경험 하게 하고 `고객의 피드백 수렴`을 통해 `서비스의 가치를 지속적으로 높이는` 활동을 할 수 있게 되었습니다.
 
+# Appendix
+- [애플리케이션 코드 참조](https://github.com/chiwoo-samples/spring-lotto-router-handler.git)
+- [테라폼 코드 참조](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub.git)
 
 <br><br>
 
-## 테라폼 코드 개요
+## Terraform Code Overview
 
-[Terraform]() 은 디렉토리 단위로 프로비저닝을 실행 합니다. REAL 인프라스트럭처의 상태를 `terraform.tfstate` 파일로 관리 합니다.  
+[Terraform](https://www.terraform.io/) 은 디렉토리 단위로 프로비저닝을 실행 합니다. REAL 인프라스트럭처의 상태를 `terraform.tfstate` 파일로 관리 합니다.  
 작성한 테라폼 코드와 terraform.tfstate 파일을 비교하여 리소스를 추가, 삭제, 갱신 작업을 통해 REAL 인프라스트럭처를 프로비저닝 및 동기화 하게 됩니다. 
 
 <br>
