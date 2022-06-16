@@ -3,7 +3,9 @@ layout: post
 title: "AWS Fargate Auto-scaling 정책 적용"
 date:  2022-03-05 19:00:00 +0900
 categories: 
-  - AWS Fargate
+  - AWS
+  - Fargate
+  - Autoscale
   - Terraform
   - Automation
 ---
@@ -96,7 +98,7 @@ Fargate 구성은 지난 글 ["Automation Building AWS Fargate & Deploy applicat
 
 ### 평균 CPU 사용율 기준 대상 추적 조정 정책의 적용 
 
-Cloudwath 에 1분간 수집한 Auto-Scale 그룹의 평균 CPU 사용율을 60% 기준으로 Scale-Out 및 Scale-In 하도록 Auto-Scale 정책을 AWS 관리 콘솔을 통해 다음과 같이 구성 할 수 있습니다. 
+Cloudwath 에 1분간 수집한 Auto-Scale 그룹의 평균 CPU 사용율 60% 를 기준으로 Scale In - Out 이 동작 하도록 AWS 관리 콘솔을 통해 다음과 같이 구성 할 수 있습니다.
 
 ![](/assets/images/220304/img_3.png)
 
@@ -115,7 +117,7 @@ resource "aws_appautoscaling_target" "scale_target" {
 }
 
 # 평균 CPU 사용율과 Scale In / Out 의 휴지 시간을 정의
-resource "aws_appautoscaling_policy" "cpu" {
+resource "aws_appautoscaling_policy" "policy_cpu" {
   name               = "<ecs-service-id>-CPUUtilization"
   resource_id        = aws_appautoscaling_target.scale_target.resource_id
   scalable_dimension = aws_appautoscaling_target.scale_target.scalable_dimension
@@ -135,8 +137,47 @@ resource "aws_appautoscaling_policy" "cpu" {
 }
 ```
 
- 
 
+### 평균 Memory 사용율 기준 대상 추적 조정 정책의 적용
+
+Cloudwath 에 1분간 수집한 Auto-Scale 그룹의 평균 Memory 사용율 80% 를 기준으로 Scale In - Out 이 동작 하도록 AWS 관리 콘솔을 통해 다음과 같이 구성 할 수 있습니다.
+
+![](/assets/images/220304/img_4.png)
+
+<br>
+
+- 위의 Memory Autoscaling 정책을 Terraform 을 통해 구현하는 예시는 다음과 같습니다.
+
+```
+# AutoScale 대상 ECS 애플리케이션 정의 및 Scale 정책 구성 
+resource "aws_appautoscaling_target" "scale_target" {
+  service_namespace  = "ecs"
+  resource_id        = "<service>:<ecs-cluster-id>/<ecs-service-id>"
+  scalable_dimension = "ecs:service:DesiredCount"
+  min_capacity       = <min_capacity>
+  max_capacity       = <max_capacity>
+}
+
+# 평균 Memory 사용율과 Scale In / Out 의 휴지 시간을 정의
+resource "aws_appautoscaling_policy" "policy_mem" {
+  name               = "<ecs-service-id>-MemoryUtilization"
+  resource_id        = aws_appautoscaling_target.scale_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.scale_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.scale_target.service_namespace
+  policy_type        = "TargetTrackingScaling"
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+    }
+
+    target_value       = 80
+    scale_in_cooldown  = 180
+    scale_out_cooldown = 240
+    disable_scale_in = true
+  }
+}
+```
 
 # Reference
 - [AWS Auto Scaling](https://aws.amazon.com/ko/autoscaling/)
