@@ -60,7 +60,7 @@ Auto-Scale 정책 구성을 통해 기준 정보를 설정 합니다.
 ### Auto-Scale 조정 정책
 `Auto-Scale 조정 정책` 은 Scale-In 과 Scale-Out 의 조건을 기입 하여 실제로 Auto-Scale 이 작동(트리거) 되도록 설정 합니다.  
 
-조정 정책 유형은 AWS 관리 메트릭 기준의 `대상 추적` 과 사용자 정의 기준의 `단계 조정`이 있습니다. 
+조정 정책 유형은 AWS 관리 메트릭 기준의 `대상 추적 조정 정책` 과 사용자 정의 기준의 `단계 조정 정책`이 있습니다. 
 
 ![](/assets/images/220304/img_2.png)
 
@@ -77,7 +77,8 @@ Auto-Scale 정책 구성을 통해 기준 정보를 설정 합니다.
 
 휴지 시간은 Scale In/Out 작업이 완료될 때까지 대기하는 시간으로 안정적인 서비스 
 
-- [Application Auto Scaling의 대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-target-tracking.html) 참고
+- [Target-Tracking 대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-target-tracking.html) 참고
+- [Stepscaling 단계 조정 정책](https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/service-autoscaling-stepscaling.html) 참고
 
 <br><br>
 
@@ -95,6 +96,7 @@ Fargate 구성은 지난 글 ["Automation Building AWS Fargate & Deploy applicat
 
 리소스 메트릭(CPU, Memory, ALB Request Count)의 지표가 Auto-Scale 조정 정책에 정의한 대상(평균) 값을 초과 하는 경우 Scale-Out 을 하고, 미만인 경우 Scale-In 을 합니다. 
 
+<br>
 
 ### 평균 CPU 사용율 기준 대상 추적 조정 정책의 적용 
 
@@ -178,6 +180,10 @@ resource "aws_appautoscaling_policy" "policy_mem" {
   }
 }
 ```
+
+
+
+<br><br>
 
 # Reference
 - [AWS Auto Scaling](https://aws.amazon.com/ko/autoscaling/)
