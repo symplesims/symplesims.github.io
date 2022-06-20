@@ -34,7 +34,7 @@ AWS 는 이런 문제를 Elastic 서비스를 통해 자동적으로 워크로�
 <br>
 
 ## Auto-Scale 배경 및 작동 방식 
-![](../assets/images/220304/img.png)
+![](/assets/images/220304/img.png)
 
 위 그림과 같이 ECS 서비스는 몇몇 리소스의 협력 으로 Auto-Scale 정책을 통해 워크로드 규모를 조정 합니다. 
 
@@ -74,7 +74,7 @@ Auto-Scale 동작 방식의 컨셉은
 
 예제로, 아래 그림과 같이 초기 트래픽이 적은 경우 태스크 수를 1로 하고 트래픽이 많을 경우 최대 10 개 까지 확장 되도록 Scaling Target 정보를 구성 할 수 있습니다.
 
-![](../assets/images/220304/img_1.png)
+![](/assets/images/220304/img_1.png)
 
 
 IAM 권한은 [Application Auto Scaling에 대한 서비스 연결 역할](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-service-linked-roles.html) 중 `AWSServiceRoleForApplicationAutoScaling_ECSService` 를 참조하세요.  
@@ -92,7 +92,7 @@ ECS 에서 [대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autos
 
 아래 그림과 같이 Auto-Scale 그룹 기준, 평균 CPU 사용율 70% 를 초과하는 경우에 Scale-Out 되고 미만인 경우에 Scale-In 되도록 구성 할 수 있습니다. 
 
-![](../assets/images/220304/img_2.png)
+![](/assets/images/220304/img_2.png)
 
 만약 하나의 ECS Task 의 CPU 사용율이 평균 80 % 였다면 Cloudwatch 알랑을 통해 Scaling 조정을 위한 트리거가 발생 하게 되고, 
 위 조건에 의해 1개의 인스턴스가 추가 되고 Auto-Scale 그룹 기준 평균 CPU 사용율은 40% 으로 낮아질 것으로 예측 됩니다.  
@@ -175,7 +175,7 @@ resource "aws_appautoscaling_policy" "policy_cpu" {
 
 예제 에선 'your-ecs-service-scale-out-by-cpu' 메트릭 알람으로 구성 하였습니다.
 
-![](../assets/images/220304/img_3.png)
+![](/assets/images/220304/img_3.png)
 
 <br>
 
@@ -183,7 +183,7 @@ resource "aws_appautoscaling_policy" "policy_cpu" {
 
 정확한 인스턴스 개수로 Scaling 되도록 하려면 조정 작업을 '다음으로 설정' 을 선택 하여야 합니다. 
 
-![](../assets/images/220304/img_4.png)
+![](/assets/images/220304/img_4.png)
 
 <br>
 
