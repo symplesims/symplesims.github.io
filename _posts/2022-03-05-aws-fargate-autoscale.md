@@ -15,6 +15,13 @@ AWS Fargate Auto-Scale 정책을 테라폼 코드로 빠르게 적용하여 서�
 
 <br>
 
+## Pre-Requisite
+시작하기에 앞서 사전에 AWS ECS Fargate 구성이 되어 있어야 합니다.
+
+Fargate 구성은 지난 글 ["Automation Building AWS Fargate & Deploy application"](/devops/aws%20fargate/terraform/automation/2022/01/15/automation-building-aws-fargate.html) 을 참고 합시다.
+
+<br><br>
+
 
 ## Background 
 
@@ -27,100 +34,91 @@ AWS 는 이런 문제를 Elastic 서비스를 통해 자동적으로 워크로�
 <br>
 
 ## Auto-Scale 배경 및 작동 방식 
-![](/assets/images/220304/img.png)
+![](../assets/images/220304/img.png)
 
 위 그림과 같이 ECS 서비스는 몇몇 리소스의 협력 으로 Auto-Scale 정책을 통해 워크로드 규모를 조정 합니다. 
 
 Auto-Scale 동작 방식의 컨셉은
 
-1. CloudWatch 에서 수집된 매트릭 측정 지표로 
+1. Cloudwatch 에서 수집된 매트릭 측정 지표로 
 2. 어떤 기준으로 확장(Scale-Out) 또는 축소(Scale-In) 할 것인가?
 
 입니다. 
 
 
-<br>
+<br><br>
 
-### 리소스 메트릭 수집
-Amazon ECS 는 Auto-Scale 작동을 위한 애플리케이션의 CPU, MEMORY, ALB Request 서비스 측정 메트릭 지표를 1분 간격으로 CloudWatch 로 보냅니다.
 
-<br>
 
-### Auto-Scale 정책 구성
-![](/assets/images/220304/img_1.png)
+## Auto-Scale 정책 구성
 
-Auto-Scale 정책 구성을 통해 기준 정보를 설정 합니다.   
+우리는 타겟이 되는 서비스(EC2, ECS, RDS, ...)에 대해 Auto-Scale 정책 구성를 설정 할 수 있습니다.   
 
-주요 속성으로 `최소 작업 개수`, `원하는 작업 개수`, `최대 작업 개수` 와 함께 `Auto Scaling 을 동작 시키기 위한 서비스 연결 역할(IAM 역할)`이 필요 합니다. 
+`Auto-Scale 조정 정책` 은 타겟이 되는 서비스에 대해 인스턴스 축소 와 확장을 위한 Scaling 조정 정책을 구성 할 수 있습니다.
 
-- [Application Auto Scaling에 대한 서비스 연결 역할](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-service-linked-roles.html) 중 `AWSServiceRoleForApplicationAutoScaling_ECSService` 참조  
-
-<br>
-
-### Auto-Scale 조정 정책
-`Auto-Scale 조정 정책` 은 Scale-In 과 Scale-Out 의 조건을 기입 하여 실제로 Auto-Scale 이 작동(트리거) 되도록 설정 합니다.  
-
-조정 정책 유형은 AWS 관리 메트릭 기준의 `대상 추적 조정 정책` 과 사용자 정의 기준의 `단계 조정 정책`이 있습니다. 
-
-![](/assets/images/220304/img_2.png)
-
-주요 속성은 다음과 같습니다. 
-
-| 속성 명          | 필수 여부 | 설명                                                                                                                                                                                                                |
-|---------------|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 정책 이름         | Y     | 조정 정책 이름 입니다.                                                                                                                                                                                                     |
-| ECS 서비스 측정치  | Y     | Scale In/Out 을 위한 메트릭 기준 정보 입니다. ECSServiceAverageCPUUtilization, ECSServiceAverageMemoryUtilization, ALBRequestCountPerTarget 중 에 선택이 가능 하며, ALBRequestCountPerTarget 메트릭을 기준으로 하려면 ECS 서비스가 ALB 와 연결되어 있어야 합니다. |
-| 대상 값          | Y     | Scale In 또는 Scale Out 이 작동 되기 위한 매트릭 기준 값 입니다.                                                                                                                                                                    |
-| 확장 휴지 기간     | N     | Scale Out 작업 동안의 휴지 시간 입니다. (기본 값: 300 초)                                                                                                                                                                         |
-| 축소 휴지 기간     | N     | Scale In 작업 동안의 휴지 시간 입니다.  (기본 값: 300 초)                                                                                                                                                                         |
-| 축소 비활성화      | N     | 축소 비활성화를 체크 하면 Scale In 동작을 하지 않습니다.  ((기본 값: 비활성)                                                                                                                                                                |
-
-휴지 시간은 Scale In/Out 작업이 완료될 때까지 대기하는 시간으로 안정적인 서비스 
+조정 정책 유형은 AWS 관리형 메트릭 기준의 `대상 추적 조정 정책` 과 사용자 정의 기준의 `단계 조정 정책`이 있습니다.
 
 - [Target-Tracking 대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-target-tracking.html) 참고
 - [Stepscaling 단계 조정 정책](https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/service-autoscaling-stepscaling.html) 참고
 
-<br><br>
 
-## Pre-Requisite
-사전에 AWS ECS Fargate 구성이 되어 있어야 합니다. 
-
-Fargate 구성은 지난 글 ["Automation Building AWS Fargate & Deploy application"](/devops/aws%20fargate/terraform/automation/2022/01/15/automation-building-aws-fargate.html) 을 참고 합시다.   
 
 <br><br>
 
 
-## 대상 추적 조정 정책 시나리오 
+## 대상 추적 조정 정책
 
-[대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/ec2/userguide/as-scaling-target-tracking.html) 은 리소스 메트릭의 평균 값을 통해 Scale 을 조정 합니다.  
+대상 추적 조정 정책은 AWS 관리형 정책으로 아주 쉽고 간편하게 구성이 가능 합니다.
 
-리소스 메트릭(CPU, Memory, ALB Request Count)의 지표가 Auto-Scale 조정 정책에 정의한 대상(평균) 값을 초과 하는 경우 Scale-Out 을 하고, 미만인 경우 Scale-In 을 합니다. 
+먼저 타겟 서비스를 위한 Scaling 정책 정보로 `최소 작업 개수`, `원하는 작업 개수`, `최대 작업 개수` 와 함께 `Auto Scaling 을 동작 시키기 위한 권한(IAM 역할)`을 설정 합니다. 
 
-<br>
+예제로, 아래 그림과 같이 초기 트래픽이 적은 경우 태스크 수를 1로 하고 트래픽이 많을 경우 최대 10 개 까지 확장 되도록 Scaling Target 정보를 구성 할 수 있습니다.
 
-### 평균 CPU 사용율 기준 대상 추적 조정 정책의 적용 
+![](../assets/images/220304/img_1.png)
 
-Cloudwath 에 1분간 수집한 Auto-Scale 그룹의 평균 CPU 사용율 60% 를 기준으로 Scale In - Out 이 동작 하도록 AWS 관리 콘솔을 통해 다음과 같이 구성 할 수 있습니다.
 
-![](/assets/images/220304/img_3.png)
+IAM 권한은 [Application Auto Scaling에 대한 서비스 연결 역할](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-service-linked-roles.html) 중 `AWSServiceRoleForApplicationAutoScaling_ECSService` 를 참조하세요.  
 
-<br>
+ 
+ECS 에서 [대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/ec2/userguide/as-scaling-target-tracking.html) 은 ECS 서비스 측정 메트릭인 ECSServiceAverageCPUUtilization, ECSServiceAverageMemoryUtilization, ALBRequestCountPerTarget 중 하나로 조정이 가능 합니다.
 
-- 위의 정책을 Terraform 을 통해 구현하는 예시는 다음과 같습니다.
+'ECS 서비스 측정 메트릭' 의 대상 지표 값이 초과 하는 경우 인스턴스를 확장 하고, 미만인 경우 축소 하는 아주 단순하면서도 강력한 조정 정책 입니다.
+
+
+<br><br>
+
+
+### 평균 CPU 사용율 기준 대상 추적 조정 정책의 적용
+
+아래 그림과 같이 Auto-Scale 그룹 기준, 평균 CPU 사용율 70% 를 초과하는 경우에 Scale-Out 되고 미만인 경우에 Scale-In 되도록 구성 할 수 있습니다. 
+
+![](../assets/images/220304/img_2.png)
+
+만약 하나의 ECS Task 의 CPU 사용율이 평균 80 % 였다면 Cloudwatch 알랑을 통해 Scaling 조정을 위한 트리거가 발생 하게 되고, 
+위 조건에 의해 1개의 인스턴스가 추가 되고 Auto-Scale 그룹 기준 평균 CPU 사용율은 40% 으로 낮아질 것으로 예측 됩니다.  
+
+그렇다면 확장 이후 CPU 사용율이 70% 미만으로 안정화된 시간이 지속 된다면 Scale-In 트리거가 발생할 수도 있습니다. 여기서 휴지 시간 설정에 의해 빈번한 Scaling 트리거를 방지 할 수 있습니다. 
+
+만약 인스턴스가 계속 추가되었음에도 평균 CPU 사용율이 70% 이상이라면 최대 10 개에 도달할 때까지 계속적으로 확장을 시도 할 것입니다. 
+
+참고로, 대상 추적 정책의 매트릭 수집은 Cloudwatch 로 하고 있으며 주기는 1분 입니다.
+
+
+### 평균 CPU 사용율 기준 대상 추적 조정 정책의 Terraform 구현 예시
 
 ```
-# AutoScale 대상 ECS 애플리케이션 정의 및 Scale 정책 구성 
+# AutoScale ECS 서비스 Target Scaling 정책 구성 
 resource "aws_appautoscaling_target" "scale_target" {
   service_namespace  = "ecs"
   resource_id        = "<service>:<ecs-cluster-id>/<ecs-service-id>"
   scalable_dimension = "ecs:service:DesiredCount"
-  min_capacity       = <min_capacity>
-  max_capacity       = <max_capacity>
+  min_capacity       = 1
+  max_capacity       = 10
 }
 
-# 평균 CPU 사용율과 Scale In / Out 의 휴지 시간을 정의
+# 평균 CPU 사용 지표인 'ECSServiceAverageCPUUtilization' 과 타겟 임계(Threahold)값 설정
 resource "aws_appautoscaling_policy" "policy_cpu" {
-  name               = "<ecs-service-id>-CPUUtilization"
+  name               = "your-ecs-service-scale-out-by-cpu"
   resource_id        = aws_appautoscaling_target.scale_target.resource_id
   scalable_dimension = aws_appautoscaling_target.scale_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.scale_target.service_namespace
@@ -131,56 +129,147 @@ resource "aws_appautoscaling_policy" "policy_cpu" {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
 
-    target_value       = 60
-    scale_in_cooldown  = 180
-    scale_out_cooldown = 240
-    disable_scale_in = true
+    target_value       = 70
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+    disable_scale_in = false
   }
 }
 ```
 
+<br>
 
-### 평균 Memory 사용율 기준 대상 추적 조정 정책의 적용
+### 대상 추적 조정 정책의 주요 속성
 
-Cloudwath 에 1분간 수집한 Auto-Scale 그룹의 평균 Memory 사용율 80% 를 기준으로 Scale In - Out 이 동작 하도록 AWS 관리 콘솔을 통해 다음과 같이 구성 할 수 있습니다.
+| 속성 명         | 필수 여부 | 설명                                                                                                                                                                                                                |
+|----------------|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 정책 이름        | Y   | 조정 정책 이름 입니다.                                                                                                                                                                                                     |
+| ECS 서비스 측정치 | Y   | Scale In/Out 을 위한 메트릭 기준 정보 입니다. ECSServiceAverageCPUUtilization, ECSServiceAverageMemoryUtilization, ALBRequestCountPerTarget 중 에 선택이 가능 하며, ALBRequestCountPerTarget 메트릭을 기준으로 하려면 ECS 서비스가 ALB 와 연결되어 있어야 합니다. |
+| 대상 값         | Y   | Scale In 또는 Scale Out 이 작동 되기 위한 매트릭 기준 값 입니다.                                                                                                                                                                    |
+| 확장 휴지 기간    | N   | 한 번의 Scale Out 작업이 완료 되고 다음 번 Scale Out 작업이 시작될 때까지 대기하는 시간이다. (기본 값: 300 초)                                                                                                                                      |
+| 축소 휴지 기간    | N   | 한 번의 Scale In 작업이 완료 되고 다음 번 Scale In 작업이 시작될 때까지 대기하는 시간이다. (기본 값: 300 초)                                                                                                                                        |
+| 축소 비활성화     | N   | 축소 비활성화를 체크 하면 Scale In 동작을 하지 않습니다.  ((기본 값: 비활성)                                                                                                                                                                |
 
-![](/assets/images/220304/img_4.png)
+
+
+<br><br>
+
+
+
+
+
+## 단계 조정 정책 시나리오
+
+정밀한 사용자 요구에 대응하는 정책 구성이 필요한 경우 단계 조정 정책을 구성할 수 있습니다. 
+
+먼저 사용자 요구에 대응하는 Cloudwatch 경보를 수집하고 Auto-Scale 대상 애플리케이션을 구성 하여 Scale In/Out 정책을 연결합니다.
+
+예를 들어 평균 CPU 사용량이 50 ~ 70% 인 경우 태스크 5개로 운영 되고, 70% 이상인 경우 10개의 태스크로 운영 되도록 Scaling 정책을 구성 할 수 있습니다.
+
 
 <br>
 
-- 위의 Memory Autoscaling 정책을 Terraform 을 통해 구현하는 예시는 다음과 같습니다.
+### 평균 CPU 사용율 기준 단계 조정 정책의 적용
+
+1. 먼저 Cloudwatch 에서 1 분내 1 개의 데이터 포인트에 대해 `CPUUtilization >= 50` 조건으로 알람을 발생하도록 Cloudwatch 알람 메트릭을 설정 합니다. 
+
+예제 에선 'your-ecs-service-scale-out-by-cpu' 메트릭 알람으로 구성 하였습니다.
+
+![](../assets/images/220304/img_3.png)
+
+<br>
+
+2. Scaling 조정 작업 추가를 50 ~ 70% 인 경우 5개의 태스크로 동작 하고, 70% 이상인 경우 10개의 태스크로 동작 되도록 조정 작업을 설정 합니다. 
+
+정확한 인스턴스 개수로 Scaling 되도록 하려면 조정 작업을 '다음으로 설정' 을 선택 하여야 합니다. 
+
+![](../assets/images/220304/img_4.png)
+
+<br>
+
+
+### 평균 CPU 사용율 기준 대상 추적 조정 정책의 Terraform 구현 예시
 
 ```
-# AutoScale 대상 ECS 애플리케이션 정의 및 Scale 정책 구성 
 resource "aws_appautoscaling_target" "scale_target" {
   service_namespace  = "ecs"
   resource_id        = "<service>:<ecs-cluster-id>/<ecs-service-id>"
   scalable_dimension = "ecs:service:DesiredCount"
-  min_capacity       = <min_capacity>
-  max_capacity       = <max_capacity>
+  min_capacity       = 1
+  max_capacity       = 10
 }
 
-# 평균 Memory 사용율과 Scale In / Out 의 휴지 시간을 정의
-resource "aws_appautoscaling_policy" "policy_mem" {
-  name               = "<ecs-service-id>-MemoryUtilization"
+# 단계 조정 정책 추가
+resource "aws_appautoscaling_policy" "policy_scale_out" {
+  name               = "your-ecs-service-step-scaling-by-cpu"
   resource_id        = aws_appautoscaling_target.scale_target.resource_id
   scalable_dimension = aws_appautoscaling_target.scale_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.scale_target.service_namespace
-  policy_type        = "TargetTrackingScaling"
 
-  target_tracking_scaling_policy_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+  step_scaling_policy_configuration {
+    adjustment_type         = "ExactCapacity"
+    cooldown                = 300
+    metric_aggregation_type = "Average"
+
+    step_adjustment {
+      scaling_adjustment          = 1 # 양수이면 확장, 음수이면 축소이며 숫자는 인스턴스 갯수를 의미 합니다. 
+      metric_interval_lower_bound = 0.0
+      metric_interval_upper_bound = 50.0
     }
-
-    target_value       = 80
-    scale_in_cooldown  = 180
-    scale_out_cooldown = 240
-    disable_scale_in = true
+    
+    step_adjustment {
+      scaling_adjustment          = 5 # 태스크 수를 5 개로 확장  
+      metric_interval_lower_bound = 50.0
+      metric_interval_upper_bound = 70.0
+    }
+    
+    step_adjustment {
+      scaling_adjustment          = 10 # 태스크 수를 10 개로 확장  
+      metric_interval_lower_bound = 70.0
+      metric_interval_upper_bound = "" # 값이 없으면 무한대를 의미 합니다.
+    }    
+    
   }
 }
-```
 
+# CPU 알람 메트릭(경보) 구성
+resource "aws_cloudwatch_metric_alarm" "scaleout_cpu" {
+  alarm_name          = "cpu50-greater-than-or-equalto"
+  alarm_description   = "This alarm monitors ECS CPU Utilisation for scaling out"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 60
+  evaluation_periods  = 1
+  statistic           = "Average"
+  threshold           = "50"
+  alarm_actions       = [ "${aws_appautoscaling_policy.policy_scale_out.arn}" ]
+
+  dimensions {
+    ClusterName = "${var.ecs_name}"
+    ServiceName = "${element(concat(aws_ecs_service.ecs-service.*.name, aws_ecs_service.ecs-service-no-alb.*.name), 0)}"
+  }
+}
+``` 
+
+<br>
+
+### 단계 조정 정책의 주요 속성 
+
+- adjustment : 몇개의 인스턴스를 추가하고 제거 할 것인지 입니다. 추가는 +, 제거는 - 부호와 함께 인스턴스 갯수는 숫자로 기입 합니다.
+- adjustment type : 인스턴스를 추가하고 제거하는 조정 정책 유형 입니다.  
+  1. ChangeInCapacity : 몇개의 인스턴스를 더하고 뺄 것인가에 대한 사항으로 기존의 인스턴스 수가 3개이고 adjustment 의 값이 5 라면 Auto Scaling 이 동작한 후에는 8개가 됩니다.
+  2. ExactCapacity : 몇개의 인스턴스가 되어야 하는가에 대한 정책으로 기존의 인스턴스가 3 이고 adjustment 의 값이 5 라면 Auto Scaling 이 동작한 후에는 5개가 됩니다.
+  3. PercentChangeInCapacity : 인스턴스의 증가와 감소를 Percentage 으로 적용 합니다. 예를들어 기존의 인스턴스가 2개이고 adjustment 의 값이 100 이라면 Auto Scaling 동작 후에는 4 개가 됩니다.  
+- cooldown : 인스턴수의 수의 조정 작업을 완료 한 후, 다음번 조정 작업이 시작 될 때까지의 휴지 시간 입니다. 
+
+<br> 
+
+### 조정 정책 휴지 기간
+Auto Scaling 그룹은 인스턴스를 추가(Scale Out)하거나 종료(Scale In)한 후 단순 조정 정책에 의해 시작된 추가 조정 활동이 시작 되기 전에 휴지 기간 동안 대기합니다.  
+쉽게 말해서 휴지 기간은 조정 정책에 의해 인스턴스 확장 처리(Scale In / Out) 작업이 완료된 이후, 일정 기간 동안 대기 시간을 가짐으로써 스케일링 중에 발생되는 메트릭(CPU, Memory 등) 증가에 의해 또 다시 스케일링 트리거가 발생하는 것을 막기 위함입니다.  
+
+예를 들어, CPU 메트릭에 의해 Scale-Out 작업을 진행 또는 지금 막 완료 되었는데, Scaling 조정 작업으로 CPU 사용율이 증가 하여 또 다시 Scale-Out 트리거가 발생 되어 확장 될 수 있는 문제를 방지하기 위해서 휴지 기간을 두게 됩니다.
 
 
 <br><br>
@@ -189,4 +278,8 @@ resource "aws_appautoscaling_policy" "policy_mem" {
 - [AWS Auto Scaling](https://aws.amazon.com/ko/autoscaling/)
 - [AWS Auto Scaling – Unified Scaling For Your Cloud Applications](https://aws.amazon.com/ko/blogs/aws/aws-auto-scaling-unified-scaling-for-your-cloud-applications/)
 
+
+## One-Step Provisioning 
+
+[aws-fargate-magiclub-scaling](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub-scaling.git)
 
