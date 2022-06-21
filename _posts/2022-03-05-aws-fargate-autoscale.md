@@ -25,23 +25,27 @@ Fargate 구성은 지난 글 ["Automation Building AWS Fargate & Deploy applicat
 
 ## Background 
 
-AWS 가 제공하는 서비스들을 보면 Elastic 을 아주 많이 강조 합니다.  
-10 명의 사용자가 서비스를 이용하는 워크로드와 10,000 명의 사용자가 서비스를 이용하는 워크로드는 사용하는 리소스의 규모 및 통합면에서 상당한 차이가 있습니다.  
-문제는 워크로드 규모를 고정 할 수 없다는 것 입니다.  
+  AWS 가 제공하는 서비스들을 보면 Elastic 으로 시작하는 서비스들을 많이 볼 수 있습니다.  
+Elastic 은 서비스 규모에 알맞은 워크로드 크기를 탄력적으로 운영 하는 AWS 의 철학이라고도 할 수 있는데요, 
+예를 들어 10 명의 사용자가 이용하는 것과 1,000 명의 사용자가 이용하는 서비스의 워크로드는 필요로 하는 리소스의 크기가 상당히 차이가 있습니다.  
+
+문제는 워크로드 크기를 고정 할 수 없다는 것 입니다.  
 서비스 품질 및 운영 비용을 최적화 하기 위해 서비스 이용자가 폭발적으로 늘어나면 이에 대응하여 워크로드를 확장해야 하고 이용자가 줄어들면 축소 해야 하니까요.  
-AWS 는 이런 문제를 Elastic 서비스를 통해 자동적으로 워크로드를 탄력적으로 확장 하거나 축소 하도록 지원 합니다. 
+
+AWS 는 이런 문제를 Elastic 서비스에 Scaling 정책 적용을 통해 자동적으로 워크로드 크기를 탄력적으로 확장 하거나 축소 하도록 지원 합니다. 
 
 <br>
 
 ## Auto-Scale 배경 및 작동 방식 
 ![](/assets/images/220304/img.png)
 
-위 그림과 같이 ECS 서비스는 몇몇 리소스의 협력 으로 Auto-Scale 정책을 통해 워크로드 규모를 조정 합니다. 
+위 그림과 같이 ECS 의 Scaling 서비스는 몇몇 리소스의 협력 으로 Auto-Scale 정책을 통해 워크로드 규모를 조정 합니다. 
 
 Auto-Scale 동작 방식의 컨셉은
 
-1. Cloudwatch 에서 수집된 매트릭 측정 지표로 
-2. 어떤 기준으로 확장(Scale-Out) 또는 축소(Scale-In) 할 것인가?
+1. EC2, ECS, RDS 와 같은 대상이 되는 서비스에 대해 
+2. CPU, Memory, Network-In / Out 등과 같은 매트릭 측정 지표를 Cloudwatch 를 통해 수집 하여    
+3. 어떤 기준으로 확장(Scale-Out) 또는 축소(Scale-In) 할 것인가?
 
 입니다. 
 
@@ -52,11 +56,9 @@ Auto-Scale 동작 방식의 컨셉은
 
 ## Auto-Scale 정책 구성
 
-우리는 타겟이 되는 서비스(EC2, ECS, RDS, ...)에 대해 Auto-Scale 정책 구성를 설정 할 수 있습니다.   
+우리는 타겟이 되는 서비스에 대해 조정 정책(Scaling Policy)을 구성 할 수 있습니다.   
 
-`Auto-Scale 조정 정책` 은 타겟이 되는 서비스에 대해 인스턴스 축소 와 확장을 위한 Scaling 조정 정책을 구성 할 수 있습니다.
-
-조정 정책 유형은 AWS 관리형 메트릭 기준의 `대상 추적 조정 정책` 과 사용자 정의 기준의 `단계 조정 정책`이 있습니다.
+`Auto-Scale 조정 정책` 은 타겟이 되는 서비스에 대해 인스턴스 축소 와 확장을 위한 설정으로, 조정 정책 유형은 AWS 관리형 메트릭 기준의 `대상 추적 조정 정책` 과 사용자 정의 기준의 `단계 조정 정책`이 있습니다.
 
 - [Target-Tracking 대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-target-tracking.html) 참고
 - [Stepscaling 단계 조정 정책](https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/service-autoscaling-stepscaling.html) 참고
@@ -68,21 +70,24 @@ Auto-Scale 동작 방식의 컨셉은
 
 ## 대상 추적 조정 정책
 
-대상 추적 조정 정책은 AWS 관리형 정책으로 아주 쉽고 간편하게 구성이 가능 합니다.
+
+ECS 에서 [대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/ec2/userguide/as-scaling-target-tracking.html) 은 AWS 관리형 정책으로 'ECS 서비스 측정 메트릭' 의 대상 지표 값이 초과 하는 경우 인스턴스를 확장 하고, 미만인 경우 축소 하는 아주 단순하지만 강력한 조정 정책 입니다.
 
 먼저 타겟 서비스를 위한 Scaling 정책 정보로 `최소 작업 개수`, `원하는 작업 개수`, `최대 작업 개수` 와 함께 `Auto Scaling 을 동작 시키기 위한 권한(IAM 역할)`을 설정 합니다. 
 
-예제로, 아래 그림과 같이 초기 트래픽이 적은 경우 태스크 수를 1로 하고 트래픽이 많을 경우 최대 10 개 까지 확장 되도록 Scaling Target 정보를 구성 할 수 있습니다.
+예시로, 아래 그림과 같이 트래픽이 적은 경우 태스크 수(min_capacity)를 1 로 하고 트래픽이 많을 경우 최대(max_capacity) 10 개 까지 확장 되도록 Scaling Target 정보를 구성 할 수 있습니다.  
+
+추가적으로 Auto-Scale 처리를 위해 AWS 의 서비스를 실행 할 수 있는 IAM 권한이 필요 합니다.  
+IAM 권한은 [Application Auto Scaling에 대한 서비스 연결 역할](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-service-linked-roles.html) 중 `AWSServiceRoleForApplicationAutoScaling_ECSService` 를 참조하세요.
 
 ![](/assets/images/220304/img_1.png)
-
-
-IAM 권한은 [Application Auto Scaling에 대한 서비스 연결 역할](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-service-linked-roles.html) 중 `AWSServiceRoleForApplicationAutoScaling_ECSService` 를 참조하세요.  
-
  
-ECS 에서 [대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/ec2/userguide/as-scaling-target-tracking.html) 은 ECS 서비스 측정 메트릭인 ECSServiceAverageCPUUtilization, ECSServiceAverageMemoryUtilization, ALBRequestCountPerTarget 중 하나로 조정이 가능 합니다.
 
-'ECS 서비스 측정 메트릭' 의 대상 지표 값이 초과 하는 경우 인스턴스를 확장 하고, 미만인 경우 축소 하는 아주 단순하면서도 강력한 조정 정책 입니다.
+
+- ECS 서비스 측정 메트릭은 아래와 같습니다.  
+  1. ECSServiceAverageCPUUtilization: 평균 CPU 사용율을 기준
+  2. ECSServiceAverageMemoryUtilization: 평균 Memory 사용율을 기준
+  3. ALBRequestCountPerTarget: ALB 를 통해 트래픽이 유입되는 건수 기준으로 ECS 애플리케이션 서비스가 ALB 와 연결 되어 있는경우만 설정이 가능
 
 
 <br><br>
