@@ -1,12 +1,11 @@
 ---
 layout: post
 title: "Automation Building AWS Fargate & Deploy application"
-date:  2022-01-15 11:00:00 +0900
+date:  2022-04-23 14:00:00 +0900
 categories: 
   - DevOps
   - AWS Fargate
   - Terraform
-  - Automation
 ---
 
 [AWS ECS Fargate](https://docs.aws.amazon.com/AmazonECS/latest/userguide/what-is-fargate.html)  는 서비스 중심의 DevOps 문화를 기능적 관점에서 빠르게 시작할 수 있는 수단으로 훌륭한 대안입니다.  
