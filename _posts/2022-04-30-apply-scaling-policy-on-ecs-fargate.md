@@ -1,13 +1,11 @@
 ---
 layout: post
-title: "AWS Fargate Auto-scaling 정책 적용"
-date:  2022-03-05 19:00:00 +0900
-categories: 
-  - AWS
-  - Fargate
+title: "Apply Scaling-policy on ECS Fargate"
+date:  2022-04-30 19:00:00 +0900
+categories:
+- DevOps
+  - ECS Fargate
   - Autoscale
-  - Terraform
-  - Automation
 ---
 
 AWS Fargate Auto-Scale 정책을 테라폼 코드로 빠르게 적용하여 서비스를 보다 탄력적으로 운영합시다.    
@@ -16,9 +14,9 @@ AWS Fargate Auto-Scale 정책을 테라폼 코드로 빠르게 적용하여 서�
 <br>
 
 ## Pre-Requisite
-시작하기에 앞서 사전에 AWS ECS Fargate 구성이 되어 있어야 합니다.
+시작하기에 앞서 사전에 ECS Fargate 구성이 되어 있어야 합니다.
 
-Fargate 구성은 지난 글 ["Automation Building AWS Fargate & Deploy application"](/devops/aws%20fargate/terraform/automation/2022/01/15/automation-building-aws-fargate.html) 을 참고 합시다.
+ECS Fargate 구성은 지난 글 [Automation Building AWS Fargate & Deploy application](/devops/aws%20fargate/terraform/2022/04/23/building-aws-fargate.html) 을 참고 합시다.
 
 <br><br>
 
@@ -37,7 +35,7 @@ AWS 는 이런 문제를 Elastic 서비스에 Scaling 정책 적용을 통해 �
 <br>
 
 ## Auto-Scale 배경 및 작동 방식 
-![](/assets/images/220304/img.png)
+![](/assets/images/22q1v2/img.png)
 
 위 그림과 같이 ECS 의 Scaling 서비스는 몇몇 리소스의 협력 으로 Auto-Scale 정책을 통해 워크로드 규모를 조정 합니다. 
 
@@ -60,7 +58,7 @@ Auto-Scale 동작 방식의 컨셉은
 
 `Auto-Scale 조정 정책` 은 타겟이 되는 서비스에 대해 인스턴스 축소 와 확장을 위한 설정으로, 조정 정책 유형은 AWS 관리형 메트릭 기준의 `대상 추적 조정 정책` 과 사용자 정의 기준의 `단계 조정 정책`이 있습니다.
 
-- [Target-Tracking 대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-target-tracking.html) 참고
+- [Target-Tracking 대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/userguide/service-autoscaling-targettracking.html) 참고
 - [Stepscaling 단계 조정 정책](https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/developerguide/service-autoscaling-stepscaling.html) 참고
 
 
@@ -70,8 +68,7 @@ Auto-Scale 동작 방식의 컨셉은
 
 ## 대상 추적 조정 정책
 
-
-ECS 에서 [대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autoscaling/ec2/userguide/as-scaling-target-tracking.html) 은 AWS 관리형 정책으로 'ECS 서비스 측정 메트릭' 의 대상 지표 값이 초과 하는 경우 인스턴스를 확장 하고, 미만인 경우 축소 하는 아주 단순하지만 강력한 조정 정책 입니다.
+ECS 에서 [대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/userguide/service-autoscaling-targettracking.html) 은 AWS 관리형 정책으로 'ECS 서비스 측정 메트릭' 의 대상 지표 값이 초과 하는 경우 인스턴스를 확장 하고, 미만인 경우 축소 하는 아주 단순하지만 강력한 조정 정책 입니다.
 
 먼저 타겟 서비스를 위한 Scaling 정책 정보로 `최소 작업 개수`, `원하는 작업 개수`, `최대 작업 개수` 와 함께 `Auto Scaling 을 동작 시키기 위한 권한(IAM 역할)`을 설정 합니다. 
 
@@ -80,7 +77,7 @@ ECS 에서 [대상 추적 조정 정책](https://docs.aws.amazon.com/ko_kr/autos
 추가적으로 Auto-Scale 처리를 위해 AWS 의 서비스를 실행 할 수 있는 IAM 권한이 필요 합니다.  
 IAM 권한은 [Application Auto Scaling에 대한 서비스 연결 역할](https://docs.aws.amazon.com/ko_kr/autoscaling/application/userguide/application-auto-scaling-service-linked-roles.html) 중 `AWSServiceRoleForApplicationAutoScaling_ECSService` 를 참조하세요.
 
-![](/assets/images/220304/img_1.png)
+![](/assets/images/22q1v2/img_1.png)
  
 
 
@@ -97,7 +94,7 @@ IAM 권한은 [Application Auto Scaling에 대한 서비스 연결 역할](https
 
 아래 그림과 같이 Auto-Scale 그룹 기준, 평균 CPU 사용율 70% 를 초과하는 경우에 Scale-Out 되고 미만인 경우에 Scale-In 되도록 구성 할 수 있습니다. 
 
-![](/assets/images/220304/img_2.png)
+![](/assets/images/22q1v2/img_2.png)
 
 만약 하나의 ECS Task 의 CPU 사용율이 평균 80 % 였다면 Cloudwatch 알랑을 통해 Scaling 조정을 위한 트리거가 발생 하게 되고, 
 위 조건에 의해 1개의 인스턴스가 추가 되고 Auto-Scale 그룹 기준 평균 CPU 사용율은 40% 으로 낮아질 것으로 예측 됩니다.  
@@ -107,6 +104,8 @@ IAM 권한은 [Application Auto Scaling에 대한 서비스 연결 역할](https
 만약 인스턴스가 계속 추가되었음에도 평균 CPU 사용율이 70% 이상이라면 최대 10 개에 도달할 때까지 계속적으로 확장을 시도 할 것입니다. 
 
 참고로, 대상 추적 정책의 매트릭 수집은 Cloudwatch 로 하고 있으며 주기는 1분 입니다.
+
+대상 추적 조정 정책 적용에서 [고려 사항]((https://docs.aws.amazon.com/ko_kr/AmazonECS/latest/userguide/service-autoscaling-targettracking.html)) 을 꼭 읽어 보시고, 특히 지정한 지표(예: ECSServiceAverageCPUUtilization)에 데이터 유입이 부족하면 Scale-In Scale-Out 이 동작하지 않습니다.  
 
 
 ### 평균 CPU 사용율 기준 대상 추적 조정 정책의 Terraform 구현 예시
@@ -161,8 +160,6 @@ resource "aws_appautoscaling_policy" "policy_cpu" {
 
 
 
-
-
 ## 단계 조정 정책 시나리오
 
 정밀한 사용자 요구에 대응하는 정책 구성이 필요한 경우 단계 조정 정책을 구성할 수 있습니다. 
@@ -180,7 +177,7 @@ resource "aws_appautoscaling_policy" "policy_cpu" {
 
 예제 에선 'your-ecs-service-scale-out-by-cpu' 메트릭 알람으로 구성 하였습니다.
 
-![](/assets/images/220304/img_3.png)
+![](/assets/images/22q1v2/img_3.png)
 
 <br>
 
@@ -188,7 +185,7 @@ resource "aws_appautoscaling_policy" "policy_cpu" {
 
 정확한 인스턴스 개수로 Scaling 되도록 하려면 조정 작업을 '다음으로 설정' 을 선택 하여야 합니다. 
 
-![](/assets/images/220304/img_4.png)
+![](/assets/images/22q1v2/img_4.png)
 
 <br>
 
@@ -284,7 +281,8 @@ Auto Scaling 그룹은 인스턴스를 추가(Scale Out)하거나 종료(Scale I
 - [AWS Auto Scaling – Unified Scaling For Your Cloud Applications](https://aws.amazon.com/ko/blogs/aws/aws-auto-scaling-unified-scaling-for-your-cloud-applications/)
 
 
-## One-Step Provisioning 
+## Terraform 프로젝트 참고
 
+Terraform 프로젝트를 통해 한번에 Scaling-Policy 를 적용할 수 있습니다.
 [aws-fargate-magiclub-scaling](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub-scaling.git)
 
