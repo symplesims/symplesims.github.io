@@ -4,8 +4,8 @@ title: "Apply Scaling-policy on ECS Fargate"
 date:  2022-04-30 19:00:00 +0900
 categories:
 - DevOps
-  - ECS Fargate
-  - Autoscale
+- ECS Fargate
+- Auto Scale
 ---
 
 AWS Fargate Auto-Scale 정책을 테라폼 코드로 빠르게 적용하여 서비스를 보다 탄력적으로 운영합시다.    
