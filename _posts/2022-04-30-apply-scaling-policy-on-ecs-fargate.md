@@ -280,9 +280,9 @@ Auto Scaling 그룹은 인스턴스를 추가(Scale Out)하거나 종료(Scale I
 - [AWS Auto Scaling](https://aws.amazon.com/ko/autoscaling/)
 - [AWS Auto Scaling – Unified Scaling For Your Cloud Applications](https://aws.amazon.com/ko/blogs/aws/aws-auto-scaling-unified-scaling-for-your-cloud-applications/)
 
+<br><br>
 
 ## Terraform 프로젝트 참고
+[aws-fargate-magiclub-scaling](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub-scaling.git) 프로젝트를 통해 자동화된 방법으로 한번에 Scaling-Policy 를 적용할 수 있습니다.
 
-Terraform 프로젝트를 통해 한번에 Scaling-Policy 를 적용할 수 있습니다.
-[aws-fargate-magiclub-scaling](https://github.com/chiwoo-cloud-native/aws-fargate-magiclub-scaling.git)
 
