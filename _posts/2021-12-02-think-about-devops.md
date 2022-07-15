@@ -50,22 +50,30 @@ DevOps 단어는 2009년 10월 `devopsdays 2009` 에서 처음으로 세상에 �
 이는 스마트폰의 등장으로 빠르고 다채로운 서비스 통합이 사용자 경험과 반응으로 이어지고 있기 때문입니다.  
 [사람 + 사람], [사람 + 기기] 의 다이내믹한 상호 작용으로 그 만큼 다양한 정보와 경험, 빠른 반응들은 IT 혁신을 가속 시키는 동력이 되었습니다.  
 
-수십억 인구와 수천억 디바이스들이 서로 상호 작용 하면서 만들어내는 데이터 양이 상상이 가나요? 그게 가능 한 기술은 또 무엇일까 생각해 봅니다.   
-이게 가능하게 된 핵심 기술은 IT 데이터 센터를 구성하는 인프라 영역에서 SDN(Software Defined Networking) 기술의 등장과 보편화에 있습니다.    
+수십억 인구와 수천억 디바이스들이 서로 상호 작용 하면서 만들어내는 데이터 양이 상상이 가나요?   
+그렇다면 현재 이것을 가능하게 한 기술은 무엇일 까요?
 
-SDN 통해서 Virtual Networking 및 Hypervisor 가상화 기술이 급속히 발전 되고 그 결과로 Virtual Computing, Virtual Storage, Policy 등을 Software 즉, Code 로 컨트롤 할 수 있게 되었습니다.
+저는 이것이 가능하게 된 핵심 기술로 SDN(Software Defined Networking) 이라고 단언 합니다.  
+SDN(Software Defined Networking) 은 말 그대로 Software 를 통해 네트워킹을 정의하는 기술 입니다.   
 
-<br>
+SDN 통해서 Virtual Network Function, Hypervisor 와 같은 가상화 기술이 급속히 발전 되고 그 결과로 
+Virtual Networking, Virtual Computing, Virtual Storage 클라우드의 근본을 이루는 서비스들이 소프트웨어로 컨트롤 할 수 있게 되었습니다.  
 
-오퍼레이터 입장에서 서비스 론칭 업무가 어떻게 변화 되었는지 과거와 현재를 비교 하자면,   
-- 과거에는 오퍼레이터가 직접 DataCenter 에 방문하여 별도의 Console 장비에 접속하여 네트워크를 구성 합니다. 마치 컴퓨터의 CMOS 셋업을 하는 것처럼 말이죠,  
-- 지금은 인터넷에 접속 하고 클라우드에서 제공하는 OpenAPI 를 통해 Infrastructure 를 쉽고 빠르게 구성 할 수 있습니다.  
-
-대표적인 클라우드 벤더(CSP: Cloud Service Provider)로 OpenStack, AWS, AZure, GCP, Alibaba 등이 있습니다.  
+이 것이 하나의 뚜렷한 형상의 서비스로 탄생 되었는데 그 것이 바로 IaaS, PaaS, SaaS, FaaS 입니다. 
 
 <br>
 
-이젠 개발자와 운영자 모두 `서비스 운영에 필요한 모든 것` 이 Software 로 가능해졌고 더 빠르고 신속하게 처리를 할 수 있게 되었습니다.  
+클라우드에서 오퍼레이터의 서비스 론칭 업무가 과거에 비해 현재 어떻게 변화 되었는지 살펴 보자면,   
+- 과거에는 오퍼레이터가 직접 DataCenter 에 방문하여 별도의 Console 장비에 접속하여 네트워크를 구성 합니다.   
+  (마치 컴퓨터의 CMOS 셋업을 하는 것처럼 말이죠)  
+- 지금은 인터넷에 접속 하고 클라우드에서 제공하는 OpenAPI 를 통해 원하는 서비스를 쉽고 빠르게 구성 할 수 있습니다.  
+
+대표적인 CSP(Cloud Service Provider) 로 OpenStack, AWS, AZure, GCP, Alibaba 등이 있습니다.  
+현재 국내 CSP 벤더만을 비교 했을 때 NCP (Naver Cloud Platform) 가 40% 정도 점유하고 있네요.  
+
+<br>
+
+이제는 개발자와 운영자 모두 `서비스 운영에 필요한 모든 것` 이 Software 로 가능해졌고 더 빠르고 신속하게 처리를 할 수 있게 되었습니다.  
 따라서 Dev 와 Ops 는 협력을 넘어 하나의 DevOps 프로세스를 발전할 수 있게 된 것입니다.  
 
 <br>
@@ -78,7 +86,7 @@ SDN 통해서 Virtual Networking 및 Hypervisor 가상화 기술이 급속히 �
 
 결론을 이렇게 맺고자 합니다.   
 
-DevOps 를 위한 환경은 이미 보편화 되었습니다. 이젠 사람이 바뀌어야 됩니다.   
+DevOps 를 위한 환경은 클라우드의 등장으로 이미 보편화 되었습니다. 이젠 사람이 바뀌어야 한다. 하고 말이죠.   
 
 <br>
 
@@ -86,4 +94,4 @@ DevOps 를 위한 환경은 이미 보편화 되었습니다. 이젠 사람이 �
 # References
 - [2009년 6월 Velocity 컨퍼런스](https://www.youtube.com/watch?v=LdOe18KhtT4)   
 - [2009년 10월 devopsdays 2009 컨퍼런스](https://www.youtube.com/watch?v=EOveXZhJpr4) 
-- [2004년 SDN 컨트롤러](https://en.wikipedia.org/wiki/Software-defined_networking) 
+- [2004년 SDN](https://en.wikipedia.org/wiki/Software-defined_networking)
