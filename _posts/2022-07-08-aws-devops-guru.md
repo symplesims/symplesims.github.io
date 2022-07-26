@@ -118,6 +118,7 @@ AWS 의 대부분의 서비스가 그러하듯 DevOps Guru 또한 사용한 만�
 4. Integrations: AWS Systems OpsCenter 와 Atlassian Ops Jini / Pagerduty 써드 파티와 통합 하면 DevOps Guru 가 생산한 Insights 를 수신하여 효과적인 워크플로우를 적용할 수 있습니다.
 
 
+<br>
 
 # DevOps Guru 서비스 살펴보기 
 DevOps Guru 초기 화면은 Dashboard 메뉴와 함께 시작 합니다.
@@ -232,10 +233,10 @@ Workflow 예시로 다음과 같은 기능들을 추가할 수 있습니다.
 
 # Conclusion  
 
-DevOps 영역 전체를 커버하는 것은 아닙니다. 배포된 애플리케이션 서비스가 안정적으로 운영되도록 돕는 서비스이고 10년 이상된 IT 운영 전문가가 옆에서 조언해주는것과 같은 안정감을 주지 않을까? 라는 기대로 정리 할 수 있을것 같습나다.  
+DevOps 영역 전체를 커버하는 것은 아닙니다. 배포된 애플리케이션 서비스가 안정적으로 운영되도록 돕는 서비스이고 10년 이상된 IT 운영 전문가가 옆에서 조언해주는것과 같은 안정감을 주지 않을까? 라는 기대로 정리 할 수 있을것 같습니다.  
 
-비용은 워크로드 규모에 따라 천차만별 이겠지만 DevOps 체계를 빠르게 체득 하고자 하는 Start-Up 이나 현재 대규모 인스턴스에 다양한 문제들을 빠르게 식별 하고 해결 가이드를 필요로 하는 Enterprise 업체에게 사용을 추천하고 싶네요.  
-그리로 효과적이고 보다 정확한 Insights 를 제공 받으려면 CloudWatch, CloudTrail, AppConfig, X-Ray, CodeDeploy, CloudFormation 등으로 AWS 리소스를 구성 하는것이 좋아 보입니다.  
+비용은 워크로드 규모에 따라 천차만별 이겠지만 DevOps 체계를 빠르게 체득 하고자 하는 Start-Up 이나 현재 대규모 인스턴스에 다양한 문제들을 빠르게 식별 하고 즉각적인 솔루션을 필요로 하는 Enterprise 기업에겐 추천하고 싶네요.  
+그리로 효과적이고 보다 정확한 Insights 를 제공 받으려면 CloudWatch, CloudTrail, AppConfig, X-Ray, CodeDeploy, CloudFormation 등의 운용을 위한 AWS 리소스를 구성 하는것이 좋습니다.  
   
 반대로 Cloud 프로비저닝을 Terraform 과 같은 Opensource 로 사용하게 되면 Insights 와 연관된 이벤트로 Stack 을 식별해 낼 수 있을지 의문이긴 합니다.  
 
@@ -243,6 +244,7 @@ DevOps 영역 전체를 커버하는 것은 아닙니다. 배포된 애플리케
 
 # References
 - [Amazon DevOps Guru](https://aws.amazon.com/ko/devops-guru/)
+- [Amazon DevOps Guru API](https://docs.aws.amazon.com/devops-guru/latest/APIReference/Welcome.html) 
 - [OpsCenter Runbook](https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-documents.html)
 - [ignio AIOps](https://digitate.com/ignio-aiops/)
 - [DevOps 에 관한 짧은 생각](/devops/2021/12/02/think-about-devops.html) 
