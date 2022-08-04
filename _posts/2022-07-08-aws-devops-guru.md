@@ -235,9 +235,8 @@ Workflow 예시로 다음과 같은 기능들을 추가할 수 있습니다.
 
 DevOps 영역 전체를 커버하는 것은 아닙니다. 배포된 애플리케이션 서비스가 안정적으로 운영되도록 돕는 서비스이고 10년 이상된 IT 운영 전문가가 옆에서 조언해주는것과 같은 안정감을 주지 않을까? 라는 기대로 정리 할 수 있을것 같습니다.  
 
-비용은 워크로드 규모에 따라 천차만별 이겠지만 DevOps 체계를 빠르게 체득 하고자 하는 Start-Up 이나 현재 대규모 인스턴스에 다양한 문제들을 빠르게 식별 하고 즉각적인 솔루션을 필요로 하는 Enterprise 기업에겐 추천하고 싶네요.  
-그리로 효과적이고 보다 정확한 Insights 를 제공 받으려면 CloudWatch, CloudTrail, AppConfig, X-Ray, CodeDeploy, CloudFormation 등의 운용을 위한 AWS 리소스를 구성 하는것이 좋습니다.  
-  
+비용은 워크로드 규모에 따라 천차만별 이겠지만 DevOps 체계를 빠르게 체득 하고자 하는 Start-Up 이나 현재 대규모 인스턴스에 다양한 문제들을 빠르게 식별 하고 즉각적인 솔루션을 필요로 하는 Enterprise 기업에겐 추천하고 싶네요.
+그리고 효과적이고 보다 정확한 Insights 를 제공 받으려면 CloudWatch, CloudTrail, AppConfig, X-Ray, CodeDeploy, CloudFormation 등의 운용을 위한 AWS 리소스를 구성 하는것이 좋습니다.  
 반대로 Cloud 프로비저닝을 Terraform 과 같은 Opensource 로 사용하게 되면 Insights 와 연관된 이벤트로 Stack 을 식별해 낼 수 있을지 의문이긴 합니다.  
 
 <br>
