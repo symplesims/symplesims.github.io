@@ -110,9 +110,15 @@ Lambda 의 주요 메트릭인 요청 수, 요청당 실행 기간, 오류를 �
 또한 X-Ray 를 사용하여 Lambda 실행에서 잠재적인 병목 현상을 식별할 수 있습니다.  
 X-Ray 는 함수의 실행 시간을 어디에 소비하는지 시각화하여 한번에 파악할 때 유용하며 전체 흐름과 연결되는 모든 다운스트림 시스템을 추적하는 데 도움이 됩니다.
 
+<br><br>
+
+## Deploy Lambda Application
+
+이제 본젹적으로 컨테이너 이미지 타입의 Lambda 애플리케이션을 배포해 보도록 하겠습니다.  
+
 <br>
 
-## Pre-Requisite
+## 사전 준비 사항 
 - 인터넷 서비스를 제공하려면 DNS 서비스를 사전에 구성 해야 하는데 이 과정은 [AWS Route 53 을 통한 도메인 서비스 관리](/devops/route53/acm/hosting/2022/01/11/aws-route53.html) 를 참고 하기 바랍니다.
 - 애플리케이션 서비스의 기능은 로또 645 게임에서 6개의 번호를 추천하는 아주 간단한 API 를 서비스 하는 것을 목표로 하겠습니다.  
 
@@ -148,7 +154,7 @@ lotto 서비스를 하는 Lambda 함수의 구성 정보를 확인할 수 있습
 ![](/assets/images/22q2/lambda_1.png)
 
 이벤트 소스와 람Lambda 함수다 함수 그리고 Lambda 함수가 처리된 결과를 보내는 Target 이 있습니다.  이 예제에는 ALB 로부터 데이터가 유입되며 결과 데이터를 ALB(타겟) 로 보내게 됩니다. 
-또한 사용된 코드를 확인할 수 있습니다. zip 으로 패키징한 경우는 코드가 보여지지만 image 로 패키징한 경우  
+또한 사용된 코드를 확인할 수 있습니다. zip 으로 패키징한 경우는 코드가 보여지지만 image 로 패키징한 경우 이미지 레지스트리 주소(ECR)를 확인할 수 있습니다.  
 
 ### 일반 구성 
 
@@ -158,7 +164,7 @@ Lambda 함수의 CPU, Memory 의 컴퓨팅 자원을 확인할 수 있습니다.
 
 ### 트리거 
 
-이벤트 소스의 상세 내역을 확인할 수 있습니다. ALB 의 host-header 정보를 확인 할 수 있습니다.  
+이벤트 소스의 상세 내역을 확인할 수 있습니다. ALB 의 경우 host-header 와 경로 정보 등 라우팅 정보를 확인 할 수 있습니다.  
 
 ![](/assets/images/22q2/lambda_3.png)
 
@@ -245,7 +251,9 @@ CloudWatch 로그를 통해 Lambda 함수의 실행시간, 처리내역, Memory 
 <br><br>
 
 
-다음으로 Lambda 컨테이너 Image 타입이 가지는 특징과 기존 서비리스 컴퓨팅 및 Lambda Zip 타입과의 차이점을 살펴 보도록 하겠습니다.    
+Lambda Image 타입이 가지는 특징과 기존 서비리스 컴퓨팅 및 Lambda Zip 타입과의 차이점을 간략히 살펴 보도록 하겠습니다.    
+
+<br>
 
 ## Fargate 및 EKS vs Lambda Image
 
@@ -278,7 +286,7 @@ Lambda 컨테이너 Image 타입과 기존 Zip 타입의 차이를 살펴 보자
 - ZIP 타입으로 패키징된 애플리케이션의 메모리는 250MB 로 제한되는 반면 컨테이너 Image 타입의 패키징은 40배가 증가된 10GB 임 
 - ZIP 타입의 패키징은 배치 Data 프로세싱이나 AI/ML 모델링과 같은 대룡량 처리에 지극히 제한적인 반면 Image 타입은 대욜량 처리및 빠른 확장성을 가지는 애플리케이션 등 폭넓은 비즈니스 케이스에서 채택될 수 있음  
 - Image 타입은 이벤트 핸들러를 지정 할 필요가 없음 (Dockerfile 의 CMD 로 정의)
-- 동일한 애플리케이션 레이어에서 Zip 타입과 Image 타입으로 패키징만 다르게 했을 뿐인데 Zip 은 300 ms vs Image 는 5200 ms 라는 Billed Duration 의 차이가 납니다.  
+- 동일한 애플리케이션 레이어에서 Zip 타입과 Image 타입으로 패키징만 다르게 했을 뿐인데 Zip 은 300 ms vs Image 는 5200 ms 라는 Billed Duration 의 차이가 남 
 
 **Zip 타입**
 ```
@@ -297,8 +305,9 @@ Duration: 502.81 ms Billed Duration: 5200 ms
 Init Duration: 4638.39 ms
 ```
     
-- Lambda Image 타입으로 ML 학습을 할때 /dev/shmPython 다중 처리 대기열을 사용하여 모델 실행애서 병렬 데이터 가져오기를 허용 하는 PyTorch DataSet 로더에서 문제가 발생 합니다.
-  [stackoverflow issue](https://stackoverflow.com/questions/34005930/multiprocessing-semlock-is-not-implemented-when-running-on-aws-lambda) 참조 
+- Lambda Image 타입으로 ML 학습을 할때 /dev/shmPython 다중 처리 대기열을 사용하여 모델 실행애서 병렬 데이터 가져오기를 허용 하는 PyTorch DataSet 로더에서 문제가 발생  
+  [stackoverflow issue](https://stackoverflow.com/questions/34005930/multiprocessing-semlock-is-not-implemented-when-running-on-aws-lambda) 참조   
+- Lambda Image 타입은 Lambda 의 런타임에 관련된 일체를 공동 책임 모델에서 AWS 가 아닌 고객이 책임지게 됩니다.
 
 <br><br>
 
@@ -308,9 +317,7 @@ Init Duration: 4638.39 ms
 개발팀이 컨테이너 환경에 익숙하고 Docker 기반의 애플리케이션 런타임과 운영 모니터링 환경등 많은 영역에서 표준화 한다면 Lambda 컨테이너 이미지 타입이 큰 도움이 됩니다. 
 뿐만 아니라 대용량 처리나 AI/ML 과 같은 워크로드에서도 Lambda 가 활용될 수 있습니다.  
   
-반면에 개발팀이 ZIP 패키지가 더 익숙하고 컨테이너 도구를 사용할 필요가 없는 경우리면 기존과 같이 Zip 타입으로 배포 및 운영하는 것이 좋을 것 같습니다.  
-  
-또 한가지로 컨테이너 Image 타입의 경우 Lambda 의 런타임에 관련된 일체를 공동 책임 모델에서 AWS 가 아닌 고객이 책임지게 됩니다. 
+반면에 개발팀이 ZIP 패키지가 더 익숙하고 컨테이너 도구를 사용할 필요가 없는 경우리면 기존과 같이 Zip 타입으로 배포 및 운영하는 것이 좋을 것 같습니다.
 
 <br>
 
