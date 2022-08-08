@@ -316,6 +316,7 @@ Init Duration: 4638.39 ms
 
 ## References
 - [Serverless](https://spring.io/serverless) 소개 
+- [AWS Lambda의 새로운 기능 — 컨테이너 이미지 지원](https://aws.amazon.com/ko/blogs/korea/new-for-aws-lambda-container-image-support/)
 - [Container Image Support in AWS Lambda Deep Dive](https://dev.to/eoinsha/container-image-support-in-aws-lambda-deep-dive-2keh)
 - [Container Image Support on AWS Lambda Bridges the Gap to Much Wider Adoption](https://www.fourtheorem.com/blog/container-image-lambda)
 - [What Does Lambda's Big Memory Increase Enable?](https://www.fourtheorem.com/blog/lambda-10gb)
