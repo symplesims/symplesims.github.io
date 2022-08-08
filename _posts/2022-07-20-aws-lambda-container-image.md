@@ -14,7 +14,7 @@ Lambda 는 서버를 프로비저닝 하지 않고도 모든 유형의 애플리
 그리고 지난 2020. 12. 1. 에는 AWS Lambda 의 새로운 기능으로 컨테이너 이미지를 지원하기 시작했습니다.  
 이로서 최대 10GB 크기의 컨테이너 이미지로 패키징 및 배포할 수 있게 되었고, 기계 학습 또는 대용량 데이터 처리를 위한 워크로드 유형 등 상당한 종속성이 수반되는 대규모 워크로드를 Lambda 로 쉽게 구축하고 배포할 수 있게 되었습니다.
 
-여기서는 AWS Lambda 에 대해 알아보고 지난번 간단하게 구현한 lotto 서비스를 Lambda Code 로 구현 하여 새롭게 지원하는 컨테이너 이미지 방식으로 배포 하는것을 연습해 보겠습니다.  
+여기서는 AWS Lambda 에 대해 알아보고 지난번 간단하게 구현한 lotto 서비스를 새롭게 지원하는 Lambda 컨테이너 이미지 타입으로 배포 하는것을 연습해 보겠습니다.  
 
 <br>
 
@@ -22,7 +22,7 @@ Lambda 는 서버를 프로비저닝 하지 않고도 모든 유형의 애플리
 
 시작하기에 앞서서 Serverless 에 대해 간단히 소개하고자 합니다.  
 
-![](../assets/images/22q2/img_12.png)
+![](/assets/images/22q2/img_12.png)
 
 위 그림의 우측 영역으로 Serverless 가 등장하기 전에는 개발팀이 구현한 애플리케이션 서비스가 제대로 동작하려면 애플리케이션을 감사꼬 있는 레거시 인프라를 필요로 했습니다.  
 여기에는 OS 와 그 위에 SDK 기반의 런타임 환경 그리고 애플리케이션을 기동하고 서비스를 할 수 있도록 돕는 WAS(Web Application Server) 가 구성되어 있습니다.    
@@ -101,7 +101,7 @@ $LATEST 버전을 사용하는 경우 새 코드를 업로드 하면 제 기능�
 이 경우 항상 특정 버전을 가리키는 별칭(Alias)을 사용하면 코드가 변경 되고 최신 버전이 게시되더라도 영향을 받지 않고, 기능 검증을 완료한 뒤에 새로운 버전을 가리키도록 별칭을 조정 할 수 있으므로  
 블루/그린 또는 카나리 배포를 계획하는 데 도움이 됩니다.
 
-![](../assets/images/22q2/img_13.png)
+![](/assets/images/22q2/img_13.png)
 
 
 ### 모니터링
@@ -125,7 +125,7 @@ AWS Lambda 서버리스 컴퓨팅 서비스를 프로비저닝 하기 위해 다
 
 ## Lotto 서비스 아키텍처 개요
  
-![](../assets/images/22q2/img_15.png)
+![](/assets/images/22q2/img_15.png)
 
 
 ## 주요 리소스 구성 개요
@@ -145,7 +145,7 @@ lotto 서비스를 하는 Lambda 함수의 구성 정보를 확인할 수 있습
 
 ### 함수 개요 
 
-![](../assets/images/22q2/lambda_1.png)
+![](/assets/images/22q2/lambda_1.png)
 
 이벤트 소스와 람Lambda 함수다 함수 그리고 Lambda 함수가 처리된 결과를 보내는 Target 이 있습니다.  이 예제에는 ALB 로부터 데이터가 유입되며 결과 데이터를 ALB(타겟) 로 보내게 됩니다. 
 또한 사용된 코드를 확인할 수 있습니다. zip 으로 패키징한 경우는 코드가 보여지지만 image 로 패키징한 경우  
@@ -154,13 +154,13 @@ lotto 서비스를 하는 Lambda 함수의 구성 정보를 확인할 수 있습
 
 Lambda 함수의 CPU, Memory 의 컴퓨팅 자원을 확인할 수 있습니다. Lambda 함수의 실행 제한 시간을 설정함으로써 내결함성을 높이게 됩니다. 
 
-![](../assets/images/22q2/lambda_2.png)
+![](/assets/images/22q2/lambda_2.png)
 
 ### 트리거 
 
 이벤트 소스의 상세 내역을 확인할 수 있습니다. ALB 의 host-header 정보를 확인 할 수 있습니다.  
 
-![](../assets/images/22q2/lambda_3.png)
+![](/assets/images/22q2/lambda_3.png)
 
 ### 실행 권한
 Lambda 함수는 VPC 네트워크의 특정 대역에 배치 되고 이벤트 소스로부터 데이터를 받고 처리 하며 그 결과를 타겟에 넘겨 주게 됩니다. 여기에 관련된 일련의 권한들을 필요로 합니다. 
@@ -169,20 +169,20 @@ Lambda 함수는 VPC 네트워크의 특정 대역에 배치 되고 이벤트 �
 - Amazon CloudWatch Log: Lambda 함수 코드에 포함된 로그 출력 정보를 CloudWatch Log 그룹에 전송 하는 권한
 - Amazon RDS IAM Authentication: 처리된 결과를 RDS 에 저장 하기위한 RDS 인증 권한 
 
-![](../assets/images/22q2/lambda_4.png)
+![](/assets/images/22q2/lambda_4.png)
 
 ### 환경 변수 
 
 환경 변수는 static 정보 또는 액세스 정보와 같이 코드에 노출되어선 안되는 중요한 정보를 설정 할 수 있습니다.
 
-![](../assets/images/22q2/lambda_5.png)
+![](/assets/images/22q2/lambda_5.png)
 
 
 ### VPC 
 
 Lambda 함수가 배치될 VPC 및 Subnet 과 보안 그룹 정보를 확인 할 수 있습니다.   
 
-![](../assets/images/22q2/lambda_6.png)
+![](/assets/images/22q2/lambda_6.png)
 
 <br><br>
 
