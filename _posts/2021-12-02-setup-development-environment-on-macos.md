@@ -9,11 +9,11 @@ categories:
 ---
 
 ## Setup MacOs
-새로운 Mac OS 장비를 갖게 되면 이것 저것 설치할 앱들이 너무 많습니다.  
-셋업에 하루가 꼬박 걸리기도 하는데 그때 마다 구글링 하며 이곳 저곳 찾아 다니면 아쉬게 생각이 드네요 ^^
+새로운 Mac OS 를 가지게 되면 이것 저것 설치할 애플리케이션들이 많습니다.  
+셋업에 하루가 꼬박 걸리기도 하는데 그때 마다 구글링 하며 이곳 저곳 찾아 다니면 낭비되는 시간이 아쉽습니다 ^^
 
 ### homebrew 설치
-MacOs 의 애플리케이션 설치 및 관리를 위한 대표적인 패키지 매니저 입니다. 
+[Brew](https://brew.sh/index_ko) 는 MacOS 의 애플리케이션 설치 및 관리를 위한 필수 패키지 매니저 입니다. 
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
@@ -140,7 +140,7 @@ brew install aws-iam-authenticator
 
 <br>
 
-### Kubernetes 관련 툴
+### Kubernetes 관련
 
 ```shell
 # docker
