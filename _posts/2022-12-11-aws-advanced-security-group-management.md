@@ -1,10 +1,9 @@
 ---
-layout: post title: "AWS Advanced Security Group Management Strategy"
+layout: post
+title: "AWS Advanced Security Group Management Strategy"
 date:  2022-12-11 18:00:00 +0900 categories:
-
-- AWS Security
-- DevOps
-
+categories:
+  - AWS Security
 ---
 
 AWS 클라우드 환경에서 컴퓨팅 인스턴스에 대해 보안 그룹을 통해 세밀하고 유연하게 통제 하는 것은 매우 중요 합니다.
