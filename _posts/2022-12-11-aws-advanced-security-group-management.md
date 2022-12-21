@@ -25,12 +25,12 @@ Bastion-EC2 인스턴스에 대해서 VPC 내부 또는 외부의 리소스가 V
 
 ### Case 1 - VPC 외부의 SSH 클라이언트가 보안 프로토콜을 통해 Bastion EC2 로 연결 하는 네트워크 트래픽 흐름
 
-![](../assets/images/22q4/img.png)
+![](/assets/images/22q4/img.png)
 
 - bastion-sg 의 Ingress Rule 예시  
   `52.78.21.101` 아이피를 사용하는 SSH 클라이언트의 접속만을 허용하는 제한된 bastion-sg 보안 그룹의 Ingress 룰을 설정 하는 예시 입니다.
 
-![](../assets/images/22q4/img_2.png)
+![](/assets/images/22q4/img_2.png)
 
 위와 같이 관리 콘솔을 통해 직접 설정 하가나, 아래와 같이 AWS CLI 를 통해 구성이 가능 합니다.
 
@@ -46,12 +46,12 @@ aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID \
 
 ### CASE 2 - VPC 내부의 Bastion EC2 인스턴스가 외부의 Git 저장소를 HTTPS 프로토콜로 연결 하는 네트워크 트래픽 흐름
 
-![](../assets/images/22q4/img2.png)
+![](/assets/images/22q4/img2.png)
 
 - bastion-sg 의 Egress Rule 예시  
   bastion-ec2 는 외부 `Gihub 저장소`를 액세스 하기 하기 위해 bastion-sg 보안 그룹의 Egress 룰을 설정 하는 예시 입니다.
 
-![](../assets/images/22q4/img_1.png)
+![](/assets/images/22q4/img_1.png)
 
 위와 같이 관리 콘솔을 통해 직접 설정 하가나, 아래와 같이 AWS CLI 를 통해 구성이 가능 합니다.
 
@@ -104,7 +104,7 @@ VPC 내부/외부 등 각 Tier 에 해당 하는 Source(CIDR, IP Prefix List, Se
 이처럼, 각 Tier 마다 보안 그룹을 관리 하게 되면 보다 세밀한 액세스 정책을 적용할 수 있고, 컴퓨팅 인스턴스마다 해당하는 보안 그룹이 있음을 암묵적으로 알게 됩니다. 또한 인스턴스와 보안 그룹의 네이밍 규칙을
 일관되게 관리 한다면 보다 쉽게 식별하고 자동화 할 수 있게 됩니다.
 
-![](../assets/images/22q4/img_3.png)
+![](/assets/images/22q4/img_3.png)
 
 - 각 Instance (Tier) 마다 필요한 액세스를 조건을 기술 하면 아래와 같습니다.
 
@@ -141,7 +141,7 @@ VPC 내부/외부 등 각 Tier 에 해당 하는 Source(CIDR, IP Prefix List, Se
 
 아래 다이어그램은 새롭게 추가된 `order-service` 애플리케이션에 대한 보안 그룹 관리 정책 입니다.  
 
-![](../assets/images/22q4/img_4.png)
+![](/assets/images/22q4/img_4.png)
 
 `Case 1` 과 같은 방법으로 보안 그룹을 기술 하게 되면 아래와 같습니다. 
 
@@ -164,7 +164,7 @@ VPC 내부/외부 등 각 Tier 에 해당 하는 Source(CIDR, IP Prefix List, Se
 
 위의 문제를 해결하는 방법으로 아래 다이어그램과 같이, 애플리케이션 인스턴스에 RDS 와 같은 공유 인스턴스 접근을 위한 별도의 (공유 인스턴스를 위한) 보안 그룹(rds-ssg)을 바인딩(binding) 하고, RDS 의 보안 그룹은 `rds-ssg` 에 대해서만 접근을 허용 하도록 하는 것 입니다.   
 
-![](../assets/images/22q4/img_5.png) 
+![](/assets/images/22q4/img_5.png) 
 
 - `rds-ssg` 는 소스 RDS 로 outbound 액세스를 위해 `rds-sg`를  대상으로 3306 프로토콜을 Egress 규칙을 허용 합니다. 
 - `rds-sg` 는 애플리케이션이 3306 프로토콜로 접근 하는 소스 `rds-ssg` 로부터 액세스를 허용하기 위해 Ingress 규칙을 허용 합니다. 
@@ -190,7 +190,7 @@ VPC 내부/외부 등 각 Tier 에 해당 하는 Source(CIDR, IP Prefix List, Se
 
 보안 그룹을 binding 하는 방식의 아키텍처는 아래와 같습니다. 
 
-![](../assets/images/22q4/img_6.png)
+![](/assets/images/22q4/img_6.png)
 
 **주의 사항** : EC2, Fargate, Lambda 등 컴퓨팅 인스턴스가 사용하는 [네트워크 인터페이스당 보안 그룹](https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/amazon-vpc-limits.html#vpc-limits-security-groups)  최대 갯수는 5개로 제한 되어 있습니다. 
 이 것의 의미는 하나의 애플리케이션이 RDS, ElastiCache, Message-Broker 등 공유 인스턴스를 액세스 할 수 있는 수가 제한 된다는 것이며, 애플리케이션은 Microservice 와 같이 비즈니스 도메인에 해당하는 데이터 저장소만 액세스 하도록 설계하는 것이 중요 합니다. 
@@ -210,7 +210,7 @@ VPC 내부/외부 등 각 Tier 에 해당 하는 Source(CIDR, IP Prefix List, Se
 On-Premise 의 NAT 역할을 하는 인스턴스(public ip)로 Customer Gateway 가 생성 되며 Site-to-Site 방식으로 VPN 이 연결 되고,  
 On-Premise 네트워크의 Private CIDR 대역이 ["10.10.101.0/24", "10.10.102.0/24", "10.10.201.0/24", ""10.10.202.0/24"] 이라고 할 때 `관리형 접두사 목록` 으로 제한된 보안 그룹 규칙을 쉽고 편리하게 적용 할 수 있습니다. 
 
-![](../assets/images/22q4/img_7.png)
+![](/assets/images/22q4/img_7.png)
 
 
 위 아키텍처에서 관리형 접두사 목록 `pl-023ef34fab3` 으로 제한된 IP 대역을 ["10.10.101.0/24", "10.10.102.11/32", "10.10.102.12/32", "10.10.102.13/32"] 으로 정의 하고 있습니다.   
@@ -233,7 +233,7 @@ On-Premise 네트워크의 Private CIDR 대역이 ["10.10.101.0/24", "10.10.102.
 1. index.html 등 리소스를 S3 버킷에 업로드하고 CloudFront OAI 로 배포 되어 제공되는 정적 컨텐츠 
 2. VPC 내의 ALB 뒷족의 backend 애플리케이션을 통해 제공 되는 동적 컨텐츠(정보)
 
-![](../assets/images/22q4/img_8.png)
+![](/assets/images/22q4/img_8.png)
 
 문제는 ALB 와 S3 버킷이 public 으로 접근이 될 수 있으며 `Cracker`에 의해 DDoS 공격에 무방비로 당할 수 있는 점 입니다. 
 이 문제를 해결하는 좋은 방법은 
