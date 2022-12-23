@@ -120,12 +120,12 @@ VPC 내부/외부 등 각 Tier 에 해당 하는 Source(CIDR, IP Prefix List, Se
 
 - 각 Instance (Tier) 에 대한 보안 그룹을 설정 하면 다음과 같습니다.
 
-| Instance (Tier) | Security Group  | Rule Type | Source        | Port | Value                                 |
-|-----------------|-----------------|-----------|---------------|------|---------------------------------------|
-| ALB             | alb-sg          | Ingress   | CIDR          | 443  | [0.0.0.0/0]                           |
-| user-service    | user-service-sg | Ingress   | Security-Grup | 8080 | <alb-sg-security-group-id>            |
-| user-service    | user-service-sg | Egress    | Security-Grup | 3306 | <rds-sg-security-group-id>            |
-| RDS             | rds-sg          | Ingress   | Security-Grup | 3306 | <user-service-sg-security-group-id>   |
+| Instance (Tier) | Security Group  | Rule Type | Source        | Port | Value                                |
+|-----------------|-----------------|-----------|---------------|------|--------------------------------------|
+| ALB             | alb-sg          | Ingress   | CIDR          | 443  | [0.0.0.0/0]                          |
+| user-service    | user-service-sg | Ingress   | Security-Grup | 8080 | ${alb-sg-security-group-id>}         |
+| user-service    | user-service-sg | Egress    | Security-Grup | 3306 | ${rds-sg-security-group-id>}         |
+| RDS             | rds-sg          | Ingress   | Security-Grup | 3306 | ${user-service-sg-security-group-id} |
 
 
 <br>
@@ -148,15 +148,15 @@ VPC 내부/외부 등 각 Tier 에 해당 하는 Source(CIDR, IP Prefix List, Se
 
 `Case 1` 과 같은 방법으로 보안 그룹을 기술 하게 되면 아래와 같습니다. 
 
-| Instance (Tier) | Security Group   | Rule Type | Source        | Port | Value                                |
-|-----------------|------------------|-----------|---------------|------|--------------------------------------|
-| ALB             | alb-sg           | Ingress   | CIDR          | 443  | [0.0.0.0/0]                          |
-| user-service    | user-service-sg  | Ingress   | Security-Grup | 8080 | <alb-sg-security-group-id>           |
-| user-service    | user-service-sg  | Egress    | Security-Grup | 3306 | <rds-sg-security-group-id>           |
-| order-service   | order-service-sg | Ingress   | Security-Grup | 8081 | <alb-sg-security-group-id>           |
-| order-service   | order-service-sg | Egress    | Security-Grup | 3306 | <rds-sg-security-group-id>           |
-| RDS             | rds-sg           | Ingress   | Security-Grup | 3306 | <user-service-sg-security-group-id>  |
-| RDS             | rds-sg           | Ingress   | Security-Grup | 3306 | <order-service-sg-security-group-id> |
+| Instance (Tier) | Security Group   | Rule Type | Source        | Port | Value                                 |
+|-----------------|------------------|-----------|---------------|------|---------------------------------------|
+| ALB             | alb-sg           | Ingress   | CIDR          | 443  | [0.0.0.0/0]                           |
+| user-service    | user-service-sg  | Ingress   | Security-Grup | 8080 | ${alb-sg-security-group-id}           |
+| user-service    | user-service-sg  | Egress    | Security-Grup | 3306 | ${rds-sg-security-group-id}           |
+| order-service   | order-service-sg | Ingress   | Security-Grup | 8081 | ${alb-sg-security-group-id}           |
+| order-service   | order-service-sg | Egress    | Security-Grup | 3306 | ${rds-sg-security-group-id}           |
+| RDS             | rds-sg           | Ingress   | Security-Grup | 3306 | ${user-service-sg-security-group-id}  |
+| RDS             | rds-sg           | Ingress   | Security-Grup | 3306 | ${order-service-sg-security-group-id} |
 
 물론 `order-service` 를 위한 별도의 `order-service-sg` 보안 그룹을 구성하여 관리하는 것은 일관된 규칙의 좋은 모델 입니다.  
 하지만 `RDS` 와 같은 공유 Instance 에 대해 user-service, order-service 처럼 다수의 애플리케이션이 rds 를 액세스 하기 위한 Egress 규칙을 구성해야 하고,
@@ -178,20 +178,20 @@ VPC 내부/외부 등 각 Tier 에 해당 하는 Source(CIDR, IP Prefix List, Se
 
 `Case 2` 공유 보안 그룹(shared-security-group: ssg) 추가를 통한 액세스 정책 관리는 아래와 같습니다.
 
-| Instance (Tier) | Security Group   | Rule Type | Source        | Port | Value                         |
-|-----------------|------------------|-----------|---------------|------|-------------------------------|
-| ALB             | alb-sg           | Ingress   | CIDR          | 443  | [0.0.0.0/0]                   |
-| user-service    | user-service-sg  | Ingress   | Security-Grup | 8080 | <alb-sg-security-group-id>    |
-| user-service    | rds-ssg          | Egress    | Security-Grup | 3306 | <rds-sg-security-group-id>    |
-| order-service   | order-service-sg | Ingress   | Security-Grup | 8081 | <alb-sg-security-group-id>    |
-| order-service   | rds-ssg          | Egress    | Security-Grup | 3306 | <rds-sg-security-group-id>    |
-| RDS             | rds-sg           | Ingress   | Security-Grup | 3306 | <rds-ssg-security-group-id>   |
+| Instance (Tier) | Security Group   | Rule Type | Source        | Port | Value                        |
+|-----------------|------------------|-----------|---------------|------|------------------------------|
+| ALB             | alb-sg           | Ingress   | CIDR          | 443  | [0.0.0.0/0]                  |
+| user-service    | user-service-sg  | Ingress   | Security-Grup | 8080 | ${alb-sg-security-group-id}  |
+| user-service    | rds-ssg          | Egress    | Security-Grup | 3306 | ${rds-sg-security-group-id}  |
+| order-service   | order-service-sg | Ingress   | Security-Grup | 8081 | ${alb-sg-security-group-id}  |
+| order-service   | rds-ssg          | Egress    | Security-Grup | 3306 | ${rds-sg-security-group-id}  |
+| RDS             | rds-sg           | Ingress   | Security-Grup | 3306 | ${rds-ssg-security-group-id} |
 
 결론적으로 다음과 같이 쉽고 간편하게 관리 할 수 있습니다. 
 - `RDS` 인스턴스를 위한 `rds-sg` 보안 그룹은 `order-service` 와 같은 새로운 애플리케이션이 추가된다 하더라도 변경 사항이 없습니다.
 - `order-service` 와 같은 신규 애플리케이션이 RDS 를 액세스 하려면 `rds-ssg` 보안 그룹을 binding 하는 것 만으로 설정이 완료 됩니다.  
 
-보안 그룹을 binding 하는 방식의 아키텍처는 아래와 같습니다. 
+컴퓨팅 인스턴스에 하나 이상의 보안 그룹을 추가(binding) 하는 방식의 아키텍처는 아래와 같습니다. 
 
 ![](/assets/images/22q4/img_6.png)
 
@@ -282,8 +282,8 @@ curl https://ip-ranges.amazonaws.com/ip-ranges.json \
 
 ## Conclusion
 
-지금까지 AWS Security Group 을 살펴 보앗습니다. 여기서 우리는 보안 그룹이 네트워크 보안을 위해 세밀하고 확장 가능한 매우 강력한 기능을 제공 하고 있음을 알 수 있었습니다. 
-위의 몇가지 사례(Case) 에서 보듯이 효과적으로 통제 하는 것은 어려울 수 있지만, 일관된 원칙을 세우고 보다 간단하고 쉽게 확장할 수 있는 아키텍처 모형을 위해 지속적으로 발전시켜 나간다면 대형 앤터프라이즈 워크로드를 대상으로도 자동화 운영 관리 할 수 있을 것입니다.  
+지금까지 AWS Security Group 을 살펴 보았습니다. 여기서 우리는 보안 그룹이 네트워크 보안을 위해 세밀하고 확장 가능한 매우 강력한 기능을 제공 하고 있음을 알 수 있었습니다. 
+위의 몇가지 사례(Case) 에서 보듯이 대규모의 워크로드 효과적으로 보안을 통제 하는 것은 어려울 수 있지만, 일관된 원칙을 세우고 보다 간단하고 쉽게 확장할 수 있는 아키텍처 모형을 위해 지속적으로 발전시켜 나간다면 대형 앤터프라이즈 워크로드를 대상으로도 자동화 운영 관리 할 수 있을 것입니다.  
 
 향후에 Terraform 을 통해 AWS 클라우드에 간단한 스택을 올려서 확인 할 수 있는 프로젝트를 공유 하도록 하겠습니다.  
 
