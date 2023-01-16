@@ -303,7 +303,7 @@ class Main {
 Person 객체를 쉽게 생성해주는 빌더를 구현할 수 있습니다.
 
 ```java
-class PersonFactory {
+public class PersonFactory {
 
     static public Person create(String firstName, String lastName) {
         Person person = new Person();
@@ -419,7 +419,7 @@ public class PersonMain {
 
 ### Functional Builder 패턴
 
-Java 8 부터 Functional Interface 와 함수형 문법을 지원 하였습니다. java.util.function.Consumer 를 활용하여 함수형 프로그래밍 방식으로 객체를 생성 할 수 있습니다.
+Java 8 부터 Functional Interface 와 함수형 문법을 지원합니다. java.util.function.Consumer 인터페이스를 사용 하여 함수형 프로그래밍 방식으로 객체를 생성 하고 속성을 설정 할 수 있습니다.
 
 ```java
 public class PersonBuilder {
