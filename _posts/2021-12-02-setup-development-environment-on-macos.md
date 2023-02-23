@@ -111,12 +111,20 @@ brew install pyenv
 
 - [pyenv](https://www.daleseo.com/python-pyenv/) 을 통한 python 버전 관리 예시
 ```shell
-pyenv install 3.10.0
-pyenv install 3.6.9
-python3 -version
+
+# 3 으로 시작하는 버전 확인 
+pyenv install -list | grep '^[ ]*3'
+
+pyenv install 3.8.11
+pyenv install 3.9.15
+
+# 로컬에 설치된 python 버전 확인 
 pyenv versions
-pyenv global 3.10.0
+
+# 글로벌 버전을 3.9.15 으로 설정 
+pyenv global 3.9.15
 python3 -version
+
 # 참고로 python-2 버전은 2020 에 EOS 되었습니다.
 pyenv install 2.7.18
 ```
