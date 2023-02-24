@@ -439,7 +439,7 @@ AWS Config는 지속적으로 AWS 리소스의 구성을 추적하고, 변경 �
 
 ## Terraform IAM User Group 모듈
 
-- [tfmodule-aws-iam-user](https://github.com/chiwooiac/tfmodule-aws-iam-user.git) 테라폼 프로젝트를 이용하면 사용자 그룹 및 정책 관리를 보다 쉽고 자동화된 방식으로 할 수 있습니다.    
+위에서 정의한 사용자 그룹, 맴버쉽 및 액세스 정책 관리를 [tfmodule-aws-iam-user](https://github.com/chiwooiac/tfmodule-aws-iam-user.git) 테라폼 프로젝트를 이용하면 보다 쉽고 자동화된 방식으로 할 수 있습니다.    
 
 
 <br>
