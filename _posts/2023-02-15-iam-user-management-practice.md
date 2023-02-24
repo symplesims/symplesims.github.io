@@ -11,7 +11,7 @@ AWS IAM (Identity and Access Management)은 AWS 서비스 및 리소스에 대�
 
 사용자 관리를 효과적으로 하기 위해서는 역할에 기반을 둔 사용자 그룹을 생성하고 여기에 적절한 권한(Policy)을 부여한 뒤 사용자를 추가 하는 것이 좋습니다.
 
-여기서는 Admin, Developer, DBA, SysOps, Viewer 과 같은 사용자 그룹을 만들고 여기에 적절한 액세스 정책과 사용자를 할당하는 과정을 살펴보도록 하겠습니다.
+여기서는 사용자 그룹, 그룹 정책 할당, 사용자 추가 및 MFA 할당과 패스워드 규칙 적용 등을 살펴보고 Matrix 를 통한 효과적인 IAM 관리 방법을 소개 합니다.
 
 <br>
 
@@ -126,12 +126,16 @@ IAM 액세스 로그는 AWS CloudTrail 서비스를 사용하여 확인 할 수 
 
 ## IAM 관리를 위한 모범 사례
 
+우리는 사용자 그룹 관련된 주요 리소스를 생성하고 간단하게 구성 하는 것을 살펴보았습니다.  
+
+여기서는 Matrix 를 통해 Admin, Developer, DBA, SysAdm, Viewer 과 같은 사용자 그룹을 만들고 여기에 적절한 액세스 정책과 사용자를 할당하는 전략을 살펴보도록 하겠습니다.
+
 ### 사용자 현황 Matrix 
 
-사용자 액세스 권한을 관리하는 Matrix를 정의하면 사용자를 보다 체계적으로 관리할 수 있습니다.
+사용자 액세스 권한을 관리하는 Matrix를 정의하면 사용자 및 액세스 정책을 보다 체계적으로 관리할 수 있습니다.
 
 
-| User                     | Admin | Developer | DBA | Viewer | SysOps |  MFA  |
+| User                     | Admin | Developer | DBA | Viewer | SysAdm |  MFA  |
 |--------------------------|:-----:|:---------:|:---:|:------:|:------:|:-----:|
 | admin@demoasacode.io     |   Y   |           |     |        |        |   Y   |
 | manager@demoasacode.io   |       |           |     |        |   Y    |   Y   |
@@ -152,7 +156,7 @@ IAM 액세스 로그는 AWS CloudTrail 서비스를 사용하여 확인 할 수 
 사용자 그룹의 역할에 적합한 액세스 정책(Policy) 관리 또한 다음과 같이 Matrix를 정의하면 효과적으로 관리할 수 있습니다.
 
 
-| Policies                         | Admin | Developer | DBA | SysOps | Viewer |
+| Policies                         | Admin | Developer | DBA | SysAdm | Viewer |
 |----------------------------------|:-----:|:---------:|:---:|:------:|:------:|
 | AdministratorAccess              |   Y   |           |     |        |        |
 | AWSCertificateManagerFullAccess  |   Y   |           |     |        |        |
@@ -180,7 +184,6 @@ IAM 액세스 로그는 AWS CloudTrail 서비스를 사용하여 확인 할 수 
 | AmazonEC2FullAccess              |       |           |     |   Y    |        |
 | AmazonEC2ReadOnlyAccess          |       |     Y     |  Y  |        |        |
 | AmazonECS_FullAccess             |       |           |     |   Y    |        |
-| AWSCertificateManagerFullAccess  |       |           |     |   Y    |        |
 | AmazonS3FullAccess               |       |           |     |   Y    |        |
 | AmazonS3ReadOnlyAccess           |       |     Y     |  Y  |        |        |
 | AWSCodeDeployFullAccess          |       |     Y     |     |        |        |
@@ -197,6 +200,8 @@ IAM 액세스 로그는 AWS CloudTrail 서비스를 사용하여 확인 할 수 
 | MFAForcePolicy                   |   Y   |     Y     |  Y  |   Y    |   Y    |
 | DenyDataPipelinePolicy           |       |     Y     |  Y  |   Y    |        |
 | DenyRDSLargeCreationPolicy       |       |           |  Y  |   Y    |        |
+
+<br>
 
 AWS 관리형 정책 뿐 아니라 관리를 위해 별도의 Custom 정책을 생성하는 경우 리소스 identifier 를 지정하면 보다 효과적으로 관리 할 수 있습니다.  
 
@@ -216,7 +221,7 @@ AWS 클라우드의 액세스를 특정 IP 대역만 접근 하도록 설정 할
 
 예를 들어 회사 네트워크의 NAT 아이피 또는 몇몇 VPN 네트워크에 대해서만 접근을 설정 할 수 있습니다. 
 
-회사 네트워크의 NAT 아이피 대역이 `192.0.2.0/24` 이고 VPN 네트워크 대역이 `203.0.113.0/24` 이라면 DenyIPAddress 정책은 다음과 같습니다. 
+회사 네트워크의 NAT 아이피 대역이 `192.0.2.0/24` 이고 VPN 네트워크 대역이 `203.0.113.0/24` 이라면 여기에 정의된 아이피를 제외한 모든 접근을 거부하는 DenyIPAddress 정책은 다음과 같습니다. 
 
 ```json
 {
@@ -366,6 +371,7 @@ MFA 로 로그인 하지 않은 사용자에 대해서 EC2 인스턴스를 중�
 [AWS Example policies](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/access_policies_examples.html) 예제를 참고하면 보다 체계적이고 강화된 정책을 구성 할 수 있습니다.  
 
 
+<br>
 
 ### IAM 식별자(identifier) 를 통한 정책 관리 
 
@@ -386,7 +392,9 @@ arn:aws:iam::111111111:policy/foundation/DenyEC2StopAndTerminationMFAPolicy
 
 ![img_8.png](/assets/images/23q1/img_8.png)
 
+
 <br>
+
 
 ## 자동화 
 
@@ -426,6 +434,7 @@ AWS Config는 지속적으로 AWS 리소스의 구성을 추적하고, 변경 �
 
 ![img_11.png](/assets/images/23q1/img_11.png)
 
+
 <br>
 
 
@@ -433,5 +442,7 @@ AWS Config는 지속적으로 AWS 리소스의 구성을 추적하고, 변경 �
 
 IAM 을 사용하여 AWS 서비스 및 리소스에 대한 액세스를 관리하는 것은 보안에 중요한 역할을 합니다.
  
-IAM을 효과적으로 사용하려면 위에서 설명 것과 같이 IAM을 계획적이고 보다 가시적으로 살펴볼 수 있도록 함으로써 예측 가능한 범주로 제어할 수 있어야 하고 지속해서 관리하는 것이 중요 합니다.
+IAM을 효과적으로 사용하려면 위에서 설명 것과 같이 IAM을 계획하고 이를통해 보다 가시적으로 살펴볼 수 있도록 함으로써 예측 가능한 범주로 제어할 수 있는것이 중요합니다.  
+
+그리고 자동화된 방식으로 IAM 액세스 내역을 지속적으로 감사 및 모니터링 함으로써 쉽고 강력하게 클라우드 서비스를 보호합시다.  
 
