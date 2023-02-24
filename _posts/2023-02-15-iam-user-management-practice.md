@@ -363,6 +363,10 @@ MFA 로 로그인 하지 않은 사용자에 대해서 EC2 인스턴스를 중�
 
 ```
 
+[AWS Example policies](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/access_policies_examples.html) 예제를 참고하면 보다 체계적이고 강화된 정책을 구성 할 수 있습니다.  
+
+
+
 ### IAM 식별자(identifier) 를 통한 정책 관리 
 
 [IAM 식별자](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/reference_identifiers.html) 는 사용자, 사용자 그룹, 역할, 정책 및 서버 인증서에 효과적으로 분류하는 기능을 합니다.  
