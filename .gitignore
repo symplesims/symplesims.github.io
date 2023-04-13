@@ -14,3 +14,4 @@ tags
 
 # IDE Tools
 .idea
+/target/
