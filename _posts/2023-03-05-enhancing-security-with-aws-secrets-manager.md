@@ -14,18 +14,16 @@ categories:
 AWS에서 제공하는 [Secrets Manager](https://aws.amazon.com/ko/secrets-manager/)는 보안 관련 인증 정보, 비밀번호, API 키 등 애플리케이션에서 사용하는 민감한
 정보들을 안전하게 저장하고 관리하는 Managed 서비스입니다.
 
-일반적으로 애플맄이션 코드 안에 보안에 관련된 민감한 정보를 기술하는 것은 매우 위험하며, 의도하지 않게 상황 또는 실수에 의해 민감한 정보는 노출될 수 있습니다.
+일반적으로 애플리케이션 코드 안에 보안에 관련된 민감한 정보를 기술하는 것은 매우 위험하며, 의도하지 않게 상황 또는 실수에 의해 민감한 정보는 노출될 수 있습니다.
 보안 관련 정보는 안전한 곳에 저장하고 필요할 때에만 호출하여 사용하는 것이 좋습니다.
 
-실제로 프로젝트를 하다 보면 간단한 PoC 나 협럽 업체와 공동 작업하는 경우가 있습니다.
-
-예전 저의 경험담을 말하자면 협력 업체분과 작업 하면서 특정 S3 버킷의 ReadOnly 권한만 부여한 API Key 를 제공 한적이 있는데,
+실제로 프로젝트를 하다 보면 간단한 PoC 나 협력사와 공동 작업을 하는 경우가 있는데 예전 저의 경험담을 말하자면, 업체분과 작업 하면서 특정 S3 버킷의 ReadOnly 권한만 부여한 API Key 를 제공 한적이 있는데,
 문제는 그분이 AccessKey 를 코드에 기재하고 외부 소스코드 저장소에 업로드를 한 것이였습니다.
 
-사실 최소 권안 액세스원칙을 준수하고 제한된 정책을 적용하여서 큰 피해는 발생하지 않겠지만,
+사실 최소 권한 액세스 원칙을 준수하고 제한된 정책을 적용하여서 큰 피해는 발생하지 않겠지만,
 정말 문제는 AWS 의 경고 메일과 함께 즉시로 보안 관련된 문제를 조치 하는 것이였습니다.
 
-AccessKey 를 발급한 이전 시간의 모든 Key 를 교체 하는 등 여러 조치 항목들이 있는데 AWS 운영계 Account 였다면 정말이지 너무나 아찔한 경험을 할 뻔 하였습니다.
+AccessKey 를 발급한 이전 시간의 모든 Key 를 교체 하는 등 여러 조치 항목들이 있는데 AWS 운영계 Account 였다면 정말이지 너무나 아찔한 상황이 아닐 수 없습니다.
 
 이 사례에서 보듯이 사람에게 아무리 주의를 준다고 하더라도 애초에 AccessKey 를 사용하지 않도록 AssumeRole 을 사용하도록 하거나 Secrets Manager 의 Key-Store 를 사용했으면 아무런
 문제가 없었을 텐데 말입니다.
@@ -56,10 +54,9 @@ AWS Lambda 를 통해 주기적으로 Key 정보를 교체가 가능합니다.
 
 ## Secrets Manager 를 통한 정보 저장
 
-AWS Secrets Manager를 사용하면 비밀 번호와 같은 보안 정보를 중앙 집중식으로 안전하게 저장할 수 있습니다.     
-이렇게 함으로서 중요한 데이터가 외부로 유출 된다 하더라도 암호화된 상태로 저장되므로 보안 위험을 줄일 수 있습니다.
+AWS Secrets Manager를 AWS 관리 콘솔을 통해 직접 구성해 보도록 하겠습니다.
 
-우선, AWS 관리 콘솔에 로그인을 한 뒤 'Secrets Manager' 화면의 `Store a new secret` 버튼을 클릭하여 손쉽게 Secrets 을 구성 할 수 있습니다.
+우선, AWS 관리 콘솔에 로그인을 한 뒤 'Secrets Manager' 의 `Store a new secret` 버튼을 클릭하여 손쉽게 Secrets 을 구성 할 수 있습니다.
 
 ### Choose secret type
 
@@ -91,7 +88,7 @@ Database 는 위 username, password 로 액세스 가능한 RDS 인스턴스를 
 
 `Resource permissions` 정책 구성을 통해 애플리케이션이 Secrets Keys 를 액세스 가능하도록 합니다.
 
-- 애플리케이션이 특정 secret store 의 key 를 액세스 하기 위한 IAM 정책 예시
+- 애플리케이션이 특정 secret store 의 key 를 액세스 하기 위한 IAM 정책 예시는 다음과 같습니다.
 
 ```json
 {
@@ -115,7 +112,7 @@ Database 는 위 username, password 로 액세스 가능한 RDS 인스턴스를 
 
 ```
 
-- Lambda 를 통해 secret store 의 key 를 주기적으로 교체 하려면 다음과 같은 IAM 정책이 필요 합니다.
+- Lambda 를 통해 secret store 의 key 를 주기적으로 교체 하기 위한 IAM 정책 예시는 다음과 같습니다. 
 
 ```json
 {
@@ -158,7 +155,7 @@ Database 는 위 username, password 로 액세스 가능한 RDS 인스턴스를 
 
 ![img_17.png](/assets/images/23q1/img_17.png)
 
-선택적 구성으로 자동화된 방식으로 주기적으로 암호화 Key 를 교체하기 위한 설정을 할 수 있습니다.
+선택적 구성을 위한 화면으로 자동화된 방식을 통해 주기적으로 암호화 Key 를 교체하는 설정을 할 수 있습니다.
 
 암호화 Key 를 교체하기 위해선 사전에 Key 교체를 위한 Lambda 애플리케이션을 구현하고 배포 하여야 합니다.
 
@@ -206,9 +203,11 @@ Json 형태로 아래와 같은 형태로 관리 됩니다.
 }
  ```
 
-## 애플리케이션 참조 예시
+<br>
 
-Spring Boot 애플리케이션을 통해 Secret Keys 정보를 편리하게 액세스 하려면 
+## 애플리케이션 구현 예시
+
+Spring Boot 와 같은 백앤드 애플리케이션을 통해 Secret Keys 정보를 편리하게 액세스 하려면 
 [spring-boot-starter-aws-secrets-manager](https://central.sonatype.com/artifact/io.github.thenovaworks/spring-boot-starter-aws-secrets-manager/0.9.5/overview)
 라이브러리를 이용 할 수 있습니다.
 
