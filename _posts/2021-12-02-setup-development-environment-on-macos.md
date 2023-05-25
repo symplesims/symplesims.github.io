@@ -110,6 +110,7 @@ brew install pyenv
 ```
 
 - [pyenv](https://www.daleseo.com/python-pyenv/) 을 통한 python 버전 관리 예시
+
 ```shell
 
 # 3 으로 시작하는 버전 확인 
@@ -130,6 +131,7 @@ pyenv install 2.7.18
 ```
 
 #### go-lang
+
 ```shell
 brew install go
 ```
