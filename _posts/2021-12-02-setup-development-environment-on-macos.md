@@ -130,6 +130,29 @@ python3 -version
 pyenv install 2.7.18
 ```
 
+#### aws-vault
+
+```
+brew install --cask aws-vault
+
+# shimson 프로파일을 추가 합니다.
+aws-vault add shimson
+
+Enter Access Key Id: ABDCDEFDASDASF
+Enter Secret Key: ************
+
+# shimson 프로파일에 해당하는 AWS 관리 콘솔에 로그인 합니다. 
+aws-vault login shimson
+
+# shimson 프로파일을 대상은 aws cli 명령을 실행 합니다.
+aws-vault exec shimson -- aws s3 ls
+
+# aws-vault 에 등록된 프로파일 목록을 확인합니다. 
+aws-vault list
+```
+
+<br>
+
 #### go-lang
 
 ```shell
