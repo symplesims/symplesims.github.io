@@ -153,7 +153,7 @@ Kubernetes 환경에서 애플리케이션을 얼마나 빨리 서비스를 올�
 helloworld 애플리케이션 배포를 통해 `선언적 구성 배포` 와 `자동화된 컨테이너 관리`와 `가용성 및 확장성`을 바로 확인할 수 있습니다.   
 
 
-- [helloworld-deploy.yaml](/assets/backup/23/helloworld-deploy.yaml)  
+- [helloworld-deploy.yaml](/assets/images/23q3/helloworld-deploy.yaml.template)  
 
 ```yaml
 ---
