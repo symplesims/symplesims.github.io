@@ -1,6 +1,8 @@
 ---
 layout: post
-title: "Understanding kubernetes and architectural overview"
+title: "Understanding kubernetes and
+ 
+architectural overview"
 date:  2023-08-29 13:00:00 +0900
 categories:
   - AWS
@@ -37,11 +39,11 @@ Kubernetes 플랫폼은 애플리케이션간의 유기적인 통합과 일관�
 
 ![img_6.png](/assets/images/23q3/img_6.png)
 
-Kubernetes 클러스터는 [컨트롤 플레인 (Control Plane)](https://kubernetes.io/docs/concepts/overview/components/#control-plane-components)과 [데이터 플레인 (Control Plane)](https://kubernetes.io/docs/concepts/overview/components/#node-components) 컴포넌트로 구성 되며, 이 두 컴포넌트는 Kubernetes 서로 상호작용하여 클러스터의 안정성과 가용성을 확보합니다.   
-`컨트롤 플레인 (Control Plane)`은 클러스터의 구성 및 관리를 담당하고, `데이터 플레인 (Control Plane)`은 실제 애플리케이션을 실행하고 관리합니다. 
+Kubernetes 클러스터는 [컨트롤 플레인 (Control Plane)](https://kubernetes.io/docs/concepts/overview/components/#control-plane-components)과 [데이터 플레인 (Data Plane)](https://kubernetes.io/docs/concepts/overview/components/#node-components) 컴포넌트로 구성 되며, 이 두 컴포넌트는 Kubernetes 서로 상호작용하여 클러스터의 안정성과 가용성을 확보합니다.   
+`컨트롤 플레인 (Control Plane)`은 클러스터의 구성 및 관리를 담당하고, `데이터 플레인 (Data Plane)`은 실제 애플리케이션을 실행하고 관리합니다. 
 
 
-예를 들어 애플리케이션 Pod 를 배포하고 서비스를 Endpoint 로 expose(노출) 하는 등의 리소스(Pod, Service, ...) 상태를 조정 하는 등의 역할은 `컨트롤 플레인 (Control Plane)`이 담당 하고, 실제 애플리케이션 Pod 가 인스턴스로 올라와서 서비스 기능 자체로 동작하도록 기반을 제공하는 것은 `데이터 플레인 (Control Plane)`이 담당하게 됩니다.  
+예를 들어 애플리케이션 Pod 를 배포하고 서비스를 Endpoint 로 expose(노출) 하는 등의 리소스(Pod, Service, ...) 상태를 조정 하는 등의 역할은 `컨트롤 플레인 (Control Plane)`이 담당 하고, 실제 애플리케이션 Pod 가 인스턴스로 올라와서 서비스 기능 자체로 동작하도록 기반을 제공하는 것은 `데이터 플레인 (Data Plane)`이 담당하게 됩니다.  
 
 
 
@@ -63,9 +65,9 @@ Kubernetes 클러스터는 [컨트롤 플레인 (Control Plane)](https://kuberne
 - 클러스터의 모든 구성 정보를 저장하는 분산 데이터 저장소로, 클러스터의 상태 및 설정 정보를 관리합니다.
 
 
-### [데이터 플레인 (Control Plane)](https://kubernetes.io/docs/concepts/overview/components/#node-components)
+### [데이터 플레인 (Data Plane)](https://kubernetes.io/docs/concepts/overview/components/#node-components)
 
-`데이터 플레인 (Control Plane)`은 모든 Node 에서 실제 컨테이너화된 애플리케이션 컨테이너가 실행중인 Pod 를 유지하고 Kubernetes 런타임 환경을 제공 합니다.    
+`데이터 플레인 (Data Plane)`은 모든 Node 에서 실제 컨테이너화된 애플리케이션 컨테이너가 실행중인 Pod 를 유지하고 Kubernetes 런타임 환경을 제공 합니다.    
 
 #### kubelet: 
 - 각 노드에서 실행되는 에이전트로, Node 에서 PodSpec에 설명된 컨테이너가 Pod 로서 실행 중이고 정상적으로 동작하는지 확인합니다. 
@@ -195,6 +197,14 @@ deployment.apps/helloworld   2/2     2            2           121m
 NAME                                   DESIRED   CURRENT   READY   AGE
 replicaset.apps/helloworld-9bf945f5f   2         2         2       121m
 ```
+
+
+## Kubernetes 가 애플리케이션을 배포하는 흐름 
+
+![img_7.jpg](/assets/images/23q3/img_7.jpg)
+
+위 다이어그램은 Kubernetes 클러스터의 컴포넌트가 유기적인 상호작용으로 애플리케이션을 어떻게 배포하고 상태를 현행화하는지를 보여주고 있습니다.  
+
 
 ## Minikube
 
