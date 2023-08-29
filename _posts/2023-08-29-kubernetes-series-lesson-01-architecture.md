@@ -142,11 +142,12 @@ Kubernetes 의 기본 아키텍처를 Cloud Native한 환경에서 운영되도�
 
 ## helloworld 애플리케이션 서비스 배포 
 
-Kubernetes 환경에서 애플리케이션을 얼마나 빨리 서비스를 올리고 그 방법의 일관됨과 단순함을  
+Kubernetes 환경에서 애플리케이션을 얼마나 빨리 서비스를 올리고 그 방법의 일관됨과 단순함을 
 helloworld 애플리케이션 배포를 통해 `선언적 구성 배포` 와 `자동화된 컨테이너 관리`와 `가용성 및 확장성`을 바로 확인할 수 있습니다.   
 
 
-- [helloworld-deploy.yaml](/assets/images/23q3/helloworld-deploy.yaml)
+- [helloworld-deploy.yaml](/assets/images/23q3/helloworld-deploy.yaml)  
+
 ```yaml
 ---
 apiVersion: apps/v1
@@ -184,14 +185,17 @@ spec:
    type: LoadBalancer
 ```
 
-- 적용 
+- kubectl 을 통한 애플리케이션 배포 
+
 ```
 kubectl apply -f helloworld.yaml
 ```
 
-- 확인 
+- kubectl 을 통한 주요 리소스 확인  
+
 ```
 kubectl -n default get all
+
 NAME                             READY   STATUS    RESTARTS   AGE
 pod/helloworld-9bf945f5f-d96vq   1/1     Running   0          121m
 pod/helloworld-9bf945f5f-sjmzh   1/1     Running   0          121m
@@ -228,7 +232,9 @@ Kubernetes 리소스를 배포 및 테스트하는 목적으로 **`Minikube`** �
 [**Minikube Start**](https://minikube.sigs.k8s.io/docs/start/) 를 통해 OS 및 CPU 아키텍처에 해당하는 번들을 다운로드하고 설치 할 수 있습니다.
 
 #### minikube 설정
+
 다음은 minikube 리소스를 정의하고 실행 에뮬레이터 드라이버를 설정 합니다.
+
 ```
 minikube config set driver docker
 minikube config set cpus 2
