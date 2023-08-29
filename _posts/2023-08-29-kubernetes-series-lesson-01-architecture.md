@@ -1,15 +1,11 @@
 ---
 layout: post
-title: "Understanding kubernetes and
- 
-architectural overview"
+title: "Understanding kubernetes and architecture overview"
 date:  2023-08-29 13:00:00 +0900
 categories:
-  - AWS
   - DevOps
   - Kubernetes
   - EKS
-
 ---
 
 Kubernetes는 컨테이너화된 애플리케이션을 배포, 관리, 확장 및 운영 하기 위한 오픈소스 플랫폼입니다. 
@@ -62,10 +58,11 @@ Kubernetes 클러스터는 [컨트롤 플레인 (Control Plane)](https://kuberne
 - 파드를 노드에 할당하는 역할을 담당합니다. 사용자가 생성한 파드를 최적의 노드에 할당하여 실행하도록 관리합니다.
 
 #### 컨트롤러 매니저 (Controller Manager)
-- 클러스터의 상태를 지속적으로 확인하고 필요에 따라 상태를 조정합니다. 레플리케이션 컨트롤러, 디플로이먼트 컨트롤러 등의 컨트롤러가 포함됩니다.
+- 클러스터의 상태를 지속적으로 확인하고 필요에 따라 상태를 조정합니다. Node Controller, Replication Controller, Deployment Controller 등의 컨트롤러가 포함됩니다.  
+새로운 Node 추가 / 제거, Taint, Drain 과 애플리케이션의 컨테이너 복제 수를 일치하도록 조정하는 등의 중요한 프로세스를 처리 합니다.  
 
 #### Etcd (Cluster Storage)
-- 클러스터의 모든 구성 정보를 저장하는 분산 데이터 저장소로, 클러스터의 상태 및 설정 정보를 관리합니다.  
+- 클러스터의 모든 구성 정보를 저장하는 분산 데이터 저장소로, 클러스터의 상태 및 설정 정보를 Key / Value 로 관리합니다.  
 
 <br>
 
@@ -87,9 +84,19 @@ kube-proxy는 각 노드에서 실행되는 네트워크 프록시로 NAT 및 �
 
 <br>
 
-### Pods
-- 컨테이너화된 애플리케이션을 배포하는 가장 작은 단위 입니다. 여기에는 애플리케이션과 애플리케이션이 사용하는 공유 리소스(Volume 등)를 함께 구성하여 배포할 수 있습니다.
-참고로, Pod 는 고유의 private IP 주소를 가집니다. Pod 를 구성하는 애플리케이션 서비스인 container 는 Pod 내에서 localhost 로 서로 통신 합니다.   
+### Kubernetes Resource
+
+`데이터 플레인 (Data Plane)`위에 애플리케이션 서비스를 위한 주요한 Kubernetes 리소스들이 배포됩니다. 
+
+#### Pods
+- 컨테이너화된 애플리케이션을 배포하는 가장 작은 단위 입니다. 여기에는 애플리케이션과 애플리케이션이 사용하는 공유 리소스(IP 주소, IPC, 호스트 이름, Volume 등)를 함께 구성하여 배포할 수 있습니다.
+참고로, Pod 는 고유의 private IP 주소를 가집니다. Pod 를 구성하는 애플리케이션 서비스인 container 는 Pod 내에서 localhost 로 서로 통신 합니다. 컴퓨팅 및 공유 리소스의 격리화를 통해 Cluster 내에서 복제 및 이동이 용이합니다.    
+
+#### Service
+- Service 는 생성 / 삭제 / 확장 / 축소와 같이 동적으로 상태가 변화하는 Pod 를 대상으로 외부에서 접근할 수 있는 하나의 Endpoint 를 제공 합니다.
+
+#### Ingress
+- Ingress는 클러스터 외부의 HTTP 및 HTTPS 요청을 클러스터 내부의 서비스로 라우팅 합니다. 특히 hostname 기반 또는 URI 경로 기반으로 Ingress 리소스에 정의된 규칙에 따라 트래픽을 제어합니다. 
 
 <br>
 
@@ -146,7 +153,7 @@ Kubernetes 환경에서 애플리케이션을 얼마나 빨리 서비스를 올�
 helloworld 애플리케이션 배포를 통해 `선언적 구성 배포` 와 `자동화된 컨테이너 관리`와 `가용성 및 확장성`을 바로 확인할 수 있습니다.   
 
 
-- [helloworld-deploy.yaml](/assets/images/23q3/helloworld-deploy.yaml)  
+- [helloworld-deploy.yaml](/assets/backup/23/helloworld-deploy.yaml)  
 
 ```yaml
 ---
