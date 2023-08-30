@@ -243,10 +243,15 @@ Kubernetes 리소스를 배포 및 테스트하는 목적으로 **`Minikube`** �
 다음은 minikube 리소스를 정의하고 실행 에뮬레이터 드라이버를 설정 합니다.
 
 ```
+# light-mode
 minikube config set driver docker
 minikube config set cpus 2
 minikube config set memory 5919MB
 minikube config view
+
+# normal-mode
+minikube config set memory 8192
+minikube config set cpus 4
 ```
 
 #### minikube 실행

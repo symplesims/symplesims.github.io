@@ -6,7 +6,6 @@ categories:
 - AWS
 - DevOps
 - ECS
-
 ---
 
 Service Connect 는 ECS 클러스터 내부의 분산된 서비스 간의 연결을 손쉽게 구축하고 운영할 수 있는 새로운 기능 입니다.  
@@ -15,22 +14,23 @@ Service Connect 는 ECS 클러스터 내부의 분산된 서비스 간의 연결
 
 <br>
 
-
 ## Business Challenge
 최근 회사에서 운영중인 서비스 스택을 Bahrain 리전에서 UAE 리전 으로 마이그레이션 해야 하는 작업이 있었습니다.   
 UAE 리전에 프로비저닝을 하기전에 UAE 리전에 관한 제약 사항들을 조사하였고 주요 항목은 다음과 같습니다.    
 - AWS 에서 현재까지 UAE 리전은 사용가능한 리전이 아니므로, 리전 목록에서 활성화를 해줘야 합니다.   
 - Ahtena 를 정식으로 지원하지 않습니다.
 - ECS Service Discovery 를 위한 CloudMap 의 Namespace 를 지원하지 않습니다.
-- 그 밖에 [Service Connect 고려 사항](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html#service-connect-considerations) 을 주의깊에 살펴보아야 합니다.
+- 그 밖에 [Service Connect 고려 사항](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html#service-connect-considerations) 을 주의깊에 살펴보아야 했습니다.
 
 
-다행히, [2023년 7월](https://aws.amazon.com/ko/about-aws/whats-new/2023/06/amazon-athena-aws-middle-east-uae-region/) 부터 Athena 서비스가 정식 지원이 되었습니다.  
+다행히 마이그레이션 기간 중에 [2023년 7월](https://aws.amazon.com/ko/about-aws/whats-new/2023/06/amazon-athena-aws-middle-east-uae-region/) 부터 Athena 서비스가 UAE 리전에서도 정식 지원이 되었습니다.  
 
-하지만, 우리의 서비스는 다수의 ECS Fargate 서비스로 구성되어 서로 인터페이스 하게 되어 있고, 내부적으로 CloudMap 의 Namespace 를 사용하도록 구성되었는데 이 부분은 여전히 지원 되지 않았기 때문에 가장 적합한 대체 서비스를 찾아야 했습니다. 
+문제는 다수의 ECS Fargate 서비스는 내부적으로 CloudMap 의 Namespace 를 사용하도록 구성되었는데 이 부분은 여전히 지원 되지 않았기 때문에 가장 적합한 대체 서비스를 찾아야 했습니다. 
 
 조사를 통해 [2022년 AWS ReInvent](https://youtu.be/1_YUmq3MpYQ?t=945) 에서 소개된 ECS Service Connect 를 사용하여 서비스간 인터페이스를 구성하고, CloudMap 을 이용한 HPPT_NAMESPACE 방식의 Service Discovery 를 사용하는 방법을 확인할 수 있었고 이를 통해 UAE 리전에 서비스를 구성할 수 있었습니다.
 
+
+<br>
 
 
 ### AWS ECS Service Connect 의 개요
@@ -40,8 +40,10 @@ Amazon ECS 서비스와 다른 AWS ECS 서비스와의 연결성을 개선하는
 이 기능은 컨테이너화된 애플리케이션과 다른 AWS 리소스 간의 통신을 보다 쉽게 설정하고 관리할 수 있도록 지원합니다.
 
 
-![img.png](../assets/images/23q3/img.png)
+![img.png](/assets/images/23q3/img.png)
 
+
+<br>
 
 ### ECS Service Connect의 주요 기능 및 장점
 
@@ -62,7 +64,7 @@ ECS Service Connect는 컨테이너화된 애플리케이션의 네트워크 통
 
 ## Service Connect 프로비저닝 흐름
 
-![img_1.png](..%2Fassets%2Fimages%2F23q3%2Fimg_1.png)
+![img_1.png](/assets/images/23q3/img_1.png)
 
 1. 콘솔에서 Service Connect 설정을 업데이트하면, Amazon ECS Agent를 통해 Service Connect Agent 컨테이너 설정이 주입됩니다.
 2. Amazon ECS Agent는 Service Connect Agent를 생성하고, 애플리케이션 컨테이너를 배포하기 위한 명령을 내립니다.
@@ -75,7 +77,7 @@ ECS Service Connect는 컨테이너화된 애플리케이션의 네트워크 통
 
 ## Service Connect Request 흐름
 
-![img_2.png](..%2Fassets%2Fimages%2F23q3%2Fimg_2.png)
+![img_2.png](/assets/images/23q3/img_2.png)
 
 위 그림은 Client - ELB - Frontend - Backkend API 서비스간 Service Connect 를 통해 Service-Mesh 를 구성하고, 그 내부에서 이루어지는 요청 흐름을 보여줍니다. 
 
@@ -88,49 +90,119 @@ ECS Service Connect는 컨테이너화된 애플리케이션의 네트워크 통
 
 <br>
 
-## ECS Service Connect 설정하기
+## ECS Service Connect 설정
 
 
-![img_3.png](..%2Fassets%2Fimages%2F23q3%2Fimg_3.png)
+![img_3.png](/assets/images/23q3/img_3.png)
 
 Service Connect 의 네임스페이스는 HTTP_NAMESPACE 로 설정 됩니다. 이는 Service Name 을 식별할 때 DNS 네임 해석을 하지 않는다는 것입니다. 그리고 Service Discovery 항목은 설정되지 않은 것을 확인할 수 있습니다.
 
 <br>
 
-![img_4.png](..%2Fassets%2Fimages%2F23q3%2Fimg_4.png)
+![img_4.png](/assets/images/23q3/img_4.png)
 
-Service Connect 를 구성할 때 현재 ECS 서비스가 다른 서비스로부터 호출되는 서비스라면 `Client and Server` 를 선택합니다.
+Service Connect 구성은 `Client side only` 와 `Client and server` 두 가지 모드가 있습니다.
+
+- Client side only: 현재 ECS 서비스가 다른 ECS 서비스를 호출하는 경우에 선택 합니다. 
+- Client and server: 다른 ECS 서비스가 현재 ECS 서비스를 호출 하는 경우에 선택 합니다. 현재 서비스를 HTTP_NAMESPACE 에 등록되며 다른 서비스는 현재서비스를 Discovery 할 수 있습니다. 
+
+현재 ECS 서비스가 다른 서비스로부터 호출되는 서비스라면 `Client and Server` 를 선택합니다.
 `Client and Server` 방식은 Service Connect Agent 가 요청을 받아들이고, 요청을 전달할 서비스를 식별하기 위해 Service Name 을 사용한다는 것을 의미합니다.
 
 |            |                                                                                                                    | 
 |------------|--------------------------------------------------------------------------------------------------------------------|
-| Port alias | Service Connect Agent 가 요청을 받아들이는 포트를 의미합니다. 컨테이너의 이름 입니다.                                                       |
+| Port alias | Service Connect Agent 가 요청을 받아들이는 포트를 의미합니다. 컨테이너의 이름 입니다.                                                         |
 | Discovery  | Service Connect Agent 가 요청을 전달할 서비스를 식별하기 위해 사용하는 서비스 디스커버리 정보를 의미합니다. Service Discovery 의 Service Name 으로 매핑 됩니다. |
-| DNS | Service Connect Agent 가 요청을 전달할 서비스를 식별하기 위해 사용하는 DNS 네임을 의미합니다.  |
+| DNS        | Service Connect Agent 가 요청을 전달할 서비스를 식별하기 위해 사용하는 DNS 네임을 의미합니다.                                                   |
+| Port       | ECS 서비스의 서비스 Listen 포트 입니다.                                                                                      |
 
 
-Port alias 는 Service Connect Agent 가 요청을 받아들이는 포트를 의미합니다. 
-Discovery 는 Service Connect Agent 가 요청을 전달할 서비스를 식별하기 위해 사용하는 서비스 디스커버리 정보를 의미합니다.
-DNS 는 Service Connect Agent 가 요청을 전달할 서비스를 식별하기 위해 사용하는 DNS 네임을 의미합니다.
+<br>
 
-## ECS Task Definition에서 ECS Service Connect 구성하기
-### 네트워크 구성 및 연결 설정
-### 환경 변수 및 구성 파일 설정
+## ECS Service Connect 네임 디스커버리 원리 및 주의 사항 
 
-## ECS Service Connect 사용 사례
-### 마이크로서비스 간의 안전한 통신 구축
-### 서비스 간 종속성 관리 및 효율적인 개발
+ECS Service Connect 를 위와 같이 설정하면 CloudMap 의 HTTP_NAMESPACE 등록을 하게 됩니다. 
 
-## ECS Service Connect 관리 및 모니터링
-### 연결된 서비스 관리 및 수정하기
-### 서비스 연결 상태 모니터링 및 문제 해결
+1. 최초로 `apple-svc` ECS 서비스를 Service Connect 로 등록 했을 때 HTTP_NAMESPACE 는 `apple-svc` 만 존재하게 됩니다. 
 
-## 보안 및 베스트 프랙티스
-### ECS Service Connect의 보안 기능 및 권장 사항
-### Best Practice: 네트워크 구성, 권한 관리, 보안 그룹 등
+[session-manager-plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) 을 사용하면 `apple-svc` ECS 서비스의 컨테이너 내부로 진입할 수 있습니다.  
+
+`apple-svc` 컨테이너의 `/etc/hosts` 파일을 열어보면 아래와 같이 보여집니다.  
+
+- `apple-svc's` /etc/hosts 
+
+```
+127.0.0.1 localhost
+10.210.51.94 ip-10-210-51-94.me-central-1.compute.internal
+127.255.0.1 apple.discovery.internal.local
+2600:f0f0:0:0:0:0:0:1 apple.discovery.internal.local
+```
+
+이 시점에서 `apple-svc` 는 Service Connect 를 통해서 다른 어떤 ECS 서비스를 디스커버리할 수 없으므로 통신을 할 수 없습니다. 
+
+
+2. 두번째로  `banana-svc` ECS 서비스를 Service Connect 로 등록 하면 HTTP_NAMESPACE 는 `apple-svc` 와 `banana-svc` 가 존재합니다. 
+
+`banana-svc` ECS 서비스의 컨테이너 내부로 진입하여 `/etc/hosts` 파일을 열어보면 아래와 같이 보여집니다. 
+
+- `banana-svc's` /etc/hosts
+
+```
+127.0.0.1 localhost
+10.210.51.94 ip-10-210-51-94.me-central-1.compute.internal
+127.255.0.1 apple-svc.discovery.internal.local
+2600:f0f0:0:0:0:0:0:1 apple-svc.discovery.internal.local
+127.255.0.2 banana-svc.discovery.internal.local
+2600:f0f0:0:0:0:0:0:2 banana-svc.discovery.internal.local
+```
+
+문제는, `apple-svc`는 여전히 `banana-svc` 에 대한 정보가 /etc/hosts 파일에 없기때문에, `banana-svc` 서비스를 호출할 수 없습니다.  
+
+반면엔, `banana-svc` 서비스는 `apple-svc` 가 `/etc/hosts` 에 존재 하므로 `apple-svc` 서비스를 호출 할 수 있게 됩니다.  
+
+우리는 여기에서 ECS Service Connect 가 ECS 서비스를 디스커버리하는 것이 자동으로 등록되어 참조되는 것이 아닌, HTTP_NAMESPACE 레지스트리에 등재된것만 디스커버리가 가능한 반 자동이라는 제약 사항에 주의하여 운영 해야만 하는 것 입니다.
+
+
+### ECS Service Connect 운영 Tip
+ECS Service Connect 를 잘 운영하려면 디스커버리 제약 사항으로 인해 ECS 서비스를 배포하는 순서가 아주 중요 합니다.   
+Cache, Database, Message Queue 와 같이 다른 ECS 서비스를 호출하지 않고, 다른 ECS 서비스에 의해 호출되어지는 서비스를 우선적으로 배포하여야 합니다.  
+
+최초에 등록한 ECS 서비스도 다른 서비스를 호출홰야하는 상황이라면, 모든 ECS 서비스를 배포한 뒤에 최초에 배포한 서비스를 다시 한번 Update 해주어 /etc/hosts 파일을 갱신하도록 할 수 있습니다.  
+
+
+### 참고 사항
+`/etc/hosts` 파일에 정의된 `127.255.0.0/24` 아이피 대역은 localhost 자신의 네트워크을 가리키는 LoopBack IP 주소 입니다.   
+여기에 등록된 호스트 이름과 IP 를 통해 다른 ECS 서비스를 찾고 통신을 할 수 있습니다. 
+
+
+<br>
+
+
+## 강화된 모니터링 대시보드 
+
+ECS 서비스에 Service Connect 를 구성하면 보다 강화된 모니터링 메트릭을 확인할 수 있습니다. 
+
+
+- 기존 CPU / Memory 모니터링 
+
+![img_7.png](/assets/images/23q3/img_7.png)
+
+<br>
+
+- 네트워크 트래픽 핼스 모니터링
+
+![img_9.png](/assets/images/23q3/img_9.png)
+
+<br>
+
+- 서버사이드 응답 모니터링
+
+![img_10.png](/assets/images/23q3/img_10.png)
+
+<br>
 
 ## 결론
 
-AWS ECS Service Connect를 통해 구축된 안전하고 확장 가능한 마이크로서비스 환경의 장점
-ECS Service Connect를 사용하여 애플리케이션 통합과 관리를 간소화하는 방법에 대한 요약
-이러한 구조를 기반으로 AWS ECS Service Connect에 대한 자세한 내용을 블로그에 작성하실 수 있습니다. 각 섹션에서는 해당 주제에 대한 상세한 내용을 설명하고 예시, 팁, 리소스 등을 추가하여 독자가 쉽게 이해하고 활용할 수 있도록 구성하는 것이 좋습니다.
+AWS ECS Service Connect를 사용하여 Bahrain 리전에서 운영되는 모든 리소스를 UAE 리전으로 안전하게 마이그레이션 하였으며, 특히 ECS Service Connect 로의 전환이 생각 보다 어렵지 않게 완료할 수 있습니다.
+
+ECS Service Connect 는 애플리케이션 컨테이너를 위한 Envoy 로서 내부 마이크로서비스간 API 통신과 네트워크 트래픽 및 라우팅을 제어하고 네트워크 보안을 강화하는 등 많은 장점이 있으므로 MSA 와 같은 마이크로 서비스 아키텍처를 지향하는 서비스 스택이 필요하다면 훌륭한 선택이 될 수 있습니다.  
