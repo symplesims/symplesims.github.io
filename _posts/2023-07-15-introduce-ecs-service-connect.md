@@ -9,8 +9,7 @@ categories:
 ---
 
 Service Connect 는 ECS 클러스터 내부의 분산된 서비스 간의 연결을 손쉽게 구축하고 운영할 수 있는 새로운 기능 입니다.  
-애플리케이션 코드를 직접 변경하지 않으면서 서비스 간 통신을 위한 회복 탄력성(resilience)있는 네트워크 계층을 추가하여 트래픽의 헬스 체크와 요청 실패시 자동 재시도와 같은 기능을 쉽게 적용할 수 았고,   
-트래픽의 텔레메트리 데이터에 대한 인사이트도 Amazon CloudWatch 와 ECS 콘솔을 통해 얻을 수 있습니다.
+애플리케이션 코드를 직접 변경하지 않으면서 서비스 간 통신을 위한 회복 탄력성(resilience)있는 네트워크 계층을 추가하여 트래픽의 헬스 체크와 요청 실패시 자동 재시도와 같은 기능을 쉽게 설정할 수 있으며 트래픽의 텔레메트리 데이터에 대한 인사이트도 Amazon CloudWatch 와 ECS 콘솔을 통해 얻을 수 있습니다.
 
 <br>
 
@@ -125,9 +124,8 @@ Service Connect 구성은 `Client side only` 와 `Client and server` 두 가지 
 
 ECS Service Connect 를 위와 같이 설정하면 CloudMap 의 HTTP_NAMESPACE 등록을 하게 됩니다. 
 
-1. 최초로 `apple-svc` ECS 서비스를 Service Connect 로 등록 했을 때 HTTP_NAMESPACE 는 `apple-svc` 만 존재하게 됩니다. 
-
-[session-manager-plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) 을 사용하면 `apple-svc` ECS 서비스의 컨테이너 내부로 진입할 수 있습니다.  
+**1.** 최초로 `apple-svc` ECS 서비스를 Service Connect 로 등록 했을 때 HTTP_NAMESPACE 는 `apple-svc` 만 존재하게 됩니다.   
+   참고로, [session-manager-plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) 을 사용하면 `apple-svc` ECS 서비스의 컨테이너 내부로 진입할 수 있습니다.  
 
 `apple-svc` 컨테이너의 `/etc/hosts` 파일을 열어보면 아래와 같이 보여집니다.  
 
@@ -142,8 +140,9 @@ ECS Service Connect 를 위와 같이 설정하면 CloudMap 의 HTTP_NAMESPACE �
 
 이 시점에서 `apple-svc` 는 Service Connect 를 통해서 다른 어떤 ECS 서비스를 디스커버리할 수 없으므로 통신을 할 수 없습니다. 
 
+<br>
 
-2. 두번째로  `banana-svc` ECS 서비스를 Service Connect 로 등록 하면 HTTP_NAMESPACE 는 `apple-svc` 와 `banana-svc` 가 존재합니다. 
+**2.** 두번째로  `banana-svc` ECS 서비스를 Service Connect 로 등록 하면 HTTP_NAMESPACE 는 `apple-svc` 와 `banana-svc` 가 존재합니다. 
 
 `banana-svc` ECS 서비스의 컨테이너 내부로 진입하여 `/etc/hosts` 파일을 열어보면 아래와 같이 보여집니다. 
 
@@ -158,12 +157,14 @@ ECS Service Connect 를 위와 같이 설정하면 CloudMap 의 HTTP_NAMESPACE �
 2600:f0f0:0:0:0:0:0:2 banana-svc.discovery.internal.local
 ```
 
+ `banana-svc` 서비스는 `apple-svc` 가 `/etc/hosts` 에 존재 하므로 `apple-svc` 서비스를 호출 할 수 있게 됩니다.  
+
 문제는, `apple-svc`는 여전히 `banana-svc` 에 대한 정보가 /etc/hosts 파일에 없기때문에, `banana-svc` 서비스를 호출할 수 없습니다.  
 
-반면엔, `banana-svc` 서비스는 `apple-svc` 가 `/etc/hosts` 에 존재 하므로 `apple-svc` 서비스를 호출 할 수 있게 됩니다.  
 
 우리는 여기에서 ECS Service Connect 가 ECS 서비스를 디스커버리하는 것이 자동으로 등록되어 참조되는 것이 아닌, HTTP_NAMESPACE 레지스트리에 등재된것만 디스커버리가 가능한 반 자동이라는 제약 사항에 주의하여 운영 해야만 하는 것 입니다.
 
+<br>
 
 ### ECS Service Connect 운영 Tip
 ECS Service Connect 를 잘 운영하려면 디스커버리 제약 사항으로 인해 ECS 서비스를 배포하는 순서가 아주 중요 합니다.   
@@ -171,6 +172,7 @@ Cache, Database, Message Queue 와 같이 다른 ECS 서비스를 호출하지 �
 
 최초에 등록한 ECS 서비스도 다른 서비스를 호출홰야하는 상황이라면, 모든 ECS 서비스를 배포한 뒤에 최초에 배포한 서비스를 다시 한번 Update 해주어 /etc/hosts 파일을 갱신하도록 할 수 있습니다.  
 
+<br>
 
 ### 참고 사항
 `/etc/hosts` 파일에 정의된 `127.255.0.0/24` 아이피 대역은 localhost 자신의 네트워크을 가리키는 LoopBack IP 주소 입니다.   
@@ -180,7 +182,7 @@ Cache, Database, Message Queue 와 같이 다른 ECS 서비스를 호출하지 �
 <br>
 
 
-## 강화된 모니터링 대시보드 
+## Service Connect 적용으로 강화된 모니터링 대시보드 
 
 ECS 서비스에 Service Connect 를 구성하면 보다 강화된 모니터링 메트릭을 확인할 수 있습니다. 
 
@@ -206,11 +208,9 @@ ECS 서비스에 Service Connect 를 구성하면 보다 강화된 모니터링 
 ## 결론
 
 AWS ECS Service Connect를 사용하여 Bahrain 리전에서 운영되는 모든 리소스를 UAE 리전으로 안전하게 마이그레이션 하였습니다.  
-
 특히 ECS Service Connect 는 애플리케이션 컨테이너를 위한 Envoy 로서 내부 마이크로서비스간 API 통신과 네트워크 트래픽 및 라우팅을 제어하고 네트워크 보안을 강화합니다.
+결과적으로 기존의 CloudMap Discovery 기능을 Service Connect 가 완벽하게 대신해 주었기 때문에 계획된 일정과 절차대로 예외없이 안전하게 완료될 수 있었습니다.
 
-결과적으로 기존의 CloudMap Discovery 기능을 Service Connect 가 완벽하게 대신해 주었기 때문에 계회된 마이그레이션 일정과 절차대로 예외없이 안전하게 완료될 수 있었습니다.
 
-
-**PS** 마이그레이션이 완료되어 QA 검증 기간에 UAE 리전에서도 CloudMap 을 통한 Service Discovery 기능을 지원한다는 AWS 발표가 있었습니다.  
+**PS)** 마이그레이션이 완료되어 QA 검증 기간중에 UAE 리전에서도 CloudMap 을 통한 Service Discovery 기능을 지원한다는 AWS 발표가 있었습니다.  
 Athena 도 그렇고 CloudMap 의 Service Discovery 기능도 그렇고 AWS 는 생각보다 빠르게 릴리즈 되므로, 가능한 예외를 만들지 않고 마이그레이션 영향도를 적게 하려면 일정을 조금 더 기다리는 것도 방법이 될 수 있을 것 같습니다. 
