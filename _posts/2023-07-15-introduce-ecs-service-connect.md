@@ -16,7 +16,9 @@ Service Connect 는 ECS 클러스터 내부의 분산된 서비스 간의 연결
 
 ## Business Challenge
 최근 회사에서 운영중인 서비스 스택을 Bahrain 리전에서 UAE 리전 으로 마이그레이션 해야 하는 작업이 있었습니다.   
-UAE 리전에 프로비저닝을 하기전에 UAE 리전에 관한 제약 사항들을 조사하였고 주요 항목은 다음과 같습니다.    
+법인이 있는 국가에 속한 리전에서 안전하게 고객 데이터를 관리하고자 하는 요구사항이 있었기에 클라우드 환경이었지만 마이그레이션을 강행하였습니다.  
+
+마이그레이션 이전을 하기전에 UAE 리전에 관한 제약 사항들을 조사하였고 주요 항목은 다음과 같습니다.    
 - AWS 에서 현재까지 UAE 리전은 사용가능한 리전이 아니므로, 리전 목록에서 활성화를 해줘야 합니다.   
 - Ahtena 를 정식으로 지원하지 않습니다.
 - ECS Service Discovery 를 위한 CloudMap 의 Namespace 를 지원하지 않습니다.
@@ -203,6 +205,12 @@ ECS 서비스에 Service Connect 를 구성하면 보다 강화된 모니터링 
 
 ## 결론
 
-AWS ECS Service Connect를 사용하여 Bahrain 리전에서 운영되는 모든 리소스를 UAE 리전으로 안전하게 마이그레이션 하였으며, 특히 ECS Service Connect 로의 전환이 생각 보다 어렵지 않게 완료할 수 있습니다.
+AWS ECS Service Connect를 사용하여 Bahrain 리전에서 운영되는 모든 리소스를 UAE 리전으로 안전하게 마이그레이션 하였습니다.  
 
-ECS Service Connect 는 애플리케이션 컨테이너를 위한 Envoy 로서 내부 마이크로서비스간 API 통신과 네트워크 트래픽 및 라우팅을 제어하고 네트워크 보안을 강화하는 등 많은 장점이 있으므로 MSA 와 같은 마이크로 서비스 아키텍처를 지향하는 서비스 스택이 필요하다면 훌륭한 선택이 될 수 있습니다.  
+특히 ECS Service Connect 는 애플리케이션 컨테이너를 위한 Envoy 로서 내부 마이크로서비스간 API 통신과 네트워크 트래픽 및 라우팅을 제어하고 네트워크 보안을 강화합니다.
+
+결과적으로 기존의 CloudMap Discovery 기능을 Service Connect 가 완벽하게 대신해 주었기 때문에 계회된 마이그레이션 일정과 절차대로 예외없이 안전하게 완료될 수 있었습니다.
+
+
+**PS** 마이그레이션이 완료되어 QA 검증 기간에 UAE 리전에서도 CloudMap 을 통한 Service Discovery 기능을 지원한다는 AWS 발표가 있었습니다.  
+Athena 도 그렇고 CloudMap 의 Service Discovery 기능도 그렇고 AWS 는 생각보다 빠르게 릴리즈 되므로, 가능한 예외를 만들지 않고 마이그레이션 영향도를 적게 하려면 일정을 조금 더 기다리는 것도 방법이 될 수 있을 것 같습니다. 
