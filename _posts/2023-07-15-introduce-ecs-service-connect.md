@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Introduce ECS Service Connect."
+title: "Introducing a migration experience replacing ECS Service Connect."
 date:  2023-07-15 18:00:00 +0900
 categories:
 - AWS
