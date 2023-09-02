@@ -192,31 +192,12 @@ spec:
    type: LoadBalancer
 ```
 
-- kubectl 을 통한 애플리케이션 배포 
 
-```
-kubectl apply -f helloworld.yaml
-```
-
-- kubectl 을 통한 주요 리소스 확인  
-
-```
-kubectl -n default get all
-
-NAME                             READY   STATUS    RESTARTS   AGE
-pod/helloworld-9bf945f5f-d96vq   1/1     Running   0          121m
-pod/helloworld-9bf945f5f-sjmzh   1/1     Running   0          121m
-
-NAME                     TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
-service/helloworld-svc   LoadBalancer   10.111.225.215   127.0.0.1     80:31038/TCP   121m
-service/kubernetes       ClusterIP      10.96.0.1        <none>        443/TCP        10h
-
-NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/helloworld   2/2     2            2           121m
-
-NAME                                   DESIRED   CURRENT   READY   AGE
-replicaset.apps/helloworld-9bf945f5f   2         2         2       121m
-```
+## 애플리케이션이 갖추어야할 미덕 
+- lightweight (Base 이미지는 alpine, slim) 
+- 구동 시간이 짧을수록 좋음
+- health 체크를위한 api 를 항상 추가 (형식은 통일 /health, httpStatus 200 OK)
+- 트러블 슈팅을 위한 툴이 필요할 수 있음 (curl, netcat, bind-utils 등 경우에 따라 컨테이너 내부에서 설치하여 확인이 필요할 수 있음)
 
 <br>
 
