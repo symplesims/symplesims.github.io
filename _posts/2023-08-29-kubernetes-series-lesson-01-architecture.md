@@ -51,6 +51,10 @@ Kubernetes 클러스터는 [컨트롤 플레인 (Control Plane)](https://kuberne
 - `컨트롤 플레인 (Control Plane)`은 클러스터 상태를 중앙 관리 및 제어를 통해 지속적으로 조정해 주는 컨트롤 센터 역할을 담당 합니다.   
 클라이언트(사용자)가 API 및 kubectl 을 통해 Kubernetes 리소스를 생성, 수정, 삭제, 자동화 요청을 하게 되며 `컨트롤 플레인 (Control Plane)` 은 이 명령들을 처리하게 됩니다.    
 
+![img_19.png](/assets/images/23q3/img_19.png)
+
+<br>
+
 #### API 서버 (API Server)  
 - 클러스터의 컨트롤 플레인의 중심이 되는 구성 요소로, 클러스터 관리 작업을 수행하고 API 요청을 처리합니다.
 
