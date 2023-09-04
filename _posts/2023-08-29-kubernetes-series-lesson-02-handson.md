@@ -720,10 +720,35 @@ kubectl delete deployment.apps/nginx-v1
 
 <br>
 
+#### Canary 배포 전략
+
+[Canary 배포](https://martinfowler.com/bliki/CanaryRelease.html)는 애플리케이션의 새로운 버전을 제한된 범위의 서비스 집합에 먼저 배포하고, 정상적인 동작을 확인 하면 전체 서비스를 대상으로 트래픽으로 확장하는 배포 전략입니다.
+
+Canary 배포는 오류를 즉시 발견하기 어려운 상황 또는 테스트가 부족하거나 새 릴리즈의 안정성에 확신이 없는 경우에 서비스의 잠재적인 문제를 미리 예방하는데 적합한 배포 전략 입니다.
+
+Canary 배포를 위해서는 세밀한 트래픽 컨트롤을 해야 합니다. 따라서 Subset 구성과 트래픽 양을 조절할 수 있는 Istio 와 같은 Service Mesh 기술을 사용하는것이 좋습니다.
+
+[Two-phased Canary Rollout with Open Source Gloo](https://kubernetes.io/blog/2020/04/two-phased-canary-rollout-with-gloo/) 시나리오를 통해 전반적인 흐름 및 설정을 구현할 수 있습니다. 
+
+<br>
+
+
+## Pods 를 건강하고 효율적으로 운영하기
+
+- 컨테이너 이미지 최적화: 컨테이너 이미지를 최적화하고 불필요한 패키지를 제거하여 Pods를 가볍게 유지합니다.
+- ConfigMap 및 Secret 사용: 구성 정보나 암호화 정보를 포함한 데이터는 ConfigMap 또는 Secret을 통해 관리합니다. 이렇게 하면 환경 설정의 중앙 집중화 및 보안이 강화됩니다.
+- Readiness / Liveness Probe 설정: Readiness Probe와 Liveness Probe를 적절하게 설정하면 Pods의 상태를 모니터링하고 문제가 발생하면 Self healing 이 되어 가용성을 보장합니다.
+- Pod 안에서 단일 프로세스 실행: Pods 내에서 여러 프로세스(Container)를 실행하지 말고, 각 Pods에서 하나의 메인 프로세스를 실행하도록 유지하는것이 디버깅 및 복제 전략에 유리합니다.
+- Pod Anti-Affinity 설정: 동일한 노드에 Pod 가 집중되지 않고 분산되도록 Anti-Affinity 정책을 설정하면 가용성을 향상시킬 수 있습니다.
+- Horizontal Pod Autoscaling (HPA) 구성: 트래픽이 많은 서비스라면 Pods의 수를 자동으로 조정하는 HPA를 구성합니다. 
+- Immutable Infrastructure 채택: 애플리케이션을 업데이트할 때 새로운 이미지를 사용하여 Pods를 완전히 교체하는 Immutable Infrastructure 패턴을 채택하여 안정성을 보장합니다.
+
+<br>
+
 ### ReadinessProbe 설정 
 
 신규로 구동된 컨테이너가 정상적으로 Start 되어서 요청 트래픽을 수신할 수 있는 상태가 되었는지를 체크 합니다.   
-대게 /health 경로로 HttpStatus 200 코드를 확인 합니다.   
+대게 /health 경로로 HttpStatus 200 코드를 확인 합니다. 
 
 ```
 spec:
@@ -764,12 +789,44 @@ spec:
 
 <br>
 
+### HPA 설정
+
+metric-server 와 같이 Pod 를 모니터링하고 metric 을 수집할 수 있어야만 HPA 가 동작 할 수 있습니다.  
+
+```
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-npa
+  labels:
+    app: nginx-app
+spec:
+  maxReplicas: 5
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-v1
+```
+
+<br>
+
 ## Practice review 
 
-- Pod, ReplicaSet, Deployment 를 활용 하여 Pod 를 배포 하고 상태를 조회해 봅니다.
-- Pod 의 실시간 로그를 확인해 봅니다.
-- Pod 의 특정 컨테이너 안으로 터미널을 통해 진입해 봅니다. 
-- 클러스터의 전반적인 이벤트를 조회해 봅니다.  
+- kubernetes 컨텍스트 목록을 조회하고 연결을 활성화할 cluster 를 지정합니다.
+- client / server 의 kubernetes 버전을 확인합니다.
+- kubernetes 클러스터에서 지원하는 API 유형 및 버전을 확인합니다. 
+- kubectl 명령을 통해 주요한 Kubernetes Object 를 조회하고 상세 내역을 확인합니다. 
+- Pod 의 실시간 로그를 확인합니다.
+- Pod 의 특정 컨테이너 안으로 터미널을 통해 진입합니다. 
+- 클러스터의 전반적인 이벤트를 조회해 봅니다.
 
 <br>
 
