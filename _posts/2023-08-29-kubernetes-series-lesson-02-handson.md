@@ -9,15 +9,22 @@ categories:
    - HandsOn
 ---
 
-Kubernetes 클러스터가 어떻게 운영되는지 kubectl 명령어를 통해 직접 확인하고 애플리케이션을 배포 및 관리하는 연습을 해 봅시다. 
+Kubernetes 클러스터가 어떻게 운영되는지 kubectl 명령어를 통해 직접 확인하고 애플리케이션을 배포 및 관리하는 연습을 해 봅니다. 
 
 그 전에 왜 Kubernetes 인지 그리고 컨테이너에 대한 특징을 알아보도록 하겠습니다.
 
+<br> 
+
 ## Why Kubernetes?
 
-Kubernetes 는 애플리케이션 서비스 배포 및 운영 방식이 과거의 모놀리스 또는 Virtual Machine 기반과 비교해서 서비스 론칭 속도와 운영의 세련됨이 비교할 수 없을 정도로 뛰어나기 때문입니다. 
+Kubernetes 는 애플리케이션 서비스 배포 및 운영 방식이 과거의 모놀리스 또는 Virtual Machine 기반과 비교해서 서비스 론칭 속도와 운영의 세련됨이 비교할 수 없을 정도로 뛰어납니다. 
+
+<br>
 
 ### Virtual Machine(hypervisor) vs Container
+
+IaaS 근본인 가상화 기술과 Kubernetes 의 근본인 Container 의 차이를 살펴봅시다.  
+
 
 ![img_14.png](/assets/images/23q3/img_14.png)
 
@@ -25,7 +32,7 @@ Kubernetes 는 애플리케이션 서비스 배포 및 운영 방식이 과거�
 |----------------|--------------------------------------|------------------------------------|
 | Weight         | Heavy                                | Light                              |
 | Performance    | Limited                              | Native                             |
-| Virtualization | Hardware level                       | OS virtualization                  |
+| Virtualization | Hardware virtualization              | OS virtualization (shared kernel)  |
 | Start-Up       | in minutes                           | in milliseconds                    |
 | Memory         | Need allocated                       | less memory space                  |
 | Isolation      | OS level Fully isolated  more secure | Process level isolated less secure |
@@ -254,6 +261,21 @@ kubectl rollout history deployment/<deployment-name>:
 
 얼마나 빠르게 애플리케이션이 배포될 수 있는지 경험해 봅니다. 
 
+### Nginx 배포
+
+- kubectl run 명령어로 배포
+
+```shell
+kubectl run nginx-first --image nginx:latest --port=80
+```
+
+- kubectl 명령어로 Spec 확인
+
+```shell
+kubectl get po nginx-first -o yaml
+```
+
+
 ### Pod 배포 
 
 - helloworld 애플리케이션 Pod 를 배포합니다.
@@ -303,7 +325,7 @@ kubectl describe po helloflask
 
 ### ReplicaSet 배포  
 
-Pods 의 기본 확장 메커니즘(Sacling을 제공하는 하위 수준 추상화입니다. 하지만 새로운 애플리케이션에 대한 업데이트를 지원하지 않습니다. 
+Pods 의 기본 확장 메커니즘(Sacling)을 제공하는 하위 수준 추상화입니다. Pod 의 이상 동작에 대해 Self-Healing 처리도 담당 합니다. 하지만 새로운 애플리케이션에 대한 업데이트를 지원하지 않습니다. 
 
 ![img_17.png](/assets/images/23q3/img_17.png)
 
@@ -311,7 +333,7 @@ Pods 의 기본 확장 메커니즘(Sacling을 제공하는 하위 수준 추상
 kubectl apply -f https://raw.githubusercontent.com/simplydemo/hello-python-flask/main/cicd/k8s/hello-rs.yaml
 ```
 
-
+<br>
 
 ### Deployment 배포
 
@@ -324,10 +346,9 @@ kubectl apply -f https://raw.githubusercontent.com/simplydemo/hello-python-flask
 kubectl apply -f https://raw.githubusercontent.com/simplydemo/hello-python-flask/main/cicd/k8s/hello-deploy.yaml
 ```
 
-
 <br>
 
-### Kubernetes 배포 컨트롤러 
+### Deployment Controller 
 
 아래 그림은 Kubernetes 배포 스케줄 컨트롤러에 대한 High-Level 추상화로 각각의 컨트롤러는 저 마다의 방식으로 Pods를 실행하고 상태를 관리합니다.  
 Kubernetes 는 SRP(Single Responsibility Principle) 원칙을 따릅니다. 
@@ -339,15 +360,418 @@ Kubernetes 는 SRP(Single Responsibility Principle) 원칙을 따릅니다.
 
 <br>
 
+
+### Deployment Controller 배포 전략
+Kubernetes Deployment 컨트롤러는 애플리케이션을 배포하기 위한 훌륭한 전략을 가지고 있습니다. 
+
+<br>
+
+#### RollingUpdate 전략 
+
+롤링 업데이트는 현재 사용중인 Pod 를 교체하기 전에 새로운 Pod가 준비되었는지 확인하며 정해진 Replication 규칙으로 진행 합니다.    
+롤링 업데이트는 `kubectl set image` 명령을 사용하여 트리거됩니다. 문제가 있는 경우 업데이트를 중지 하고 롤백할 수있습니다.  
+
+주요 옵션은 다음과 같습니다.  
+- MaxSurge:  롤아웃 중에 신규로 생성할 Pod 수를 지정합니다. Pod 갯수를 지정하거나 전체 Pod 의 백분율로 지정할 수 있습니다. (기본값은 25%) 입니다.
+- MaxUnavailable: 롤아웃 중에 한번에 축소할 최대 Pod 수를 지정 합니다.
+
+```
+cat <<EOF | > nginx-deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 4
+      maxUnavailable: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine3.17 # alpine3.17 | alpine3.18 
+EOF
+
+```
+
+- nginx 애플리케이션 배포 
+
+```shell
+# 애플리케이션 배포
+kubectl apply -f nginx-deploy.yaml
+
+# 배포 상택 확인 
+kubectl rollout status deployment.apps/nginx --watch
+
+# 배포 이력 확인 
+kubectl rollout history deployment.apps/nginx
+
+# Pod 확인 
+kubectl get po -l="app=nginx"
+```
+
+<br>
+
+#### RollingUpdate Rollout 동작 확인
+
+현재 애플리케이션 이미지가 `nginx:alpine3.17` 인데 `nginx:alpine3.18` 로 새롭게 업데이트해 보겠습니다.  
+
+`kubectl set image deployment` 명령을 통해 새로운 이미지로 업데이트 할 수 있습니다.  
+
+```shell
+# 새로운 이미지로 교체 
+kubectl set image deployment.apps/nginx nginx=nginx:alpine3.18
+
+# 실시간 Rollout 상택 확인 
+kubectl rollout status deployment.apps/nginx --watch
+
+# 배포 이력 확인 
+kubectl rollout history deployment.apps/nginx
+
+# 변경 내역 코멘트 추가 
+kubectl annotate deployment.apps/nginx kubernetes.io/change-cause="nginx 애플리케이션 버전 업 from alpine3.17 to alpine3.18" --overwrite=true
+```
+
+#### 이전 버전으로 Rollback 하기 
+```
+# 배포 이력 확인 
+kubectl rollout history deployment.apps/nginx
+
+# revision 1 버전으로 롤백 
+kubectl rollout undo --to-revision=1 deployment.apps/nginx
+
+# 실시간 rollout 상태 확인 
+kubectl rollout status deployment.apps/nginx --watch
+
+________________________________________
+Waiting for deployment "nginx" rollout to finish: 6 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 6 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 6 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 7 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 8 out of 10 new replicas have been updated...
+Waiting for deployment "nginx" rollout to finish: 4 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 3 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 3 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 2 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 2 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 2 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "nginx" rollout to finish: 1 old replicas are pending termination...
+deployment "nginx" successfully rolled out
+
+# 현재 버전 코멘트 
+kubectl annotate deployment.apps/nginx kubernetes.io/change-cause="nginx 애플리케이션 롤백 to alpine3.17" --overwrite=true
+```
+
+
+<br>
+
+#### Recreate 전략 
+
+현재 Replica 셋의 모든 Pods 를 한번에 교체 합니다.
+
+```
+cat <<EOF | > nginx-deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 10
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine3.17 # alpine3.17 | alpine3.18
+EOF
+
+```
+
+#### Recreate Rollout 동작 확인
+
+```
+# 새로운 이미지로 교체 
+kubectl set image deployment.apps/nginx nginx=nginx:alpine3.18
+
+# 실시간 Rollout 상택 확인 
+kubectl rollout status deployment.apps/nginx --watch
+
+________________________________________
+Waiting for deployment "nginx" rollout to finish: 0 of 10 updated replicas are available...
+Waiting for deployment "nginx" rollout to finish: 1 of 10 updated replicas are available...
+Waiting for deployment "nginx" rollout to finish: 2 of 10 updated replicas are available...
+Waiting for deployment "nginx" rollout to finish: 3 of 10 updated replicas are available...
+Waiting for deployment "nginx" rollout to finish: 5 of 10 updated replicas are available...
+Waiting for deployment "nginx" rollout to finish: 6 of 10 updated replicas are available...
+Waiting for deployment "nginx" rollout to finish: 7 of 10 updated replicas are available...
+Waiting for deployment "nginx" rollout to finish: 8 of 10 updated replicas are available...
+Waiting for deployment "nginx" rollout to finish: 9 of 10 updated replicas are available...
+deployment "nginx" successfully rolled out
+```
+
+- 이미지는 가능한 안정적이고 가벼운 것을 선택 합니다. Start-Up / Memory 효율이 좋은 이미지를 선택 합니다.    
+- 이미지 버전은 `latest` 으로 하는 것 보다 정확한 버전을 명시하는 것이 좋습니다.   
+
+
+<br>
+
+### Ramped Slow Rollout 전략
+느리지만 가장 안전하게 Pod 를 교체 하는 배포 전략 입니다.  항상 10개의 Pods가 운영되는것을 보장 하면서 한번에 하나씩 교체하는 전략 입니다.
+
+```yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+#... more
+
+```
+
+<br>
+
+### Blue-Green 전략
+
+Kubernetes Service / Ingress 객체가 가리키는 타겟 객체(Service, Deployment)을 Blue 또는 Green 으로 한번에 전환할 수 있습니다.
+
+대규모의 워크로드를 한번에 전환할 수 있으며, 특히 기존 버전(Blue)과 교체(Green)할 버전을 Rollout 시점에 유지하고 있으므로 문제가 발생하는 경우 즉시 이전 버전으로 롤백이 가능 합니다.
+
+전환 방법은 Blue / Green 에 해당하는 객체의 Selector 를 통해 이루어 입니다.
+
+- minikube 를 사용한다면 [Tunnel](https://minikube.sigs.k8s.io/docs/handbook/accessing/#example-of-loadbalancer) 세션을 열어서 LoadBalancer 타입을 지원합니다.
+
+```
+minikube tunnel
+``` 
+
+- `nginx` 를 사용한 Blue / Green 애플리케이션 스택을 구성하여 배포 합니다. 
+
+```
+cat <<EOF | > nginx-deploy-bg.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-v1
+  labels:
+    app: nginx-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-app
+      version: v1.0
+  template:
+    metadata:
+      labels:
+        app: nginx-app
+        version: v1.0
+    spec:
+      initContainers:
+      - name: install
+        image: busybox
+        command:
+        - sh
+        - -c
+        - echo "<!DOCTYPE html><html><head></head><body><h1>Nginx App-V1</h1></body></html>" > /htdocs/index.html
+        volumeMounts:
+        - name: htdocs
+          mountPath: "/htdocs"
+      containers:
+      - name: nginx
+        image: nginx:alpine3.17 
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: htdocs        
+      dnsPolicy: Default
+      volumes:
+      - name: htdocs
+        emptyDir: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-v2
+  labels:
+    app: nginx-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-app
+      version: v2.0
+  template:
+    metadata:
+      labels:
+        app: nginx-app
+        version: v2.0
+    spec:
+      initContainers:
+      - name: install
+        image: busybox
+        command:
+        - sh
+        - -c
+        - echo "<!DOCTYPE html><html><head></head><body><h1>Nginx App-V2</h1></body></html>" > /htdocs/index.html
+        volumeMounts:
+        - name: htdocs
+          mountPath: "/htdocs"
+      containers:
+      - name: nginx
+        image: nginx:alpine3.17 
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: htdocs        
+      dnsPolicy: Default
+      volumes:
+      - name: htdocs
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-app-svc
+  labels:
+    app: nginx-app
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8880
+    targetPort: 80
+  selector:
+    app: nginx-app
+    version: v1.0
+
+EOF
+
+```
+
+
+#### Blue/Green 배포 전환 
+
+현재 서비스 중인 상태를 확인 하고 Service 의 Selector 지시자를 통해 Blue/Green 타겟 런탐임을 선택할 수 있습니다. 
+
+- 생성된 kubernetes 객체를 조회 하고 v1(Blue) 를 v2(Green) 으로 타겟을 변경해 보도록 하겠습니다.
+
+```
+# STEP 1 - 연관된 객체를 조회   
+kubectl get all -o wide -n default
+
+kubectl get all -l "app=nginx-app" -n default
+```
+
+- `v1` 버전 에서 `v2` 버전 으로의 전환은 현재 서비스가 가리키는 Selector(선택자)의 타겟을 확인하고 변경할 수 있습니다.   
+
+```
+# STEP 2 - 현재 서비스 expose(Endpoint) 및 대상 Selector 확인합니다.
+kubectl get svc nginx-app-svc -o wide
+
+________________________________________
+NAME            TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE     SELECTOR
+nginx-app-svc   LoadBalancer   10.101.245.95   127.0.0.1     8880:31385/TCP   3m57s   app=nginx-app,version=v1.0
+________________________________________
+
+# `nginx-app-svc` 서비스의 Selector 선택자 속성 중 version 을 v2.0 으로 변경합니다.  
+kubectl patch service/nginx-app-svc -p '{"spec":{"selector":{"version":"v2.0"}}}'
+```
+
+- `v2` 버전 에서 모든 서비스가 정상적으로 동작됨을 확인 했다면 `v1` 버전을 삭제합니다. 
+```
+kubectl delete deployment.apps/nginx-v1
+```
+
+<br>
+
+### ReadinessProbe 설정 
+
+신규로 구동된 컨테이너가 정상적으로 Start 되어서 요청 트래픽을 수신할 수 있는 상태가 되었는지를 체크 합니다.   
+대게 /health 경로로 HttpStatus 200 코드를 확인 합니다.   
+
+```
+spec:
+  containers:
+  - name: my-app-container-name
+    image: my-app-image
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+```
+
+<br>
+
+### LivenessProbe 설정
+
+현재 구동중인 컨테이너가 정상적으로 동작하는지를 체크 합니다. 예를들어 listen 포트나 health 체크는 정상이지마, 실제 비즈니스 처리에서 Hang 걸려서 응답이 오지 않는 경우 등을 점검할 수 있습니다.  
+대부분의 경우에서 생략할 수 있으며 필요하다고 판단되는 애플리케이션에 대하여 구성할 수 있습니다.  
+
+```
+spec:
+  containers:
+  - name: my-app-container-name
+    image: my-app-image
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 80
+      initialDelaySeconds: 180
+      periodSeconds: 60
+      timeoutSeconds: 60
+      failureThreshold: 3
+```
+
+
 ## Practice review 
 
 - Pod, ReplicaSet, Deployment 를 활용 하여 Pod 를 배포 하고 상태를 조회해 봅니다.
 - Pod 의 실시간 로그를 확인해 봅니다.
 - Pod 의 특정 컨테이너 안으로 터미널을 통해 진입해 봅니다. 
-- port-forward 을 통해 HOST 에서 Container 로 proxy 연결을 구성해 봅니다. 
 - 클러스터의 전반적인 이벤트를 조회해 봅니다.  
 
 <br>
+
 
 ## Kubectl cheatsheet
 

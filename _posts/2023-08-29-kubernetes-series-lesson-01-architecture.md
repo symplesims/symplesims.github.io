@@ -247,6 +247,12 @@ minikube tunnel
 
 #### minikube 다중 노드 실행
 ```
-minikube start --nodes 3 -p mininode
+# minikube start --nodes 3 --profile <profile_name>
+minikube start --nodes 3 --profile mininode
 ```
- 
+
+#### minikube Node 로 터미널 접속 
+```
+# minikube ssh --profile <profile_name>
+minikube ssh --profile basic
+```
