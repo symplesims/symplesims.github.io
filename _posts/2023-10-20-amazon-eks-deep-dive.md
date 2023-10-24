@@ -372,6 +372,8 @@ AWS Cloud Map 서비스에 연결된 MCS(Multi-Cluster-Services) 컨트롤러를
 AWS는 Kubernetes 환경을 AWS, On Premise, Outposts 에 이르는 완전 관리형부터 EKS Anywhere 같은 하드웨어 런타임 환경에 이르기까지 일관된 방식으로 EKS 클러스터를 배포하고 운영할 수 있도록 지원하고 있습니다.    
 
 
+<br>
+
 ##  Conclusion
 
 [Deep dive on Amazon EKS](https://youtu.be/cipDJwDWWbY)를 통해 EKS를 왜 사용해야하는지, AWS가 EKS 서비스를 릴리즈하는데 어떤 철학을가지고 무엇에 주력하는지?를 알 수 있었습니다. 
