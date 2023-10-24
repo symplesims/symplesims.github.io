@@ -377,4 +377,4 @@ AWS는 Kubernetes 환경을 AWS, On Premise, Outposts 에 이르는 완전 관�
 [Deep dive on Amazon EKS](https://youtu.be/cipDJwDWWbY)를 통해 EKS를 왜 사용해야하는지, AWS가 EKS 서비스를 릴리즈하는데 어떤 철학을가지고 무엇에 주력하는지?를 알 수 있었습니다. 
 
 사용자는 맨 처음 EKS와 같은 Cloud의 서비스를 생각할 때 비교적 높은 운영 비용과 기술 스택에 부담을 느낄 수 있겠지만 이 블로그를 통해 EKS 서비스가 빙산의 수면 아래에서 운영되는 
-Kubernetes 기술들의 복잡함과 통합의 노력들이 얼마나 녹아져있느지 그리고 Built for Production을 위한 서비스 수준을 이해하는 시간이었기를 바랍니다.
+Kubernetes 기술들의 복잡함과 통합을 위해 얼마나 큰 노력이 녹아 있음을 이해하고, 왜 EKS를 사용하는 게 좋은지 Built for Production의 가치를 생각하는 시간이었기를 바랍니다.
