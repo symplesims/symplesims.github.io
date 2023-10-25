@@ -123,14 +123,22 @@ Amazon Bedrock은 AI21 Labs, Anthropic, Cohere, Meta, Stability AI 및 다양한
 
 그리고 행사 시점에는 Amazon Bedrock 이 정식 서비스로 론칭되지 않았었는데요, Ambassador가 Amazon Bedrock의 출시 일정을 AWS에 압박하는 것을 볼 수 있었습니다.  
 예상컨대 고객에게 Amazon Bedrock 을 이용하여 모든 것을 가속할 수 있다고 제안했겠지요???  
-여하튼 적극적으로 AWS 서비스를 이용/활용하고 고객에게 제안하는 자세를 엿볼 수 있어서 신선했습니다.
+여하튼 적극적으로 AWS 서비스를 이용/활용하고 고객에게 제안하는 현장을 직접 엿볼 수 있어서 신선했습니다.
 
+<br>
+
+둘째 날 저녁은 액티비티를 통한 Ambassador 친목 모임입니다. 볼링장에 모여서 액티비티를 즐깁니다. 모두들 진심 즐거워하는 표정들입니다.
+
+![img_33.png](/assets%2Fimages%2F23q4%2Fimg_33.png)
 
 <br>
 <br>
 
 ## Conclusion
 
+꽉 채워진 일정을 보람차게 보냈습니다.   
+
 이번 모임에서 분명하게 느낀 건 AWS는 Next IT를 Gen AI로 삼았고, 모든 산업, 모든 서비스에 Gen AI를 통한 가속화를 목표로 한다는 것입니다.
 
 지금까지 저는 AI 분야에 관심을 두지 않았는데 이제는 PoC라도 해야 되겠다는 결심을 하게 됩니다.
+
