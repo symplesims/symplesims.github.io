@@ -80,7 +80,7 @@ Security 세션입니다.
 
 ![img_32.png](/assets%2Fimages%2F23q4%2Fimg_32.png)
 
-Security Lake를 들으면서 AWS는 최초에 서비스를 기획할 때 뚜렷한 목표와 범위로 디자인하고 다른 영역을 침범하지 않는 점이 놀랍습니다.
+Security Lake를 들으면서 AWS는 최초에 서비스를 기획할 때 뚜렷한 목표와 범위로 디자인하고 다른 영역을 침범하지 않는 점이 놀랍습니다.  
 GuardDuty 나 Inspector 등 여러 서비스가 서로 침범하지 않게 디자인하고 구현합니다.
 이렇게 기존에 잘 만들어진 서비스가 개별적으로 잘 동작하기에 Security Lake와 같은 통합이 유연하게 되고 전체 보안을 관장하는 Governance 서비스로 자리 잡게 됩니다.
 
@@ -127,9 +127,11 @@ Amazon Bedrock은 AI21 Labs, Anthropic, Cohere, Meta, Stability AI 및 다양한
 
 <br>
 
-둘째 날 저녁은 액티비티를 통한 Ambassador 친목 모임입니다. 볼링장에 모여서 액티비티를 즐깁니다. 모두들 진심 즐거워하는 표정들입니다.
+둘째 날 저녁은 액티비티를 통한 Ambassador 친목 모임입니다. 볼링장에 모여서 액티비티를 즐깁니다.
 
 ![img_33.png](/assets%2Fimages%2F23q4%2Fimg_33.png)
+
+모두들 진심 즐거워하는 표정들입니다.
 
 <br>
 <br>
