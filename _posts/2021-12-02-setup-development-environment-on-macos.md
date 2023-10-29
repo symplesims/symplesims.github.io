@@ -91,9 +91,19 @@ nvm -v
 - Node 버전 관리 예시
 
 ```shell
-# node & npm 설치 
-nvm install node
+# node & npm 설치
+nvm ls-remote --lts 
+
+# install node 
 nvm install --lts
+nvm install v18.18.2
+
+# uninstall node
+nvm uninstall v18.18.2
+
+# select node version
+nvm use v18.18.2
+nvm alias default v18.18.2
 nvm ls
 node -v
 npm -v
