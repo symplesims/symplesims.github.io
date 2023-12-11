@@ -2,7 +2,7 @@
 layout: post
 title: "Amazon EKS Deep dive"
 
-date:  2023-10-20 20:00:00 +0900
+date:  2023-11-01 20:00:00 +0900
 categories:
    - DevOps
    - Kubernetes
