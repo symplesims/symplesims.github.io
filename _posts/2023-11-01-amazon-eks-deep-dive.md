@@ -11,9 +11,11 @@ categories:
 
 Amazon EKS에 대한 심층 분석 
 
-EKS를 경험하며 다른사람에게 EKS를 어떻게 설명하면 좋을지 고민한적이 있었는데 
-지난 AWS re:Invent 2021 에서 [Deep dive on Amazon EKS](https://youtu.be/cipDJwDWWbY) 영상이 
-간략하면서도 핵심적인 내용을 다루고 있어서 이것을 기반으로 소개하는것이 가장 좋을것 같습니다.
+EKS를 경험하며 다른사람에게 EKS를 어떻게 설명하면 좋을지 고민한적이 있었습니다.  
+자료를 찾던 중 다소 시간이 지났지만 AWS re:Invent 2021 에서 [Deep dive on Amazon EKS](https://youtu.be/cipDJwDWWbY) 주제로 발표한 영상이 
+간략하면서도 핵심적인 내용을 다루고 있어서 보물을 발견한 기분이였습니다.  
+
+여기 발표 영상을 Rewind 하며 하나씩 살펴보는 것 만으로 의미있는 시간이 될 거라 생각하며 저와 함께 EKS 여정을 함께합시다.
 
 
 <br> 
