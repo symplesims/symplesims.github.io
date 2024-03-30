@@ -66,12 +66,12 @@ S3 버킷에 저장된 데이터를 안전하게 보호하기 위해서는 적�
 
 - S3 버킷의 `Permissions` 에서 `Block public access`를 다음과 같이 제한 합니다.
 
-![img.png](./assets%2Fimages%2F24q1%2Fimg.png)
+![img.png](/assets%2Fimages%2F24q1%2Fimg.png)
 
 
 - AWS 관리형 키(SSE-S3) 또는 고객 관리형 키(SSE-KMS)를 사용하여 서버 측 암호화을 다음과 같이 설정 합니다. 
 
-![img_2.png](./assets%2Fimages%2F24q1%2Fimg_2.png)
+![img_2.png](/assets%2Fimages%2F24q1%2Fimg_2.png)
 
 AWS 관리형 또는 고객 관리형 KMS 키인 SSE-KMS 를 사용할 경우 Bucket Key 를 캐시하여 사용하게 되어 비용은 줄이고 성능을 올릴 수 있습니다.
 
@@ -115,7 +115,7 @@ AWS 관리형 또는 고객 관리형 KMS 키인 SSE-KMS 를 사용할 경우 Bu
 }
 ```
 
-![img_1.png](./assets%2Fimages%2F24q1%2Fimg_1.png)
+![img_1.png](/assets%2Fimages%2F24q1%2Fimg_1.png)
 
 
 <br>
@@ -130,7 +130,7 @@ AWS 관리형 또는 고객 관리형 KMS 키인 SSE-KMS 를 사용할 경우 Bu
 
 S3 버킷을 CloudFront만 액세스 할 수 있도록 CloudFront OAC 생성합니다.
 
-![img_3.png](./assets%2Fimages%2F24q1%2Fimg_3.png)
+![img_3.png](/assets%2Fimages%2F24q1%2Fimg_3.png)
 
 <br>
 
@@ -156,12 +156,12 @@ openssl genrsa -out my-cf.pem 2048
 openssl rsa -pubout -in my-cf.pem -out my-cf.pub
 ```
 
-![img_5.png](./assets%2Fimages%2F24q1%2Fimg_5.png)
+![img_5.png](/assets%2Fimages%2F24q1%2Fimg_5.png)
 
 
 위와 같이 생성한 Public Key 를 `CloudFront > Public keys > Create public key` 를 통해 등록 합니다.
 
-![img_6.png](./assets%2Fimages%2F24q1%2Fimg_6.png)
+![img_6.png](/assets%2Fimages%2F24q1%2Fimg_6.png)
 
 
 <br>
@@ -169,7 +169,7 @@ openssl rsa -pubout -in my-cf.pem -out my-cf.pub
 
 - Key Group 등록
 
-![img_4.png](./assets%2Fimages%2F24q1%2Fimg_4.png)
+![img_4.png](/assets%2Fimages%2F24q1%2Fimg_4.png)
 
 `CloudFront > Key groups > Create key group` 을 통해 Key Group 을 등록 합니다. Public Keys 는 앞에서 등록한 Public Key 를 추가합니다.
 
@@ -183,7 +183,7 @@ openssl rsa -pubout -in my-cf.pem -out my-cf.pub
 
 S3 버킷 이름 기준으로 `<s3-bucket-name>.s3.<region>.amazonaws.com` Origin 도메인, CloudFront 이름이 자동으로 기입됩니다. `Origin access` 항목에서 앞에서 생성한 CloudFront OAC를 선택합니다.   
 
-![img_4.png](./assets%2Fimages%2F24q1%2Fimg_7.png)
+![img_4.png](/assets%2Fimages%2F24q1%2Fimg_7.png)
 
 
 ### CloudFront 의 주요 설정
@@ -198,7 +198,7 @@ S3 버킷 이름 기준으로 `<s3-bucket-name>.s3.<region>.amazonaws.com` Origi
 CloudFront는 리전 구분이 없는 글로벌 서비스이므로 Public 도메인(예: 'myappservice.com')에 대한 ACM Certificate 는 us-east-1 버지니아 리전에 생성하여야 하며 인증서는 Verified 된 Issued 상태여야 합니다. 
 
 
-![img_8.png](./assets%2Fimages%2F24q1%2Fimg_8.png)
+![img_8.png](/assets%2Fimages%2F24q1%2Fimg_8.png)
 
 
 - Behaviors 설정 
@@ -208,10 +208,10 @@ S3 버킷의 /uploads 경로에 대해 클라이언트가 직접적으로 액세
 CloudFront의 Behavior로 `/uploads` 버킷 경로에 대해 캐싱 동작, 라우팅 룰, Viewer 제한 및 CORS와 같은 보안 정책 등을 다음과 같이 설정 합니다.
 
  
-![img_9.png](./assets%2Fimages%2F24q1%2Fimg_9.png)
+![img_9.png](/assets%2Fimages%2F24q1%2Fimg_9.png)
 
 
-![img_10.png](./assets%2Fimages%2F24q1%2Fimg_10.png)
+![img_10.png](/assets%2Fimages%2F24q1%2Fimg_10.png)
 
 
 특히, `Viewer` 설정에서 `Viewer protocol policy` 라우팅 정책, `Allowed HTTP methods` 허용 메서드, `Restrict viewer access`를 통해 클라이언트의 액세스를 제한합니다. 
@@ -240,7 +240,7 @@ aws cloudfront sign --key-pair-id K2Z******** \
 https://d2owqjwir1q8d8.cloudfront.net/uploads/AIM352-R-securely-build-generative-AI-with-bedrock.pdf?Expires=1712016000&Signature=nrghUaxaGx9~2OAPIH9K0ud9LTsCI....&Key-Pair-Id=K2Z6XUBK23XBDH
 ```
 
-![img_13.png](./assets%2Fimages%2F24q1%2Fimg_12.png)
+![img_13.png](/assets%2Fimages%2F24q1%2Fimg_12.png)
 
 <br>
 
