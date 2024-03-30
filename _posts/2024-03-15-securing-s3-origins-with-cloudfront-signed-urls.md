@@ -9,7 +9,7 @@ categories:
    - HandsOn
 ---
 
-CloudFront Signed URL로 S3 오리진 보안 강화 하기  
+CloudFront Signed URL로 S3 오리진 컨텐츠 보호 하기   
 
 <br> 
 
@@ -246,4 +246,5 @@ https://d2owqjwir1q8d8.cloudfront.net/uploads/AIM352-R-securely-build-generative
 
 ##  Conclusion
 
-이제 우리는 CloudFront 기반의 간단한 아키텍처 개선으로 악의적인 클라이언트의 요청으로부터 안전하게 S3 Origin 객체를 보호하고, 개발자가 `Signed URL`을 생성하기 위해 불필요한 사용자 AssumeRole로 전환하거나 코드에서 위함한 Credentials를 더이상 사용할 필요가 없게 되었습니다.
+이제 우리는 CloudFront 기반의 간단한 아키텍처 개선으로 악의적인 클라이언트의 요청으로부터 안전하게 S3 Origin 객체를 보호하고,
+개발자가 `Signed URL`을 생성하기 위해 불필요한 사용자 AssumeRole로 전환하거나 코드에서 위함한 Credentials를 더이상 사용할 필요가 없게 되었습니다.
