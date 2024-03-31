@@ -14,7 +14,6 @@ categories:
 S3 오리진 보호를 위한 CloudFront Signed URL 생성을 위한 AWS Lambda 구현 하기
 
 
-
 <br>
 
 
@@ -127,9 +126,9 @@ Python 으로 구현하는 Lambda 프로젝트의 템플릿은 많이 확보되�
 
 ## Node.js 개발 환경 구축
 
-개발 환경은 Node 버전이 `v20.11.1` 이고, npm 버전은 `10.2.4` 입니다.  
+MacOS 에서 개발하였으며 개발 환경의 Node 버전이 `v20.11.1` 이고, npm 버전은 `10.2.4` 입니다.  
 
-MacOS 에서 Node.Js 개발 환경 구성은 [Node 패키지 매니저](https://symplesims.github.io/development/setup/macos/2021/12/02/setup-development-environment-on-macos.html#node)를 참고 하면 쉽게 구성할 수 있습니다. 
+MacOS 기반에서 Node.Js 개발 환경 구성은 [Node 패키지 매니저](https://symplesims.github.io/development/setup/macos/2021/12/02/setup-development-environment-on-macos.html#node)를 참고 하면 쉽게 구성할 수 있습니다. 
 
 <br/>
 
@@ -391,7 +390,15 @@ const handler: Handler = async (event: any, context: Context) => {
 export {handler};
 ```
 
-## serverless.yml 정의
+<br/>
+<br/>
+
+
+## Lambda 배포 및 테스트
+위와 같이 주요한 Node.Js 클래스와 핸들러 구현이 모두 완료되었고 이제 AWS 클라우드 리소스를 정의하고 배포하여 정상적으로 동작하는지 확인해 보도록 합니다.
+
+### serverless.yml 정의
+
 Node.Js 기반 Lambda 애플리케이션을 AWS 클라우드에 배포하기 위해 `serverless.yml`을 정의합니다. 
 
 `package:`  - 빌드 결과물을 정의 합니다. '!' 는 제외할 파일 또는 디렉토리를 의미합니다.  
@@ -452,32 +459,111 @@ functions:
 
 참고로, serverless.yaml 은 CloudFormation 템플릿으로 변환되어 CloudFormation Stack 으로 배포가 됩니다. 
 
-<br>
-
-## Lambda 배포 및 테스트
-
-람다 애플리케이션 배포 및 삭제는 serverless CLI 명령을 통해 즉시 진행될 수 있습니다. 
-
+<br/>
 
 ### Lambda 배포 
+
+람다 애플리케이션 배포 및 삭제는 serverless CLI 명령을 통해 즉시 진행될 수 있습니다. 
 
 ```
 serverless deploy  
 ```
 
+<br/>
+
 ### Lambda 테스트
 
-아래 명령은 S3 버킷에서 `uploads/uploaded-report.pdf` 파일에 대해 sigend-url 을 생성하며 만료일을 현재일 기준 7일 이하로 설정하는 명령입니다. 
+Lambda가 정상적으로 배포되면 아래와 같은 명령으로 signed-url 을 생성할 수 있습니다.
+
 ```
 aws lambda invoke --function-name cloudfront-signedurl-lambda-dev-cloudfrontSignedUrl \
   --cli-binary-format raw-in-base64-out \
   --payload '{"s3ObjectPath":"uploads/uploaded-report.pdf", "expireDays":"7"}' \
   output.json
 ```
+위 명령은 S3 버킷에서 `uploads/uploaded-report.pdf` 객체에 대해 sigend-url 을 생성하며 만료일을 현재일 기준 7일 이하로 설정하는 명령입니다.
+
+<br/>
 
 ### Lambda 제거  
 
 ```
 serverless remove  
 ```
+
+<br>
+
+## 컴퓨팅환경의 무결성을 위한 Dockerize
+
+AWS Lambda 는 이미지 타입으로 배포할 수 있습니다. 이렇게 하면 런타임 환경의 최적화를 할 수 있습니다. 
+그리고 동일한 런타임 환경이 보장되며, 일관된 배포 환경을 유지하고 문제가 발생될 경우 이전 이미지로의 롤백 역시 용이합니다.
+
+<br>
+
+### Dockerize
+
+아래와 같이 ARM64 기반의 AWS Manged 베이스라인 이미지로부터 `Dockerfile` 을 작성합니다. 
+
+[Dockerfile]
+```
+FROM public.ecr.aws/lambda/nodejs:20.2023.12.06.12-arm64
+LABEL author="symplesims@gmail.com"
+
+COPY package.json index.ts src tsconfig.json ./
+COPY ./src ./src/
+
+RUN npm install
+RUN npm run build
+
+ADD index.ts ${LAMBDA_TASK_ROOT}/
+ADD src/ ${LAMBDA_TASK_ROOT}/src/
+
+CMD [ "index.handler" ]
+```
+
+<br>
+
+### Troubleshooting 
+
+불행하게도 현재 시점에서 이미지 기반 Lambda 런타임은 typescript 를 지원하지 않고 있습니다.  
+esbuild 플러그인을 통해 typescirpt 를 javascript 형식으로 변환하여 배포를 해야만 합니다. 
+
+- `npm run build` 명령을 실행할 경우 esbuild 로 패키징되도록 `package.json` 파일에 아래 코드를 추가 합니다.    
+
+[package.json]
+```
+  "scripts": {
+    "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js"
+  },
+```
+
+<br/>
+
+- esbuild 컴파일 옵션을 `tsconfig.json` 파일로 정의 합니다.
+
+```
+{
+  "compilerOptions": {
+    "target": "es2016",
+    /* Modules */
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+<br/>
+
+##  Conclusion
+
+이번 CloudFront Signed URL 생성을 전담하는 Lambda 구현을 통해 보안성과 편의성을 모두 높일 수 있게 되었습니다.
+
+S3 오리진 콘텐츠에 대한 액세스 제어를 강화함으로써 데이터 보호 수준을 향상시켰고, 동시에 Lambda 기반의 서버리스 아키텍처로 운영의 복잡성을 줄일 수 있었습니다.
+
+특히 이 공통 모듈을 활용하면 개발팀에서 CloudFront Signed URL 생성 로직을 직접 구현할 필요 없이 모듈을 재사용할 수 있어 생산성 향상에도 기여할 것으로 기대됩니다. 
+
+이러한 방식으로 클라우드 기반 모범 사례를 도입하여 보안, 확장성, 비용 효율성 등 다양한 측면에서 애플리케이션의 품질을 지속적으로 개선해 나가는 한가지 사례로 결론을 맺고자 합니다.
 
