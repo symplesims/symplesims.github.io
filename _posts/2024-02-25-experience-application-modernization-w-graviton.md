@@ -23,7 +23,7 @@ AWS Graviton 마이그레이션 경험
 참고로, [Amazon AWS 서울 리전에서 Graviton 인스턴스의 타입 지원](https://aws.amazon.com/ko/about-aws/whats-new/2023/05/amazon-rds-m6g-r6g-database-instances-four-regions/)은 23년 5월 부터 입니다.  
 
 
-<br>
+<br/>
 
 ## 마이그레이션 전/후 성능 비교 및 비용 절감 효과 설명
 
@@ -32,18 +32,14 @@ AWS Graviton 마이그레이션 경험
 - MRR: 2023. 5. 
 
 <p style="text-align: center;">
-
-<img style="display: block; margin: auto;" src="/assets/images/24q1/img_13.png">
-
+    <img style="display: block; margin: auto;" src="/assets/images/24q1/img_13.png" />
 </p>
 
 
 - MRR: 2024. 1.
 
 <p style="text-align: center;">
-
-![img_14.png](/assets/images/24q1/img_14.png)
-
+    <img style="display: block; margin: auto;" src="/assets/images/24q1/img_14.png" />
 </p>
 
 또한, 전체 절감액이 6,317 USD 이고, 이중 RDS가 차지하는 비중이 6,046 USD 으로 절감액의 95%가 RDS 가 차지하고 있는 것을 확인할 수 있습니다.
@@ -52,9 +48,7 @@ AWS Graviton 마이그레이션 경험
 - Cost reduction trend change from 2023. 5. to 2024. 2.
 
 <p style="text-align: center;">
-
-![img_15.png](/assets/images/24q1/img_15.png)
-
+    <img style="display: block; margin: auto;" src="/assets/images/24q1/img_15.png" />
 </p>
 
 
@@ -62,14 +56,14 @@ AWS Graviton 마이그레이션 경험
 
 Graviton 2 인스턴스타입 조정 뿐만 아니라 RI/SP 적용으로 현재 이와 같은 절감을 실현할 수 있었습니다. 
 
-<br>
+<br/>
 
 
 ## Graviton2 마이그레이션 과정
 
 Aurora Mysql 클러스터, EC2 인스턴스, ECS 컨테이너를 대상으로 Graviton 인스턴스 타입으로 마이그레이션 하였고, 그 과정은 아래와 같습니다. 
 
-<br>
+<br/>
 
 ### Aurora Mysql 클러스터 마이그레이션
 
@@ -84,7 +78,7 @@ RDS 클러스터를 선택하고 `Action > Add reader`메뉴를 통해 Reader �
 
 혹시라고 애플리케이션이 Write 인스턴스의 Endpoint 를 직접 연결한 경우를 대비하여 새롭게 승격한 Reader 노드의 이름을 기존 Writer 인스턴스 이름으로 변경하는 것을 권고합니다.
 
-<br> 
+<br/> 
 
 ### 마이그레이션 이전에 다음을 고려해야 합니다.
 
@@ -93,7 +87,7 @@ RDS 클러스터를 선택하고 `Action > Add reader`메뉴를 통해 Reader �
 - 별도의 RDS 컴플라이언스 툴이 있는지 사전에 확인이 필요합니다. RDS 보안 관리툴은 RDS 인스턴스의 아이피를 등록하여 통제하는 경우가 있습니다. 이 경우 RDS 인스턴스의 아이피가 변경되므로 사전에 보안 관리툴의 설정을 염두해 두는것이 좋습니다.
 
 
-<br>
+<br/>
 
 
 ## EC2 인스턴스 마이그레이션
@@ -111,7 +105,7 @@ jar tf app.jar | grep .so
 별도의 JNI 를 사용하는 애플리케이션이 없었고, Graviton 기반의 AWS Managed AMI를 선택하여 인스턴스 생성 및 CICD 파이프라인으로 앱을 빌드하여 배포 합니다. 
 
 
-<br>
+<br/>
 
 
 ## 컨테이너 마이그레이션 과정
@@ -121,9 +115,7 @@ AWS 클라우드를 이용중이므로 Java, Python, Node을 위한 Docker Base 
 [gallery.ecr.aws](https://gallery.ecr.aws/search?architecture=ARM+64&operatingSystems=Linux&popularRegistries=amazon&verified=verified) AWS ECR 저장소를 통해 플랫폼별 Verified된 이미지를 찾을 수 있습니다. 
 
 <p style="text-align: center;">
-
-![img_16.png](/assets/images/24q1/img_16.png)
-
+    <img style="display: block; margin: auto;" src="/assets/images/24q1/img_16.png">
 </p>
 
 
@@ -147,7 +139,7 @@ CMD [ "app.handler" ]
 
 참고로, Python 의 경우 실제 동작하는 모듈을 C/C++ 로 제작되었습니다. 그러므로 `requirements.txt`과 같이 정의된 Dependency 모듈들이 ARM64를 지원하는지 사전에 체크해야 합니다.  
 
-<br>
+<br/>
 
 
 
@@ -161,7 +153,7 @@ CMD [ "app.handler" ]
 ARM(Advanced RISC Machine)은 마이크로프로세서 아키텍처로 약자로 RISC(Reduced Instruction Set Computing)는 아키텍처의 한 유형입니다.
 RISC 아키텍처는 프로세서의 명령어 세트를 단순화하여 더 적은 수의 트랜지스터로 더 빠르게 명령을 실행할 수 있도록 해줍니다.  
 
-<br>
+<br/>
 
 ### RISC 아키텍처 이점은 다음과 같습니다.
 
@@ -175,22 +167,17 @@ RISC 아키텍처는 프로세서의 명령어 세트를 단순화하여 더 적
 ARM 프로세서는 대부분의 AWS 서비스에서 지원되고 있으며, 이제 스마트폰, 태블릿과 같은 모바일 장치에 널리 사용될 뿐만아니라, 임베디드 시스템, IoT 장치, 서버 및 데이터 센터에서도 점점 더 많이 사용되고 있습니다.
 
 <p style="text-align: center;">
-
-![ARMCore](https://upload.wikimedia.org/wikipedia/commons/2/2b/ARMCortexA57A53.jpg)
-
-[이미지 출처: wikimedia]
-
+    <img style="display: block; margin: auto;" src="https://upload.wikimedia.org/wikipedia/commons/2/2b/ARMCortexA57A53.jpg" />
+    [이미지 출처: wikimedia] 
 </p>
 
-
-<br>
+<br/>
 
 ## ARM 기반 프로세서란 무엇입니까?
 
+
 <p style="text-align: center;">
-
-[![AWS Graviton](https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/04/10/Site-Merch_Graviton_SocialMedia_2.jpg)](https://youtu.be/Fvh4djznuuM)
-
+    <a href="https://youtu.be/Fvh4djznuuM"><img style="display: block; margin: auto;" src="https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/04/10/Site-Merch_Graviton_SocialMedia_2.jpg" /></a>
 </p>
 
 
@@ -201,10 +188,8 @@ AWS Graviton 프로세서는 Amazon EC2 및 EC2 기반 PaaS에서 실행되는 �
 AWS는 범용 워크로드를 위해 Graviton 프로세서를 주력하고 있고, 23년 작년 re:Invent 에서 AWS Graviton 4를 소개하기도 했습니다.  
 
 <p style="text-align: center;">
-
-![AWS Graviton 4](https://fuse.wikichip.org/wp-content/uploads/2023/12/graviton4_keynote_header.png)  
-[이미지 출처: 2023 re:Invent]
-
+    <img style="display: block; margin: auto;" src="https://fuse.wikichip.org/wp-content/uploads/2023/12/graviton4_keynote_header.png" />
+    [이미지 출처: 2023 re:Invent] 
 </p>
 
 
@@ -229,8 +214,7 @@ SW 호환성을 중점으로 둔다면 Intel을, 저 전력으로 병렬처리 �
 - Graviton2는 네이티브 바이너리를 실행할 때 Intel에 비해 상당한 성능 향상을 보여주었습니다.
 - Graviton2와 Intel 간의 Node.js 및 SSVM 성능 비교는 혼합되어 있습니다. 하지만 Graviton2 인스턴스가 24% 저렴하다는 점을 고려하면 비용 대비 성능면에서 앞서 있습니다
 
-
-<br>
+<br/>
 
 ## AWS Graviton 마이그레이션 전략
 
@@ -243,7 +227,7 @@ SW 호환성을 중점으로 둔다면 Intel을, 저 전력으로 병렬처리 �
 
 사실 Graviton 프로세서의 성능을 최대한 발휘하기 위해서는 운영체제(OS)와 소프트웨어(SW)가 Arm 아키텍처를 완벽히 지원해야 하며, 구체적으로 `Arm64 아키텍처용 컴파일된 바이너리`, `최적화된 커널 및 라이브러리`, `Arm 네이티브 명령어 셋 활용`, `Arm 친화적인 컴파일러 플래그 사용`, `최신 드라이버/펌웨어 업데이트` 과 같은 고려사항이 있습니다.
 
-<br>
+<br/>
 
 ### 마이그레이션 Tip
 
@@ -255,11 +239,21 @@ Graviton 마이그레이션에서 컴퓨팅 인스턴스를 위한 애플리케�
 - 일관성 보장: 항상 동일한 상태의 Immutable 이미지를 사용하므로 일관성이 유지됩니다.
 - 롤백 용이성: 장애 또는 신규 애플리케이션 배포에서 문제가 발생하는 경우 쉽게 롤백 가능합니다.
 
+<br/>
 
 ## Conclusion
 
-ㅇㅇㅇ
+요약하자면, AWS Graviton 인스턴스로의 마이그레이션은 애플리케이션 성능을 크게 향상시키는 동시에 운영 비용을 대폭 절감할 수 있는 기회였습니다. 
 
+사전 준비와 단계적 접근을 통해 마이그레이션 프로세스 자체도 생각보다 수월하게 진행할 수 있었습니다.
+
+특히 Graviton의 높은 가격 대비 성능 덕분에 상당한 비용 절감 효과를 누렸으며, 이는 향후 클라우드 리소스 활용에 있어 더욱 유연성을 제공할 것으로 기대됩니다. 
+
+이번 성공적인 Graviton 마이그레이션 경험을 통해 AWS 최신 기술을 리서치하고 활용하는 데 있어 보다 적극적인 행동변화도 가져왔습니다.
+
+앞으로도 지속적으로 새로운 클라우드 네이티브 기술을 찾고 변화하는 트렌드에 발맞추어 애플리케이션의 민첩성, 비용 효율성, 보안성을 지속적으로 개선해 나가는 것으로 결론을 맺고자 합니다. 
+
+<br/>
 
 ## References
 
