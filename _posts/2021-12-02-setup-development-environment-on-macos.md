@@ -8,18 +8,23 @@ categories:
   - MacOS
 ---
 
-## Setup MacOs
+# Setup MacOs
 새로운 Mac OS 를 가지게 되면 이것 저것 설치할 애플리케이션들이 많습니다.  
 셋업에 하루가 꼬박 걸리기도 하는데 그때 마다 구글링 하며 이곳 저곳 찾아 다니면 낭비되는 시간이 아쉽습니다 ^^
 
-### homebrew 설치
+### [homebrew 설치][#homebrew)
+
 [Brew](https://brew.sh/index_ko) 는 MacOS 의 애플리케이션 설치 및 관리를 위한 필수 패키지 매니저 입니다. 
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-### oh-my-zsh 설치
+<br/>
+
+## [oh-my-zsh 설치][#oh-my-zsh)
+
 Zsh 터미널을 위한 필수 오픈 소스 입니다.
+
 ```
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
@@ -28,8 +33,13 @@ brew install zsh-autosuggestions
 brew install zsh-syntax-highlighting
 ```
 
-### 개발자 Font
+<br/>
+
+
+## [개발자 Font][#dev-font)
+
 글자도 이쁘고 자간도 일정한 폰트를 추천 합니다.
+
 ```
 D2Coding
 Droid Sans Mono Dotted for Powerline
@@ -37,20 +47,31 @@ Droid Sans Mono Dotted for Powerline
 
 <br/>
 
-### 개발 관련 오픈 소스
+## 개발 관련 오픈 소스
 
-#### git 
+### [git][#git )
+
 ```shell
 brew install git
 ```
 
-#### ansible
+
+<br/>
+
+
+### ansible
+
 AMI 빌드 및 리모트 OS 관리를 위한 오픈 소스 입니다.
+
 ```shell
 brew install ansible
 ```
 
-#### tfswitch 패키지 매니저
+<br/>
+
+
+### tfswitch 패키지 매니저
+
 tfswitch 명령을 통해 terraform 의 다양한 버전을 관리 합니다.
 
 ```shell
@@ -60,7 +81,11 @@ terraform --version
 ln -s /usr/local/bin/terraform /usr/local/bin/tf
 ```
 
-#### sdkman 패키지 매니저
+
+<br/>
+
+
+### sdkman 패키지 매니저
 Java 및 관련 오픈소스 버전들을 관리 합니다.
 ```shell
 curl -s "https://get.sdkman.io" | bash
@@ -68,6 +93,7 @@ source "$HOME/.sdkman/bin/sdkman-init.sh"
 ```
 
 - java / maven / gradle 등 여러 버전 관리 예시
+
 ```shell
 sdk list java 
 sdk install java <Version_Identifier>
@@ -75,7 +101,12 @@ sdk install maven
 sdk install gradle
 ```
 
-#### Node 개발 환경을 위한 nvm 패키지 매니저 
+
+<br/>
+
+
+### Node 개발 환경을 위한 nvm 패키지 매니저 
+
 ```shell
 brew install nvm
 
@@ -113,13 +144,16 @@ npm install -global yarn
 yarn -v
 ```
 
-#### python 개발 환경을 위한 pyenv 패키지 매니저
+<br/>
+
+### python 개발 환경을 위한 pyenv 패키지 매니저
 
 ```shell
 brew install pyenv
 ```
 
 - [pyenv](https://www.daleseo.com/python-pyenv/) 을 통한 python 버전 관리 예시
+
 
 ```shell
 
@@ -140,7 +174,9 @@ python3 -version
 pyenv install 2.7.18
 ```
 
-#### aws-vault
+<br/>
+
+### aws-vault
 
 ```
 brew install --cask aws-vault
@@ -163,7 +199,7 @@ aws-vault list
 
 <br>
 
-#### go-lang
+### go-lang
 
 ```shell
 brew install go
@@ -171,7 +207,7 @@ brew install go
 
 <br>
 
-### AWS 관련 툴
+## AWS 관련 툴
 
 ```shell
 # aws cli v2 설치
@@ -183,7 +219,7 @@ brew install aws-iam-authenticator
 
 <br>
 
-### Kubernetes 관련
+## Kubernetes 관련
 
 ```shell
 # docker
@@ -202,22 +238,32 @@ brew install helm
 brew install minikube
 ```
 
-### 편집 툴
+<br/>
 
-#### MS Office
+
+## 편집 툴
+
+
+### MS Office
 - App Store 를 통해 설치 
 
-#### IntelliJ
+<br/>
+
+### IntelliJ
 ```
 https://www.jetbrains.com/idea/
 ```
 
-#### Jetbrain Toolbox
+<br/>
+
+### Jetbrain Toolbox
 ```
 https://www.jetbrains.com/ko-kr/toolbox-app/
 ```
 
-#### IntelliJ Plug-In
+<br/>
+
+### IntelliJ Plug-In
 ```
 # Jetbrain Toolbox 로도 편리하게 설치 가능
 SonarLint
@@ -226,17 +272,24 @@ Rainbow Brackets
 Grep Console
 ```
 
-#### Postman
+<br/>
+
+### Postman
 ```
 https://www.postman.com/downloads/
 ```
 
-#### Sublime Text
+<br/>
+
+
+### Sublime Text
 ```
 https://www.sublimetext.com/
 ```
 
-#### Authy OTP 프로그램 설치 (직접 다운로드)
+<br/>
+
+### Authy OTP 프로그램 설치 (Manually download)
 ```
 https://authy.com/download/
 ```
