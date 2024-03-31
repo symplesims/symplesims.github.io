@@ -238,6 +238,8 @@ Lambda 함수 구현함에 있어서 아래의 주요 가이드라인을 계획�
 - 하나의 책임 원칙(Single Responsibility Principle)으로 컴포넌트화 재사용성과 유연한 결합을 지향합니다.  
 - typescript 기반으로 구현합니다. 
 
+<br/>
+
 ### CloudfrontSignedHandler 클래스의 구현
 
 `CloudfrontSignedHandler` 클래스는 `getSignedUrl(s3ObjectPath: string, expireDays?: number)` 메서드를 통해 signed url 을 생성합니다.  
@@ -500,14 +502,14 @@ serverless remove
 
 ## 컴퓨팅환경의 무결성을 위한 Dockerize
 
-AWS Lambda 는 이미지 타입으로 배포할 수 있습니다. 이렇게 하면 런타임 환경의 최적화를 할 수 있습니다. 
-그리고 동일한 런타임 환경이 보장되며, 일관된 배포 환경을 유지하고 문제가 발생될 경우 이전 이미지로의 롤백 역시 용이합니다.
+AWS Lambda 는 이미지 타입으로 배포할 수 있습니다. 이미지 타입은 런타임 환경을 최적화 할 수 있습니다.   
+또한 동일한 런타임을 보장하며, 일관된 배포 환경을 유지하고 문제가 발생될 경우 이전 이미지로의 롤백 역시 용이합니다.  
 
 <br>
 
 ### Dockerize
 
-아래와 같이 ARM64 기반의 AWS Manged 베이스라인 이미지로부터 `Dockerfile` 을 작성합니다. 
+아래와 같이 ARM64 기반의 AWS Manged 베이스라인 이미지를 참조하는 `Dockerfile`을 작성합니다. 
 
 [Dockerfile]
 ```
@@ -530,7 +532,7 @@ CMD [ "index.handler" ]
 
 ### Troubleshooting 
 
-불행하게도 현재 시점에서 이미지 기반 Lambda 런타임은 typescript 를 지원하지 않고 있습니다.  
+불행하게도 현재 시점에서 이미지 기반 Lambda 런타임은 typescript 를 지원하지 않고 있습니다.    
 esbuild 플러그인을 통해 typescirpt 를 javascript 형식으로 변환하여 배포를 해야만 합니다. 
 
 - `npm run build` 명령을 실행할 경우 esbuild 로 패키징되도록 `package.json` 파일에 아래 코드를 추가 합니다.    
