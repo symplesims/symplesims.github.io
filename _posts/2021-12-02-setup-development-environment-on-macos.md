@@ -12,7 +12,7 @@ categories:
 새로운 Mac OS 를 가지게 되면 이것 저것 설치할 애플리케이션들이 많습니다.  
 셋업에 하루가 꼬박 걸리기도 하는데 그때 마다 구글링 하며 이곳 저곳 찾아 다니면 낭비되는 시간이 아쉽습니다 ^^
 
-## [homebrew 설치][#homebrew]
+## [homebrew 설치](#homebrew)
 
 [Brew](https://brew.sh/index_ko) 는 MacOS 의 애플리케이션 설치 및 관리를 위한 필수 패키지 매니저 입니다. 
 ```
@@ -21,7 +21,7 @@ categories:
 
 <br/>
 
-## [oh-my-zsh 설치][#oh-my-zsh]
+## [oh-my-zsh 설치](#oh-my-zsh)
 
 Zsh 터미널을 위한 필수 오픈 소스 입니다.
 
@@ -36,7 +36,7 @@ brew install zsh-syntax-highlighting
 <br/>
 
 
-## [개발자 Font][#dev-font]
+## [개발자 Font](#dev-font)
 
 글자도 이쁘고 자간도 일정한 폰트를 추천 합니다.
 
@@ -49,7 +49,7 @@ Droid Sans Mono Dotted for Powerline
 
 ## 개발 관련 오픈 소스
 
-### [git][#git]
+### [git](#git)
 
 ```shell
 brew install git
@@ -59,7 +59,7 @@ brew install git
 <br/>
 
 
-### [ansible][#ansible]
+### [ansible](#ansible)
 
 
 AMI 빌드 및 리모트 OS 관리를 위한 오픈 소스 입니다.
@@ -71,7 +71,7 @@ brew install ansible
 <br/>
 
 
-### [tfswitch 테라폼 패키지 매니저][#tfswitch]
+### [tfswitch 테라폼 패키지 매니저](#tfswitch)
 
 tfswitch 명령을 통해 terraform 의 다양한 버전을 관리 합니다.
 
@@ -85,7 +85,7 @@ ln -s /usr/local/bin/terraform /usr/local/bin/tf
 
 <br/>
 
-### [sdkman 패키지 매니저][#sdkman]
+### [sdkman 패키지 매니저](#sdkman)
 
 Java 및 관련 오픈소스 버전들을 관리 합니다.
 ```shell
@@ -105,7 +105,7 @@ sdk install gradle
 
 <br/>
 
-### [Node 패키지 매니저][#node]
+### [Node 패키지 매니저](#node)
 
 ```shell
 brew install nvm
@@ -146,7 +146,7 @@ yarn -v
 
 <br/>
 
-### [python 패키지 매니저][#pyenv]
+### [python 패키지 매니저](#pyenv)
 
 ```shell
 brew install pyenv
@@ -176,7 +176,7 @@ pyenv install 2.7.18
 
 <br/>
 
-### [aws-vault][#pyenv]
+### [aws-vault](#aws-vault)
 
 ```
 brew install --cask aws-vault
@@ -199,7 +199,7 @@ aws-vault list
 
 <br>
 
-### [go-lang][#go-lang]
+### [go-lang](#go-lang)
 
 ```shell
 brew install go
@@ -207,7 +207,7 @@ brew install go
 
 <br>
 
-## [AWS CLI][#aws-cli]
+## [AWS CLI](#aws-cli)
 
 
 ```shell
@@ -220,7 +220,7 @@ brew install aws-iam-authenticator
 
 <br>
 
-## [Kubernetes 관련][#k8s]
+## [Kubernetes 관련](#k8s)
 
 ```shell
 # docker
@@ -242,7 +242,7 @@ brew install minikube
 <br/>
 
 
-## [기타 툴][#etc-tools]
+## [기타 툴](#etc-tools)
 
 
 ### MS Office
@@ -284,7 +284,7 @@ https://www.sublimetext.com/
 <br/>
 
 
-### [Authy OTP (Manually download)][#authy]
+### [Authy OTP (Manually download)](#authy)
 
 ```
 https://authy.com/download/
@@ -292,7 +292,7 @@ https://authy.com/download/
 
 <br/>
 
-### [Postman][#postman]
+### [Postman](#postman)
 
 ```
 https://www.postman.com/downloads/
