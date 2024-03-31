@@ -33,7 +33,7 @@ AWS Graviton 마이그레이션 경험
 
 <p style="text-align: center;">
 
-![img_13.png](/assets%2Fimages%2F24q1%2Fimg_13.png)
+<img style="display: block; margin: auto;" src="/assets/images/24q1/img_13.png">
 
 </p>
 
@@ -42,7 +42,7 @@ AWS Graviton 마이그레이션 경험
 
 <p style="text-align: center;">
 
-![img_14.png](/assets%2Fimages%2F24q1%2Fimg_14.png)
+![img_14.png](/assets/images/24q1/img_14.png)
 
 </p>
 
@@ -53,7 +53,7 @@ AWS Graviton 마이그레이션 경험
 
 <p style="text-align: center;">
 
-![img_15.png](/assets%2Fimages%2F24q1%2Fimg_15.png)
+![img_15.png](/assets/images/24q1/img_15.png)
 
 </p>
 
@@ -122,7 +122,7 @@ AWS 클라우드를 이용중이므로 Java, Python, Node을 위한 Docker Base 
 
 <p style="text-align: center;">
 
-![img_16.png](/assets%2Fimages%2F24q1%2Fimg_16.png)
+![img_16.png](/assets/images/24q1/img_16.png)
 
 </p>
 
