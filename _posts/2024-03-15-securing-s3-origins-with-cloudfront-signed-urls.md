@@ -231,6 +231,8 @@ CloudFront의 Behavior로 `/uploads` 버킷 경로에 대해 캐싱 동작, 라�
 
 이로써 CloudFront 배포 설정 및 S3 Origin 을 안전하게 보안되도록 구성이 완료 되었습니다.
 
+<br/>
+<br/>
 
 ## CloudFront Signed URL 생성 및 Origin 객체 액세스 테스트
 
