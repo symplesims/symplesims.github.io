@@ -167,7 +167,7 @@ RISC 아키텍처는 프로세서의 명령어 세트를 단순화하여 더 적
 ARM 프로세서는 대부분의 AWS 서비스에서 지원되고 있으며, 이제 스마트폰, 태블릿과 같은 모바일 장치에 널리 사용될 뿐만아니라, 임베디드 시스템, IoT 장치, 서버 및 데이터 센터에서도 점점 더 많이 사용되고 있습니다.
 
 <p style="text-align: center;">
-    <img style="display: block; margin: auto;" src="https://upload.wikimedia.org/wikipedia/commons/2/2b/ARMCortexA57A53.jpg" />
+    <img style="display: block; margin: auto;" src="https://upload.wikimedia.org/wikipedia/commons/2/2b/ARMCortexA57A53.jpg" width="50%" />
     [이미지 출처: wikimedia] 
 </p>
 
@@ -177,7 +177,7 @@ ARM 프로세서는 대부분의 AWS 서비스에서 지원되고 있으며, 이
 
 
 <p style="text-align: center;">
-    <a href="https://youtu.be/Fvh4djznuuM"><img style="display: block; margin: auto;" src="https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/04/10/Site-Merch_Graviton_SocialMedia_2.jpg" /></a>
+    <a href="https://youtu.be/Fvh4djznuuM" target="_blank"><img style="display: block; margin: auto;" src="https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/04/10/Site-Merch_Graviton_SocialMedia_2.jpg" width="80%"/></a>
 </p>
 
 
