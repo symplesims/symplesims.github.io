@@ -5,6 +5,7 @@ title: "Generating Secure CloudFront URLs with a AWS Lambda Function"
 date:  2024-04-01 05:30:00 +0900
 categories:
    - Security
+   - Lambda
    - DevOps
    - HandsOn
 ---
