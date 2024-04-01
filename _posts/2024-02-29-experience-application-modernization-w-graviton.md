@@ -29,37 +29,36 @@ AWS Graviton 마이그레이션 경험
 
 작년 2023년 5월 기준의 R5 인스턴스 타입과 현재 2월 기준의 R6G Graviton2 타입으로 변경 이후의 변화를 아래 그래프로 확인할 수 있습니다. 
 
-- MRR: 2023. 5. 
+### MRR: 2023. 5. 
 
 <p style="text-align: center;">
     <img style="display: block; margin: auto;" src="/assets/images/24q1/img_13.png" />
 </p>
 
 
-- MRR: 2024. 1.
+### MRR: 2024. 1.
 
 <p style="text-align: center;">
     <img style="display: block; margin: auto;" src="/assets/images/24q1/img_14.png" />
 </p>
 
-또한, 전체 절감액이 6,317 USD 이고, 이중 RDS가 차지하는 비중이 6,046 USD 으로 절감액의 95%가 RDS 가 차지하고 있는 것을 확인할 수 있습니다.
 
-
-- Cost reduction trend change from 2023. 5. to 2024. 2.
+### Cost reduction trend change from 2023. 5. to 2024. 2.
 
 <p style="text-align: center;">
     <img style="display: block; margin: auto;" src="/assets/images/24q1/img_15.png" />
 </p>
 
+`MRR: 2024. 1.` 그래프에서 전체 절감액이 6,317 USD 이고, 이 중 RDS 6,046 USD으로 절감액의 95%를 차지하고 있음을 확인할 수 있습니다.
 
-위 비용절감 트랜드 차트를 보면 2023. 5. 이후로 서비스 워크로드는 지속적으로 증가했음에도 불구하고 2023.8 월을 기점으로 RDS 비용이 지속적으로 감소하고 있음이 확인됩니다.  
+또한, 비용 트랜드 차트를 보면 2023. 5. 이후로 서비스 워크로드는 지속적으로 증가했음에도 불구하고 2023.8 월을 기점으로 RDS 비용이 지속적으로 감소하고 있음이 확인됩니다.  
 
-Graviton 2 인스턴스타입 조정 뿐만 아니라 RI/SP 적용으로 현재 이와 같은 절감을 실현할 수 있었습니다. 
+이렇게 비용을 절감한 배경으로 Graviton 2 인스턴스 타입으로의 마이그레이션과 해당 타입의 RI/SP 적용으로 인해 이와 같은 절감 효과를 실현할 수 있었습니다. 
 
 <br/>
 
 
-## Graviton2 마이그레이션 과정
+## AWS Graviton2 마이그레이션 과정
 
 Aurora Mysql 클러스터, EC2 인스턴스, ECS 컨테이너를 대상으로 Graviton 인스턴스 타입으로 마이그레이션 하였고, 그 과정은 아래와 같습니다. 
 
