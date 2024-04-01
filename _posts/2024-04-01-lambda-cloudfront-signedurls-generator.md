@@ -574,3 +574,8 @@ S3 오리진 콘텐츠에 대한 액세스 제어를 강화함으로써 데이�
 
 이러한 방식으로 클라우드 기반 모범 사례를 도입하여 보안, 확장성, 비용 효율성 등 다양한 측면에서 애플리케이션의 품질을 지속적으로 개선해 나가는 한가지 사례로 결론을 맺고자 합니다.
 
+<br/>
+
+## References
+
+- [aws-signedurl-lambda](https://github.com/simplydemo/aws-signedurl-lambda.git)
