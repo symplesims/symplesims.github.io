@@ -115,9 +115,6 @@ AWS 관리형 또는 고객 관리형 KMS 키인 SSE-KMS 를 사용할 경우 Bu
 }
 ```
 
-![img_1.png](/assets%2Fimages%2F24q1%2Fimg_1.png)
-
-
 <br>
 
 ## CloudFront 배포 및 S3 오리진 보안
