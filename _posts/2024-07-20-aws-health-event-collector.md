@@ -33,12 +33,16 @@ AWS Health 이벤트를 통합하고 실시간 알림을 받음으로써 이 문
 - **서비스 운영 신뢰 유지**: 서비스의 신뢰성과 안정성을 유지함으로써 조직의 신뢰를 유지하고, 사용자 경험을 향상시킬 수 있습니다.
 
 
+<br>
+<br>
 
 ## 아키텍처
 
-아키텍처 다이어그램을 보듯이 Lambda 를 제외하고 SaaS 서비스로 통합되어 집니다. 특히 Organizations 에 가입된 각각의 맴버용 서비스 계정을 대상으로 일관된 방식으로 Health 이벤트를 통합하여 수집하는 점이 장점입니다. 
 
 ![img_17.png](/assets%2Fimages%2F24q3%2Fimg_17.png)
+
+아키텍처 다이어그램을 보듯이 Lambda 를 제외하고 SaaS 서비스로 통합되어 집니다. 
+특히 Organizations 에 가입된 각각의 맴버용 서비스 계정을 대상으로 일관된 방식으로 Health 이벤트를 통합하여 수집하는 점이 장점입니다.
 
 <br>
 
@@ -49,18 +53,42 @@ AWS Health 이벤트를 통합하고 실시간 알림을 받음으로써 이 문
 - **Event Forwarder**: Organizations 에 가입된 AWS 계정이 Health 이벤트를 전송합니다.
 
 <br>
+<br>
 
 ## 구현 전략
 
-서비스를 이루는 컴포넌트는 `Data Collector` 와 `Event Forwarder` 입니다. `Data Collector`가 이벤트를 수신할 모든 준비가 되어 있다면, 동일한 규격의 다수의 `Event Forwarder` 요청을 처리할 수 있습니다.
-
-이런 이유로 CloudFormation 통해 구현 하였습니다. 
-- CloudFormation 템플릿을 통해 이벤트를 통합 수집하고 노티 할 AWS 계정 및 리전에 `Data Collector` 를 프로비저닝  
-- CloudFormation Stack-Sets를 통해 다수의 `Event Forwarder`를 자동화된 방식으로 프로비저닝 
+서비스를 이루는 컴포넌트는 `Data Collector` 와 `Event Forwarder` 입니다.   
 
 
-CloudFormation 템플릿은 `자동화된 배포`, `일관성`, `버전관리`, `확장성`, `재사용성`, `보안 및 감사` 등 주요한 장점이 있습니다.
+### Data Collector 구성
 
+Data Collector 의 구성은 `CloudFormation 템플릿`으로 프로비저닝 하는것을 결정했습니다.
+
+
+![CF-Template](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/images/create-stack-diagram.png)
+
+`Data Collector`는 AWS 리소스 간의 상호 작용을 고려한 유기적인 관계를 구성 해야합니다. 여기에서 개별 리소스 설정에서 발생할 수 있는 결함을 줄이고,
+전체 시스템을 일관성있는 방법으로 안정적이고도 자동화된 프로세스로 할 수 있어야 하는데, 이것을 만족시키는 최적의 도구가 CloudFormation 템플릿 입니다.
+
+
+<br>
+
+### Event Forwarder 구성
+
+`Event Forwarder` 의 구성은 `CloudFormation StackSets`으로 프로비저닝 하는것을 결정했습니다.
+
+![StackSet](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/images/stack_sets_operations_stacks_sv.png)
+
+[CloudFormation StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/what-is-cfnstacksets.html)는 
+단일 작업으로 여러 계정과 AWS 리전에 대해 스택을 생성, 업데이트 또는 삭제할 수 있도록 하여 스택의 기능을 확장할 수 있으므로 `Data Collector` 단일 창구로 Health Event 를 보내는
+`Event Forwarder`를 프로버저닝 하기에 최고의 도구입니다. 
+
+
+
+`CloudFormation`을 통해 AWS Health Event 통합 및 알림 서비스를 프로비저닝 하면서,
+`자동화된 배포`, `일관성`, `버전관리`, `확장성`, `재사용성`, `보안 및 감사` 등 주요한 장점을 가져오게 됩니다.
+
+<br>
 <br>
 
 ## Data Collector 컴포넌트  
@@ -69,18 +97,105 @@ CloudFormation 템플릿은 `자동화된 배포`, `일관성`, `버전관리`, 
 
 CloudFormation 다이어그램에서 보듯이 생각 보다 많은 리소스가 통합됩니다. 특히 고려한 부분은 KMS 를 적용한 `데이터 보안`과 `리소스 상호간의 IAM 정책의 구성`입니다.   
 
-- [aws-cf-template-health-collector-v1.0.yaml](https://raw.githubusercontent.com/simplydemo/aws-health-collector/main/cf-stacks/aws-cf-template-health-collector-v1.0.yaml) 템플릿 소스 코드  
+아래는 `Data Collector`를 구성하는 핵심 리소스만 YAML 으로 간략하게 보여주고 있습니다.  
 
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "This CloudFormation template listens for the 'aws.health' event sent by the EventBus Sender for each member account provisioned as 'sender-org-stacks' in AWS Organizations. Additionally, received events are sent to SNS topics and sent to Hangout Chat through Lambda subscribers."
+
+Parameters:
+  Project         : 프로젝트 이름 입니다. 리소스를 일관되게 식별 및 관리하는데 도움을 줍니다.
+  Region          : 스택을 배포할 리전입니다.
+  ECRImageUri     : Lambda 를 구현할 컨테이너 이미지 입니다. ECR 저장소에 업로드 되어야 합니다.
+  GchatWebhookUrl : 실시간 채널 중 하나인 Google Hangout 채널 입니다.
+  OrgId           : AWS Organizations 맴버 계정의 `Event Forwarder`가 보내는 Health Event를 허용하기 위한 Organization ID 입니다.
+
+Resources:
+  DelibirdLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: health-delibird-lambda
+  
+  HealthKMS:
+    Type: AWS::KMS::Key
+  HealthKMSAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: alias/health-kms
+      TargetKeyId: !Ref HealthKMS
+
+  HealthTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: aws-health-topic
+
+  HealthTopicSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref HealthTopic
+      Protocol: lambda
+      Endpoint: !GetAtt DelibirdLambda.Arn
+
+  HealthEventBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Sub ${Project}-health-collector-bus
+
+  HealthProcessorRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub ${Project}-health-processor-rule
+      Targets:
+        - Arn: !Ref HealthTopic
+      State: "ENABLED"
+```
+
+- 전체 CF 템플릿 코드는 [aws-cf-template-health-collector-v1.0.yaml](https://raw.githubusercontent.com/simplydemo/aws-health-collector/main/cf-stacks/aws-cf-template-health-collector-v1.0.yaml)를 참조하세요.
+
+
+<br>
 <br>
 
 ## Event Forwarder 컴포넌트
 
-CloudFormation 다이어그램에서 보듯이 AWS Health 이벤트만 수집하여 포워딩하므로 아주 단촐합니다. 이 컴포넌트는 Organizations 에서 다양한 OU, Account, Region 등 운영자가 프로비저닝을 원하는 어떤 형태로든 프로비저닝을 할 수 있습니다.
-
-
 ![img_18.png](/assets%2Fimages%2F24q3%2Fimg_18.png)
 
+`Event Forwarder`는 수신한 AWS Health 이벤트를 `Data Collector`로 포워딩만 담당하므로 아주 간단합니다. 다음은 몇가지 주의 고려 사항 입니다. 
 
+- Organizations 을 관리하는 Master 계정에서 배포되어야 합니다. 
+- [AWSServiceRoleForHealth_Organizations](https://docs.aws.amazon.com/health/latest/ug/using-service-linked-roles.html#service-linked-role-permissions) 서비스 연결 역할이 마스터 계정에 존재해야 합니다.
+- CloudFormation StackSet을 통해 OU, Account, Region 등 운영자가 프로비저닝을 원하는 어떤 형태로든 `Event Forwarder`스택을 프로비저닝 할 수 있습니다.
+
+다음은 `Event Forwarder`를 구성하는 Template 의 주요한 정보입니다.
+
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'This CloudFormation Stack-sets template sends AWS Health events to the Data Collector account for each account managed through AWS Organizations. (StackSets version)'
+
+Parameters:
+  Project               : 프로젝트 이름 입니다. 리소스를 일관되게 식별 및 관리하는데 도움을 줍니다.
+  CollectorEventBusArn  : 앞서 구성한 Data Collector 의 Arn 리소스 식별자를 입력합니다.
+
+Resources:
+  HealthEventRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Name: health-deliver-org-rule'
+      Description: 'Forward AWS Health events to Data Collector account'
+      EventPattern:
+        source:
+          - 'aws.health'
+      State: 'ENABLED'
+      Targets:
+        - Arn: !Ref CollectorEventBusArn
+          Id: 'ForwardToCollectorEventBus'
+          RoleArn: !GetAtt HealthEventForwardingRole.Arn
+```
+
+- 전체 CF 템플릿 코드는 [aws-cf-stacks/aws-cf-template-health-forwarder](https://raw.githubusercontent.com/simplydemo/aws-health-collector/main/cf-stacks/aws-cf-template-health-forwarder-orgs-v1.0.yaml)를 참조하세요.
+
+
+<br>
 <br>
 
 ## 배포 순서
@@ -91,9 +206,10 @@ CloudFormation 템플릿을 통해 완전 자동화 하려면 먼저 커스텀 N
 
 2. `Data Collector 스택`을 [aws-cf-template-health-collector-v1.0.yaml](https://raw.githubusercontent.com/simplydemo/aws-health-collector/main/cf-stacks/aws-cf-template-health-collector-v1.0.yaml) 템플릿 으로 배포합니다.
 
-3. `Event Forwarder 스택`을 [aws-cf-template-health-sender-orgs-v1.0.yaml](https://raw.githubusercontent.com/simplydemo/aws-health-collector/main/cf-stacks/aws-cf-template-health-sender-orgs-v1.0.yaml) Stack-Sets 으로 배포합니다.
+3. `Event Forwarder 스택`을 [aws-cf-stacks/aws-cf-template-health-forwarder](https://raw.githubusercontent.com/simplydemo/aws-health-collector/main/cf-stacks/aws-cf-template-health-forwarder-orgs-v1.0.yaml) Stack-Sets 으로 배포합니다.
 
 
+<br>
 <br>
 
 ## 배포 절차 리뷰
