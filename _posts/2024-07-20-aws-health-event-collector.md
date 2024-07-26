@@ -17,7 +17,7 @@ AWS Health Event 통합하고 실시간 채널로 주요 이벤트 확인 하기
 
 회사에서 운영하는 Cloud 규모가 커지면서 다양한 아키텍처, 그리고 많은 리소스를 운영 관리해야 합니다. 리소스는 언제나 상태가 변하기 마련입니다. AWS 메인트넌스, 개발팀의 애플리케이션 변화, 뜻하지 않은 장애 등 다양한 상황에 놓이게 됩니다.    
 
-AWS Health 이벤트를 통합하고 실시간 알림을 받음으로써 이 문제를 어느 정도 완하할 수 있습니다. 
+AWS Health 이벤트를 통합하고 실시간 알림을 받음으로써 이 문제를 어느 정도 완화할 수 있습니다. 
 
 
 다음은 AWS Health 이벤트를 통합하고 실시간 알림을 받는 주요 이유입니다.
@@ -32,6 +32,10 @@ AWS Health 이벤트를 통합하고 실시간 알림을 받음으로써 이 문
 
 - **서비스 운영 신뢰 유지**: 서비스의 신뢰성과 안정성을 유지함으로써 조직의 신뢰를 유지하고, 사용자 경험을 향상시킬 수 있습니다.
 
+<br>
+
+이 모든걸 떠나서 제가 딱 지금 이 환경이 필요한 상황에 놓여지게 되었습니다. 수십개의 AWS 계정 및 다양한 워크로드를 안정적으로 운영 관리해야하는 상황입니다. 
+ 
 
 <br>
 <br>
@@ -212,9 +216,11 @@ CloudFormation 템플릿을 통해 완전 자동화 하려면 먼저 커스텀 N
 <br>
 <br>
 
-## 배포 절차 리뷰
+## 배포
 
-**1.** `Data Collector 스택`을 구성하기 위한 ECR 저장소와 이미지를 업로드 합니다.
+<br>
+
+### 1. ECR 저장소 구성 및 Lambda 컨테이너 이미지 업로드
 
 [aws-health-ecr.sh](https://raw.githubusercontent.com/simplydemo/aws-health-collector/main/shells/aws-health-ecr.sh) 쉘 파일을 이용하여,
 [symplesims/aws-health-delibird:1.0.0](https://hub.docker.com/r/symplesims/aws-health-delibird) 도커 이미지를 로컬에 내려받고 ECR 저장소를 생성하고 업로드를 합니다. 
@@ -234,9 +240,11 @@ ECR_TAG="1.0.0"
 KMS_ALIAS_NAME="aws/ecr"
 ```
 
-**2.** `Data Collector 스택`을 배포 합니다.
+<br>
 
-CloudFormation > Stacks - `Create stack`
+### 2. Data Collector 스택 프로비저닝
+
+CloudFormation > Stacks - `Create stack`를 통해 진행 합니다.
 
 ![img_11.png](/assets%2Fimages%2F24q3%2Fimg_11.png)
 
@@ -279,8 +287,9 @@ OrgId           : Organizations 조직 아이디 입니다. OrgId 에서오는 �
 
 
 
+<br>
 
-**3.** `Event Forwarder 스택`을 배포 합니다.
+### 3. Event Forwarder 스택 프로비저닝
 
 - `CloudFormation > StackSets` - `Create StackSet` 으로 진행됩니다.
 
@@ -358,5 +367,21 @@ CollectorEventBusArn : 앞서 프로비저닝한 Data Collector의 Event Bus ARN
 StackSet 을 통해 다수의 프로비저닝 진행상황을 모니터링 할 수 있습니다. 
 
 <br>
+<br>
+
+## 결과
+
+이제 우리는 아래와 같이 AWS Health의 주요 이벤트를 `Google Hangout`과 같은 알림을 통해 실시간으로 받아볼 수 있습니다. 
 
 ![img_19.png](/assets%2Fimages%2F24q3%2Fimg_19.png)
+
+
+## 맺음말 
+
+AWS Health 시스템을 CloudFormation 스택으로 구성하여 실시간 알림을 받는 방법을 소개하였습니다. 
+
+이를 통해 저를 괴롭히는 리소스 상태 변화를 즉각적으로 파악하고 대응할 수 있어 운영 효율성과 안정성을 크게 향상시킬 수 있습니다.
+
+클라우드 인프라의 복잡성 속에서도 체계적이고 신속한 문제 해결이 가능해졌습니다. 
+
+앞으로도 이러한 통합 시스템을 통해 더욱 효과적인 클라우드 관리를 소개할 수 있었으면 합니다. 
