@@ -51,12 +51,9 @@ AWS에 관심있는 다양한 배경을 가진 파트너사의 테크 그루들�
 조만간 사람과 대화하듯이 원하는 물건을 구매하고 예약하는 시기가 올 것 같습니다.   
 
 
-### 현장 분위기 및 발표 자료
+### 현장 분위기
 
 ![1000003303.jpg](/assets/images/24q3/1000003303.jpg)
-
-[AWS Health Event 통합하고 실시간 채널로 주요 이벤트 확인 하기.pdf](/assets/archive/eeb94818-b3c6-49f1-92f4-dff3b86c468c.pdf)
-
 
 <br>
 
@@ -67,3 +64,14 @@ AWS 커뮤니티 밋업은 단순한 정보 교류의 장을 넘어, 같은 열�
 저는 이러한 이유로 시간 내기가 어렵더라도 가능한 참여 하려고 노력을 하고 있습니다. 
 
 여러분도 커뮤니티와 함께 성장할 수 있기를 바랍니다.
+
+<br>
+
+### 참고 자료 
+
+- [AWS Health Event 통합하고 실시간 채널로 주요 이벤트 확인 하기.pdf](/assets/archive/eeb94818-b3c6-49f1-92f4-dff3b86c468c.pdf)
+- [CloudFormation Template - Data Collector](https://github.com/simplydemo/aws-health-collector/blob/main/cf-stacks/aws-cf-template-health-collector-v1.0.yaml)
+- [CloudFormation StackSet - Event Forwarder](https://github.com/simplydemo/aws-health-collector/blob/main/cf-stacks/aws-cf-template-health-forwarder-orgs-v1.0.yaml)
+- [trigger-evtbus.sh - ECR 생성 및 이미지 Push](https://github.com/simplydemo/aws-health-collector/blob/main/cf-stacks/trigger-evtbus.sh)
+
+
