@@ -778,8 +778,42 @@ STEP 3 - 커넥터 속성
 
 ![img_16.png](/assets/images/25q1/img_16.png)
 
+```
+{
+  "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+  "tasks.max": "1",
+  "database.hostname": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSrcEndpoint}",
+  "database.port": "3306",
+  "database.user": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSrcUsername}",
+  "database.password": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSrcPassword}",
+  "database.server.id": "76311378",
+  "database.include.list": "demosrc",
+  "database.allowPublicKeyRetrieval": "true",
+  "table.include.list": "demosrc.products",
+  "topic.prefix": "simply",
+  "schema.history.internal.kafka.topic": "history.schema-changes",
+  "schema.history.internal.kafka.bootstrap.servers": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:bootstrapServers}",
+  "schema.history.internal.consumer.security.protocol": "SASL_SSL",
+  "schema.history.internal.consumer.sasl.mechanism": "AWS_MSK_IAM",
+  "schema.history.internal.consumer.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
+  "schema.history.internal.consumer.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+  "schema.history.internal.producer.security.protocol": "SASL_SSL",
+  "schema.history.internal.producer.sasl.mechanism": "AWS_MSK_IAM",
+  "schema.history.internal.producer.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
+  "schema.history.internal.producer.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+  "include.schema.changes": "true",
+  "snapshot.mode": "initial",
+  "time.precision.mode": "connect",
+  "heartbeat.interval.ms": "2000",
+  "snapshot.locking.mode": "none",
+  "quote.identifiers": "always",
+  "decimal.handling.mode": "double",
+  "delete.enabled": "true"
+}
+```
 
-STEP 4 - 커넥터 용량
+
+STEP 4 - 커넥터 용량(성능)
 
 ![img_17.png](/assets/images/25q1/img_17.png)
 
@@ -815,49 +849,7 @@ STEP 2 - 커넥터 속성
 
 ![img_23.png](/assets/images/25q1/img_23.png)
 
-STEP 3 - 검토 및 생성 
 
-![img_24.png](/assets/images/25q1/img_24.png)
-
-
-```
-{
-  "connector.class": "io.debezium.connector.mysql.MySqlConnector",
-  "tasks.max": "1",
-  "database.hostname": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSrcEndpoint}",
-  "database.port": "3306",
-  "database.user": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSrcUsername}",
-  "database.password": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSrcPassword}",
-  "database.server.id": "76311378",
-  "database.include.list": "demosrc",
-  "database.allowPublicKeyRetrieval": "true",
-  "table.include.list": "demosrc.products",
-  "topic.prefix": "simply",
-  "schema.history.internal.kafka.topic": "history.schema-changes",
-  "schema.history.internal.kafka.bootstrap.servers": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:bootstrapServers}",
-  "schema.history.internal.consumer.security.protocol": "SASL_SSL",
-  "schema.history.internal.consumer.sasl.mechanism": "AWS_MSK_IAM",
-  "schema.history.internal.consumer.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
-  "schema.history.internal.consumer.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
-  "schema.history.internal.producer.security.protocol": "SASL_SSL",
-  "schema.history.internal.producer.sasl.mechanism": "AWS_MSK_IAM",
-  "schema.history.internal.producer.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
-  "schema.history.internal.producer.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
-  "include.schema.changes": "true",
-  "snapshot.mode": "initial",
-  "time.precision.mode": "connect",
-  "heartbeat.interval.ms": "2000",
-  "snapshot.locking.mode": "none",
-  "skipped.operations": "none",
-  "quote.identifiers": "always",
-  "decimal.handling.mode": "double",
-  "auto.create": "false",
-  "auto.evolve": "false",
-  "delete.enabled": "true"
-}
-```
-
-- simplydemo-msk-sink-connector-productinfo
 ```
 {
     "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
@@ -893,11 +885,35 @@ STEP 3 - 검토 및 생성
     "sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler"
 }
 ```
-  
 
-## Appendix
-- [Amazon Managed Streaming for Apache Kafka - 개발자 가이드](https://docs.aws.amazon.com/ko_kr/msk/latest/developerguide/MSKDevGuide.pdf) 문서를 참고하세요, 운영에서 중요한 정보들이 다수 있습니다. 
+
+STEP 3 - 검토 및 생성 
+
+![img_24.png](/assets/images/25q1/img_24.png)
+
+
+
 
 
 ## Conclude 
 
+AWS MSK(Managed Streaming for Apache Kafka) 클러스터와 Connector는 데이터 스트리밍 인프라를 빠르고 편리하게 확장할 수 있는 강력한 도구입니다. 
+이 솔루션은 다양한 서비스 통합, 운영 및 유지 보수 비용 절감, 그리고 자동화 목표 달성을 용이하게 합니다.
+
+Debezium 프레임워크를 활용하여 최소한의 코드 구현만으로 데이터 통합을 실현할 수 있었습니다. 그러나 이 과정에서 속성 설정과 통합 관련 오류가 빈번히 발생함을 경험 하였습니다. 
+이는 새로운 기술 도입 시 흔히 겪는 학습 곡선의 일부라고 볼 수 있습니다.
+
+초기 적용 시 개발팀은 높은 학습 곡선에 직면할 수 있으며, 워크로드에 대응하는 서비스 확장에 있어 운영 경험을 쌓아야 합니다. 
+AWS Cloud 환경에서 MSK 클러스터와 Connector를 통한 파이프라인 구축은 잦은 인스턴스 생성, 삭제, 재구성 과정을 거치게 되어 시간 소모적일 수 있습니다.
+
+그럼에도 불구하고, 이러한 도전은 장기적으로 볼 때 가치 있는 투자입니다. 초기의 어려움을 극복하면, 확장 가능하고 유연한 데이터 스트리밍 인프라를 갖출 수 있습니다. 
+앞으로 AWS MSK와 Connector를 활용하는 팀들은 이러한 경험을 바탕으로 더욱 효율적인 구현 전략을 개발할 수 있을 것입니다.
+
+결론적으로, AWS MSK와 Connector는 강력한 도구이지만, 성공적인 구현을 위해서는 충분한 학습과 경험이 필요합니다. 
+이 기술의 잠재력을 최대한 활용하기 위해서는 지속적인 학습과 실험, 그리고 팀 내 지식 공유가 필수적입니다.
+
+
+## Appendix
+- [Amazon Managed Streaming for Apache Kafka - 개발자 가이드](https://docs.aws.amazon.com/ko_kr/msk/latest/developerguide/MSKDevGuide.pdf) 문서에는 운영에 필요한 팁들도 다수 있습니다.
+- [Debezium](https://debezium.io/) 은 CDC(change data capture)을 위한 효과적인 분산 플랫폼입니다.
+- 
