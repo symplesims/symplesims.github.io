@@ -1,3 +1,5 @@
+```sql
+
 -- SOURCE
 
 CREATE DATABASE IF NOT EXISTS demosrc;
@@ -64,3 +66,4 @@ CREATE TABLE IF NOT EXISTS demosink.productinfo
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+```

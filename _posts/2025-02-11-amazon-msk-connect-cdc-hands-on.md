@@ -95,11 +95,9 @@ Amazon MSK는 다음과 같은 네 가지 접근 제어 방법을 제공합니�
 | SASL/SCRAM            | 9096  |
 | TLS                   | 9094  |
 
-보다 강화된 보안 환경에서 안전한 클라이언트 접근을 위해 `IAM` 및 `SASL/SCRAM` 액세스 컨트롤을 선택하는것을 권고합니다. 
+보다 강화된 보안 환경에서 안전한 클라이언트 접근을 위해 `IAM` 또는 `SASL/SCRAM` 방식의 액세스 컨트롤을 선택하는것을 권고합니다. 
 
-`SASL/SCRAM Authentication` 방식에서 클라이언트 설정은 대게 다음과 같습니다. 
-
-[client.properties]
+`IAM Authentication` 방식에서 클라이언트 설정은 대게 다음과 같습니다. 
 ```properties
 security.protocol=SASL_SSL
 sasl.mechanism=AWS_MSK_IAM 
@@ -129,7 +127,7 @@ MSK 클러스터를 구성하고 MSK Connector 를 통한 CDC 구현을 본격�
 
 PoC를 위한 Source 및 Target 테이터베이스를 구성합니다. 소스 테이블 `demosrc.products`를 타겟 테이블 `demosink.productinfo` 으로 Sink 하는 Use-Case 를 Debezium 오픈소스로 구현합니다.
 
-[schema.sql](aws-msk-cdc-schema.sql) 을 참조하여 데이터베이스 및 테이블을 구성 합니다.
+[schema.sql](/assets/archive/amazon-msk-connect-cdc-hands-on.schema.md) 을 참조하여 데이터베이스 및 테이블을 구성 합니다.
 
 
 
@@ -223,7 +221,7 @@ MSK 커넥터를 구성하기 전에, 로컬 환경에 Kafka Debezium 커넥터�
 
 두 개의 스키마는 서로 다른 데이터베이스에 있으며 image 칼럼이 Target 스키마엔 존재하지 않습니다. 
 
-- [init.sql](../assets/archive/aws-msk-connector-demo-schema.sql) 스키마 참고
+- [init.sql]((/assets/archive/amazon-msk-connect-cdc-hands-on.schema.md) 스키마 참고
 
 
 ### docker-compose 로컬 런타임 환경 구성
@@ -311,7 +309,7 @@ networks:
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
 ```
 
-- `mysql.cnf` 및 [init.sql](../assets/archive/aws-msk-connector-demo-schema.sql) 스키마 예시
+- `mysql.cnf` 및 [init.sql](../assets/archive/aws-msk-connector-demo-schema) 스키마 예시
 
 ```
 [client]
