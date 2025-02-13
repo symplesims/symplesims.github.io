@@ -694,20 +694,20 @@ zip -9 ../debezium-connector-mysql-2.7.3.Final.zip *
 
 MySQL 용 MSK Sink Connector plugin 구성을 위해 [debezium-connector-jdbc-2.7](https://debezium.io/releases/2.7) 버전을 다운로드 받아서 플러그인을 만들어 S3 버킷에 업로드 합니다.
 
-- debezium-connector-jdbc-2.7.3.Final.zip 소스 커넥터 플러그인 구성 절차 예시
+- debezium-connector-jdbc-2.2.1.Final.zip 소스 커넥터 플러그인 구성 절차 예시
 
 ```
-curl -O https://repo1.maven.org/maven2/io/debezium/debezium-connector-jdbc/2.7.3.Final/debezium-connector-jdbc-2.7.3.Final-plugin.tar.gz
-tar -xvzf debezium-connector-jdbc-2.7.3.Final-plugin.tar.gz
+curl -O https://repo1.maven.org/maven2/io/debezium/debezium-connector-jdbc/2.2.1.Final/debezium-connector-jdbc-2.2.1.Final-plugin.tar.gz
+tar -xvzf debezium-connector-jdbc-2.2.1.Final-plugin.tar.gz
 cd debezium-connector-jdbc
 
 # You should add this `msk-config-providers` for accessing Secrets Keys  
 curl -L -O https://github.com/aws-samples/msk-config-providers/releases/download/r0.3.1/msk-config-providers-0.3.1-all.jar
 
-zip -9 ../debezium-connector-jdbc-2.7.3.Final.zip *
+zip -9 ../debezium-connector-jdbc-2.2.1.Final.zip *
 ```
 
-`debezium-connector-jdbc-2.7.3.Final.zip` 싱크커넥터 플러그인을 본인의 S3 버킷에 업로드 합니다.
+`debezium-connector-jdbc-2.2.1.Final.zip` 싱크커넥터 플러그인을 본인의 S3 버킷에 업로드 합니다.
 
 
 ### MSK Worker 속성 구성
@@ -853,7 +853,6 @@ STEP 2 - 커넥터 속성
 
 ![img_23.png](/assets/images/25q1/img_23.png)
 
-
 ```
 {
     "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
@@ -886,7 +885,10 @@ STEP 2 - 커넥터 속성
     "security.protocol": "SASL_SSL",
     "sasl.mechanism": "AWS_MSK_IAM",
     "sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
-    "sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler"
+    "sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+    "retries": "0",
+    "max.retries": "0",
+    "retry.backoff.ms": "0"
 }
 ```
 
@@ -896,6 +898,13 @@ STEP 3 - 검토 및 생성
 ![img_24.png](/assets/images/25q1/img_24.png)
 
 
+### MSK Connector 완성
+
+아래 그림과 같이 Source / Sink 커넥터가 완성 되었습니다. 비록 작은 기능 이지만 MSK 브로커와 통합하여 실시간 데이터 파이프라인이 동작하는 것을 확인할 수 있습니다. 
+뿐만 아니라, Source 커넥터의 "table.include.list" 속성에 테이블을 추가하는 것 만으로 쉽게 데이터소스를 확장 할 수 있습니다. 
+Sink 커넥터는 `topics` 속성 값에 설정된 메시지를 소비하며 Target 시스템에 데이터를 쉽게 적재할 수 있습니다. 
+
+![img_26.png](/assets/images/25q1/img_26.png)
 
 
 
@@ -904,20 +913,18 @@ STEP 3 - 검토 및 생성
 AWS MSK(Managed Streaming for Apache Kafka) 클러스터와 Connector는 데이터 스트리밍 인프라를 빠르고 편리하게 확장할 수 있는 강력한 도구입니다. 
 이 솔루션은 다양한 서비스 통합, 운영 및 유지 보수 비용 절감, 그리고 자동화 목표 달성을 용이하게 합니다.
 
-Debezium 프레임워크를 활용하여 최소한의 코드 구현만으로 데이터 통합을 실현할 수 있었습니다. 그러나 이 과정에서 속성 설정과 통합 관련 오류가 빈번히 발생함을 경험 하였습니다. 
-이는 새로운 기술 도입 시 흔히 겪는 학습 곡선의 일부라고 볼 수 있습니다.
+Debezium 프레임워크를 활용하여 코드 없이 설정만으로 데이터 통합을 실현할 수 있었습니다. 
+그러나 이 과정에서 통합을 위한 설정에서 빈번한 오류를 경험 하였습니다. 이는 새로운 기술 도입 시 흔히 겪는 학습 곡선의 일부라고 볼 수 있습니다.
 
 초기 적용 시 개발팀은 높은 학습 곡선에 직면할 수 있으며, 워크로드에 대응하는 서비스 확장에 있어 운영 경험을 쌓아야 합니다. 
 AWS Cloud 환경에서 MSK 클러스터와 Connector를 통한 파이프라인 구축은 잦은 인스턴스 생성, 삭제, 재구성 과정을 거치게 되어 시간 소모적일 수 있습니다.
+그렇기 때문에 빠르게 테스트가 가능한 환경을 마련하는 전략이 필수적입니다. 여기선 Docker-Compose 를 통한 로컬에서 런타임 환경을 구성하여 많은 부분을 해결하엿습니다. 
 
-그럼에도 불구하고, 이러한 도전은 장기적으로 볼 때 가치 있는 투자입니다. 초기의 어려움을 극복하면, 확장 가능하고 유연한 데이터 스트리밍 인프라를 갖출 수 있습니다. 
-앞으로 AWS MSK와 Connector를 활용하는 팀들은 이러한 경험을 바탕으로 더욱 효율적인 구현 전략을 개발할 수 있을 것입니다.
+AWS MSK와 Connector는 초기 어려움을 극복하면 자동화와 비용 효율성을 통해 데이터 스트리밍 인프라를 빠르게 확장하고 혁신할 수 있는 강력한 솔루션을 얻게됩니다. 
 
-결론적으로, AWS MSK와 Connector는 강력한 도구이지만, 성공적인 구현을 위해서는 충분한 학습과 경험이 필요합니다. 
-이 기술의 잠재력을 최대한 활용하기 위해서는 지속적인 학습과 실험, 그리고 팀 내 지식 공유가 필수적입니다.
 
 
 ## Appendix
 - [Amazon Managed Streaming for Apache Kafka - 개발자 가이드](https://docs.aws.amazon.com/ko_kr/msk/latest/developerguide/MSKDevGuide.pdf) 문서에는 운영에 필요한 팁들도 다수 있습니다.
 - [Debezium](https://debezium.io/) 은 CDC(change data capture)을 위한 효과적인 분산 플랫폼입니다.
-- 
+- [Debezium Transformations](https://debezium.io/documentation/reference/stable/transformations/index.html) 데이터 Source / Sink 를 위한 데이터를 변환 합니다.  
