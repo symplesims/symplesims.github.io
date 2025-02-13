@@ -347,40 +347,46 @@ docker 컨테이너를 구동하기전에 반드시 AWS 클라우드를 액세�
 
 ### AWS MKS 클러스터의 브로커와 연결 확인
 
-- [KafkaIAMConnectTest] 샘플 코드 
+<details>
+  <summary>KafkaIAMConnectTest - 보기/숨기기</summary>
 
 ```java
 public class KafkaIAMConnectTest {
-    // BOOTSTRAP_SERVERS 브로커 주소를 설정하세요
-    private static final String BOOTSTRAP_SERVERS = "your.mskbroker1.kafka.awsregion.amazonaws.com:9098, ...";
+  // BOOTSTRAP_SERVERS 브로커 주소를 설정하세요
+  private static final String BOOTSTRAP_SERVERS = "your.mskbroker1.kafka.awsregion.amazonaws.com:9098, ...";
 
-    private static HashMap<String, Object> getStringObjectHashMap() {
-        HashMap<String, Object> props = new HashMap<>();
-        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
-        // IAM 인증 설정
-        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
-        props.put(SaslConfigs.SASL_MECHANISM, "AWS_MSK_IAM");
-        props.put(SaslConfigs.SASL_JAAS_CONFIG, "software.amazon.msk.auth.iam.IAMLoginModule required;");
-        props.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, "software.amazon.msk.auth.iam.IAMClientCallbackHandler");
-        return props;
-    }
+  private static HashMap<String, Object> getStringObjectHashMap() {
+    HashMap<String, Object> props = new HashMap<>();
+    props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+    // IAM 인증 설정
+    props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
+    props.put(SaslConfigs.SASL_MECHANISM, "AWS_MSK_IAM");
+    props.put(SaslConfigs.SASL_JAAS_CONFIG, "software.amazon.msk.auth.iam.IAMLoginModule required;");
+    props.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, "software.amazon.msk.auth.iam.IAMClientCallbackHandler");
+    return props;
+  }
 
-    public void createTopic() {
-        HashMap<String, Object> props = getStringObjectHashMap();
-        final NewTopic newTopic = new NewTopic(KafakaClientAuth.TOPIC, 1, (short) 1);
-        try (final AdminClient adminClient = AdminClient.create(props)) {
-            adminClient.createTopics(Collections.singleton(newTopic)).all().get();
-            System.out.println("Topic created successfully");
-        } catch (InterruptedException | ExecutionException e) {
-            System.out.println(e.getMessage());
-        }
+  public void createTopic() {
+    HashMap<String, Object> props = getStringObjectHashMap();
+    final NewTopic newTopic = new NewTopic(KafakaClientAuth.TOPIC, 1, (short) 1);
+    try (final AdminClient adminClient = AdminClient.create(props)) {
+      adminClient.createTopics(Collections.singleton(newTopic)).all().get();
+      System.out.println("Topic created successfully");
+    } catch (InterruptedException | ExecutionException e) {
+      System.out.println(e.getMessage());
     }
+  }
 
-    public static void main(String[] args) {
-        new KafkaIAMConnectTest().createTopic();
-    }
+  public static void main(String[] args) {
+    new KafkaIAMConnectTest().createTopic();
+  }
 }
 ```
+
+</details>
+
+
+
 
 위와 같이 로컬에서 KafkaIAMConnectTest 파일을 실행했을 때 `Topic created successfully`가 정상적으로 나온다면 `SASL_SSL` 방식으로 연결이 됩니다. 
 
