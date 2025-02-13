@@ -198,7 +198,7 @@ MSK 커넥터를 구성하기 전에, 로컬 환경에 Kafka Debezium 커넥터�
 
 ## PoC 기능 검증 아키텍처
 
-[파이프라인 아키텍처 이미지]
+![img_25.png](/assets/images/25q1/img_25.png)
 
 
 ## Kafka 커넥터 기능 구현
