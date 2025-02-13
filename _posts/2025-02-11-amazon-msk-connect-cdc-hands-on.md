@@ -127,7 +127,7 @@ MSK 클러스터를 구성하고 MSK Connector 를 통한 CDC 구현을 본격�
 
 PoC를 위한 Source 및 Target 테이터베이스를 구성합니다. 소스 테이블 `demosrc.products`를 타겟 테이블 `demosink.productinfo` 으로 Sink 하는 Use-Case 를 Debezium 오픈소스로 구현합니다.
 
-[schema.sql](/assets/archive/amazon-msk-connect-cdc-hands-on.schema.md) 을 참조하여 데이터베이스 및 테이블을 구성 합니다.
+[init.sql](/assets/archive/amazon-msk-connect-cdc-hands-on.schema.md) 을 참조하여 데이터베이스 및 테이블을 구성 합니다.
 
 
 
@@ -221,7 +221,7 @@ MSK 커넥터를 구성하기 전에, 로컬 환경에 Kafka Debezium 커넥터�
 
 두 개의 스키마는 서로 다른 데이터베이스에 있으며 image 칼럼이 Target 스키마엔 존재하지 않습니다. 
 
-- [init.sql]((/assets/archive/amazon-msk-connect-cdc-hands-on.schema.md) 스키마 참고
+- [init.sql](/assets/archive/amazon-msk-connect-cdc-hands-on.schema.md) 스키마 참고
 
 
 ### docker-compose 로컬 런타임 환경 구성
@@ -392,7 +392,7 @@ MSK 클러스터를 AWS VPC의 Private 네트워크에 배포했다면 로컬 PC
 
 Kafka 커넥터는 플러그인으로 아무런 코드 구현 없이 설정만으로 동작합니다.
 
-- [source-connector-demosrc.json] 소스 커넥터 설정 파일 예시 
+- `source-connector-demosrc.json` 소스 커넥터 설정 파일 예시 
 
 ```config
 {
@@ -525,7 +525,7 @@ CDC 메시지 캡쳐에 대해 상세한 내용은 [Debezium connector for MySQL
 
 ### Sink 커넥터 배포 및 상태 확인
 
-- [sink-connector-productinfo.json] Sink 커넥터 설정 파일 예시
+- `sink-connector-productinfo.json` Sink 커넥터 설정 파일 예시
 
 ```
 {
@@ -624,12 +624,18 @@ mysql -u sinko -psinko1234 -D demosink
 select * from productinfo;
 ```
 
+<br>
+
+아래와 같이 Source / Target 시스템간 데이터 Sink 가 정상적으로 처리되는것을 확인할 수 있습니다. 
+
+테이블 레코드의 수정, 삭제 뿐만아니라 PK 구조가 동일한 테이블 이리면, 칼럼 추가 및 제거 마저도 동기화 됨을 확인할 수 있습니다.   
+
 ![img_11.png](/assets/images/25q1/img_11.png)
 
 
-여기까지 로컬 환경에서 AWS MSK 클러스터를 대상으로 외부 시스템의 RDS 데이터를 또 다른 외부 시스템의 RDS 으로 동기화 하는 한가지 Pipeline 을 구현해 보았습니다. 
+지금까지 로컬 환경에서 AWS MSK 클러스터를 대상으로 외부 시스템의 RDS 데이터를 또 다른 외부 시스템의 RDS 으로 동기화 하는 한가지 Pipeline 을 구현해 보았습니다. 
 
-이어서 AWS Cloud 에 MSK 커넥터를 배포합니다. 
+이어서 AWS 클라우드 환경에서 MSK 커넥터를 배포합니다. 
  
 
 ## MSK 커넥터 아키텍처
