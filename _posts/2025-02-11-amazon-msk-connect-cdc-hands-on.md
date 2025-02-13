@@ -24,7 +24,7 @@ Amazon Managed Streaming for Apache Kafka(Amazon MSK)는 Apache Kafka를 완전 
 이를 통해 클러스터의 프로비저닝, 구성, 유지 관리 등의 작업을 AWS에서 처리하므로 개발자는 애플리케이션 개발에 집중할 수 있습니다. 
 특히 Amazon MSK는 엔터프라이즈급 보안 기능과 고가용성을 제공하여 안정적인 데이터 스트리밍 환경을 구축할 수 있습니다.
 
-![img.png](../assets/images/25q1/img.png)
+![img.png](/assets/images/25q1/img.png)
 
 ### Amazon MSK의 주요 특징
 - 완전 관리형 서비스: 클러스터 생성, 확장, 유지 관리, 보안 설정 등 Apache Kafka의 운영 부담을 AWS에서 담당합니다.
@@ -58,7 +58,7 @@ Amazon MSK 클러스터의 핵심 구성 요소는 하나 이상의 브로커로
 그러므로 파티션 수는 클러스터의 병렬 처리량과 성능에 직접적으로 영향을 주게됩니다.
 Kafka 데이터 분산처리 메커니즘의 핵심은 데이터를 저장할 때 리더 파티션에서 읽고 쓰며, 팔로워 파티션에 복제된다는 점입니다.
 
-![img_1.png](../assets/images/25q1/img_1.png)
+![img_1.png](/assets/images/25q1/img_1.png)
 
 #### 주의사항
 - 파티션 수가 적으면 클러스터의 처리량이 제한될 수 있습니다.
@@ -86,6 +86,8 @@ Amazon MSK는 다음과 같은 네 가지 접근 제어 방법을 제공합니�
 - TLS Client Authentication through AWS Certificate Manager (ACM): TLS를 사용하여 클라이언트와 MSK 브로커 간의 보안 연결을 설정하며, AWS Private CA를 통한 인증서를 필요로 합니다.
 
 #### 접근 제어 유형별 엔드포인트 포트 번호
+
+|-----------------------|-------|
 | Authentication type   | Port  |
 |-----------------------|-------|
 | Plaintext             | 9092  |
@@ -133,7 +135,7 @@ PoC를 위한 Source 및 Target 테이터베이스를 구성합니다. 소스 �
 
 ### VPC 구성
 
-![img_2.png](../assets/images/25q1/img_2.png)
+![img_2.png](/assets/images/25q1/img_2.png)
 
 
 ### MSK 클러스터 구성 
@@ -145,27 +147,27 @@ PoC를 위한 Source 및 Target 테이터베이스를 구성합니다. 소스 �
 
 - 클러스터 기본 정보 
 
-![img_3.png](../assets/images/25q1/img_3.png)
+![img_3.png](/assets/images/25q1/img_3.png)
 
 - 네트워킹
 
 MSK 클러스터를 위한 VPC 서브넷 및 보안 그룹을 설정 합니다.
 
-![img_4.png](../assets/images/25q1/img_4.png)
+![img_4.png](/assets/images/25q1/img_4.png)
 
 
 - 보안 
 
 클라이언트 인증 방식을 결정하고, TLS 암호화 및 Topic 에 저장되는 데이터 암호화를 위한 KMS 키를 설정합니다. 
 
-![img_5.png](../assets/images/25q1/img_5.png)
+![img_5.png](/assets/images/25q1/img_5.png)
 
 
 - 모니터링 및 태그
 
 CloudWatch 로그 그룹을 `/aws/msk/cluster/{MSK_CLUSTER_NAME}` 형식으로 사전에 만들어 둡니다.
 
-![img_6.png](../assets/images/25q1/img_6.png)
+![img_6.png](/assets/images/25q1/img_6.png)
 
 * 최종적으로 입력한 구성 정보를 `검토` 하고 MSK 클러스터를 생성 합니다. 
 
@@ -217,7 +219,7 @@ MSK 커넥터를 구성하기 전에, 로컬 환경에 Kafka Debezium 커넥터�
 
 위 시나리오 구현을위해 MySQL 데이터베이스에서  단순하게 `demosrc.products` 스키마의 데이터를 `demosink.productinfo` 스키마로 적재하는 기능을 구현합니다. 
 
-![img_9.png](../assets/images/25q1/img_9.png)
+![img_9.png](/assets/images/25q1/img_9.png)
 
 두 개의 스키마는 서로 다른 데이터베이스에 있으며 image 칼럼이 Target 스키마엔 존재하지 않습니다. 
 
@@ -338,7 +340,7 @@ lower_case_table_names  = 1
 
 `docker-compose up -d` 명령으로 백그라운드 모드로 실행하고 아래와 같이 STATUS 상태가 Up 인지 확인합니다.
 
-![img_10.png](../assets/images/25q1/img_10.png)
+![img_10.png](/assets/images/25q1/img_10.png)
 
 docker 컨테이너를 구동하기전에 반드시 AWS 클라우드를 액세스할 수 있는 AWS_PROFILE 환경 변수를 설정하세요.
 
@@ -347,8 +349,7 @@ docker 컨테이너를 구동하기전에 반드시 AWS 클라우드를 액세�
 
 ### AWS MKS 클러스터의 브로커와 연결 확인
 
-<details>
-  <summary>KafkaIAMConnectTest - 보기/숨기기</summary>
+- KafkaIAMConnectTest.java 샘플
 
 ```java
 public class KafkaIAMConnectTest {
@@ -382,10 +383,6 @@ public class KafkaIAMConnectTest {
   }
 }
 ```
-
-</details>
-
-
 
 
 위와 같이 로컬에서 KafkaIAMConnectTest 파일을 실행했을 때 `Topic created successfully`가 정상적으로 나온다면 `SASL_SSL` 방식으로 연결이 됩니다. 
@@ -629,7 +626,7 @@ mysql -u sinko -psinko1234 -D demosink
 select * from productinfo;
 ```
 
-![img_11.png](../assets/images/25q1/img_11.png)
+![img_11.png](/assets/images/25q1/img_11.png)
 
 
 여기까지 로컬 환경에서 AWS MSK 클러스터를 대상으로 외부 시스템의 RDS 데이터를 또 다른 외부 시스템의 RDS 으로 동기화 하는 한가지 Pipeline 을 구현해 보았습니다. 
@@ -639,7 +636,7 @@ select * from productinfo;
 
 ## MSK 커넥터 아키텍처
 
-![img_12.png](../assets/images/25q1/img_12.png)
+![img_12.png](/assets/images/25q1/img_12.png)
 
 
 
@@ -652,7 +649,7 @@ Kafka 커넥터는 데이터를 처리하기 위해 코드를 전혀 작성하�
 커넥터는 데이터를 대상에 전달을 위해 데이터 타입 및 값을 변환하거나 데이터 필터링과 같은 간단한 로직을 수행할 수도 있습니다.
 
 
-![img_8.png](../assets/images/25q1/img_8.png)
+![img_8.png](/assets/images/25q1/img_8.png)
 
 위 그림은 End-To-End 간 둘 간의 시스템을 하나의 파이프라인으로 데이터가 전달하는 것처럼 보입니다.
 
@@ -663,7 +660,7 @@ EAI, ESB 와 같은 시스템간 통합을 커넥터를 이용 하게되면 설�
 
 ### MSK Plugin 구성
 
-![img_7.png](../assets/images/25q1/img_7.png)
+![img_7.png](/assets/images/25q1/img_7.png)
 
 MSK Plugin은 Kafka Connect 프레임워크의 확장으로, 특정 데이터 소스나 싱크와 Kafka 간의 데이터 이동을 담당합니다.
 
@@ -716,7 +713,7 @@ MSK Worker는 플러그인을 로드하고 데이터 이동 처리를 주관하�
 MSK Worker 커넥터가 생성될 때 미리 정의된 공통 속성을 참조하여 일관되고 자동화된 운영을 돕습니다.     
 
 
-![img_13.png](../assets/images/25q1/img_13.png)
+![img_13.png](/assets/images/25q1/img_13.png)
 
 - worker.properties
 
@@ -771,38 +768,38 @@ AWS 관리 콘솔을 통해 주요 5가지 단계를 거쳐서 Source 커넥터�
 
 STEP 1 - 사용자 지정 플러그인 
 
-![img_14.png](../assets/images/25q1/img_14.png)
+![img_14.png](/assets/images/25q1/img_14.png)
 
 STEP 2 - 커넥터 기본 정보
 
-![img_15.png](../assets/images/25q1/img_15.png)
+![img_15.png](/assets/images/25q1/img_15.png)
 
 STEP 3 - 커넥터 속성 
 
-![img_16.png](../assets/images/25q1/img_16.png)
+![img_16.png](/assets/images/25q1/img_16.png)
 
 
 STEP 4 - 커넥터 용량
 
-![img_17.png](../assets/images/25q1/img_17.png)
+![img_17.png](/assets/images/25q1/img_17.png)
 
 
 STEP 5 - Kafka 커넥터 버전 및 액세스 권한
  
-![img_18.png](../assets/images/25q1/img_18.png)
+![img_18.png](/assets/images/25q1/img_18.png)
 
 
 STEP 6 - 보안
 
-![img_19.png](../assets/images/25q1/img_19.png)
+![img_19.png](/assets/images/25q1/img_19.png)
 
 STEP 7 - 로그 및 태그 
 
-![img_20.png](../assets/images/25q1/img_20.png)
+![img_20.png](/assets/images/25q1/img_20.png)
 
 STEP 8 - 검토 및 생성
 
-![img_21.png](../assets/images/25q1/img_21.png)
+![img_21.png](/assets/images/25q1/img_21.png)
 
 
 
@@ -812,15 +809,15 @@ Connector 를 구성하는 과정은 Sink 를 위한 `커넥터 속성`만 크�
 
 STEP 1 - 사용자 지정 플러그인
 
-![img_22.png](../assets/images/25q1/img_22.png)
+![img_22.png](/assets/images/25q1/img_22.png)
 
 STEP 2 - 커넥터 속성
 
-![img_23.png](../assets/images/25q1/img_23.png)
+![img_23.png](/assets/images/25q1/img_23.png)
 
 STEP 3 - 검토 및 생성 
 
-![img_24.png](../assets/images/25q1/img_24.png)
+![img_24.png](/assets/images/25q1/img_24.png)
 
 
 ```
@@ -860,12 +857,7 @@ STEP 3 - 검토 및 생성
 }
 ```
 
-
-<div class="code-container">
-  <div class="code-header" onclick="toggleCode('code1')">
-    펼치기/접기: simplydemo-msk-sink-connector-productinfo
-  </div>
-  <div id="code1" class="code-content">
+- simplydemo-msk-sink-connector-productinfo
 ```
 {
     "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
@@ -901,36 +893,11 @@ STEP 3 - 검토 및 생성
     "sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler"
 }
 ```
-  </div>
-</div>
+  
+
+## Appendix
+- [Amazon Managed Streaming for Apache Kafka - 개발자 가이드](https://docs.aws.amazon.com/ko_kr/msk/latest/developerguide/MSKDevGuide.pdf) 문서를 참고하세요, 운영에서 중요한 정보들이 다수 있습니다. 
 
 
+## Conclude 
 
-
-
-
-
-#### 참고 사항 
-- KRaft 모드는 `3.7.x` 버전 이상에서만 가능하며 특히 개발 환경에 사용되는 `T` 타입의 인스턴스를 사용할 수 없습니다. 
-- KRaft 모드의 Express 
-
-
-
-### 운영 시 주의사항
-워크로드 규모에 대응하는 클러스터 크기를 결정해야 합니다. 과도한 리소스는 비용을 증가시키고, 너무 낮은 리소스 스펙은 프로비저닝 성능 저하를 초래합니다.
-
-리플리케이션 팩터와 데이터의 크기는 네트워크 및 스토리지 비용에 영향을 미침.
-필요한 복제본 이상으로 설정하지 않도록 주의.
-데이터 손실 방지
-
-ISR 상태 확인으로 파티션 복제가 정상적으로 이루어지는지 모니터링.
-로그 유지 설정(log.retention.ms)을 적절히 조정하여 오래된 데이터를 관리.
-보안 관리
-
-Kafka 브로커와 클라이언트 간 암호화 및 인증 설정 테스트.
-IAM 역할을 최소 권한 원칙으로 설정하여 보안 위험 줄이기.
-
-
-
-
-[Amazon Managed Streaming for Apache Kafka - 개발자 가이드](https://docs.aws.amazon.com/ko_kr/msk/latest/developerguide/MSKDevGuide.pdf)
