@@ -743,7 +743,7 @@ ${secretManager:MySecret-1234:dbusername}
 - Kafka Connector 에 대한 속성 및 역할은 [Kafka Connector Configs](https://kafka.apache.org/documentation/#connectconfigs) 를 참고할 수 있으며, AWS MKS 에서는 보안 및 관리를 목적으로 제한한 속성들이 다수 있습니다.    
 
 
-### MSK Connector 구성
+### MSK Connector 준비 
 
 MSK Connector 는 크게 Source Connector 와 Sink Connector 로 구분 합니다.  
 
@@ -758,7 +758,10 @@ MSK Connector 는 크게 Source Connector 와 Sink Connector 로 구분 합니�
 - IAM Role : [IAM roles and policies](https://docs.aws.amazon.com/msk/latest/developerguide/msk-connect-iam.html) 를 참고하여 Connector 역할을 생성합니다.
   (참고로, MKS, S3, SecretsManager, KMS, Cloudwatch 등의 액세스 권한이 필요합니다.)
 
-다음 몇몇 단계를 통해 커넥터를 생성합니다. 
+
+### MSK Source Connector 구성
+
+AWS 관리 콘솔을 통해 주요 5가지 단계를 거쳐서 Source 커넥터가 구성됩니다. 여기선 8 개의 섹션으로 구성해 보았습니다.  
 
 STEP 1 - 사용자 지정 플러그인 
 
@@ -794,6 +797,24 @@ STEP 7 - 로그 및 태그
 STEP 8 - 검토 및 생성
 
 ![img_21.png](../assets/images/25q1/img_21.png)
+
+
+
+### MSK Sink Connector 구성
+
+Connector 를 구성하는 과정은 Sink 를 위한 `커넥터 속성`만 크게 차이가 나며 나머지 과정은 생략 합니다. 
+
+STEP 1 - 사용자 지정 플러그인
+
+![img_22.png](../assets/images/25q1/img_22.png)
+
+STEP 2 - 커넥터 속성
+
+![img_23.png](../assets/images/25q1/img_23.png)
+
+STEP 3 - 검토 및 생성 
+
+![img_24.png](../assets/images/25q1/img_24.png)
 
 
 ```
@@ -832,6 +853,51 @@ STEP 8 - 검토 및 생성
   "delete.enabled": "true"
 }
 ```
+
+
+<div class="code-container">
+  <div class="code-header" onclick="toggleCode('code1')">
+    펼치기/접기: simplydemo-msk-sink-connector-productinfo
+  </div>
+  <div id="code1" class="code-content">
+```
+{
+    "connector.class": "io.debezium.connector.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+    "topics": "simply.demosrc.products",
+    "connection.url": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSinkEndpoint}",
+    "connection.username": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSinkUsername}",
+    "connection.password": "${secretsmanager:AmazonMSK_dev/simplydemo/kylo:rdsDemoSinkPassword}",
+    "table.name.format": "productinfo",
+    "insert.mode": "upsert",
+    "delete.enabled": "true",
+    "auto.create": "false",
+    "auto.evolve": "false",
+    "schema.evolution": "basic",
+    "primary.key.fields": "id",
+    "primary.key.mode": "record_key",
+    "transforms": "createdAt,updatedAt,filterFields",
+    "transforms.createdAt.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.createdAt.target.type": "Timestamp",
+    "transforms.createdAt.field": "created_at",
+    "transforms.createdAt.format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+    "transforms.updatedAt.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.updatedAt.target.type": "Timestamp",
+    "transforms.updatedAt.field": "updated_at",
+    "transforms.updatedAt.format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+    "transforms.filterFields.renames": "",
+    "transforms.filterFields.replace.null.with.default": "true",
+    "transforms.filterFields.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.filterFields.blacklist": "image",
+    "security.protocol": "SASL_SSL",
+    "sasl.mechanism": "AWS_MSK_IAM",
+    "sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
+    "sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler"
+}
+```
+  </div>
+</div>
+
 
 
 
