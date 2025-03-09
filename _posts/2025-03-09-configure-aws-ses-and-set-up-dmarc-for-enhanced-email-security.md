@@ -421,9 +421,65 @@ Suppression 유형
 Suppression 목록은 모니터링을 통해 주기적 검토하여 발송 성공률을 높이고, 불필요한 발송 시도를 줄여 전체 이메일 캠페인의 품질을 높일 수 있습니다.
 
 
-### DMARC 리포트 샘플
-![img_41.png](../assets/images/25q1/img_41.png)
+### DMARC 리포트 예시
 
+![img_41.png](/assets/images/25q1/img_41.png)
+
+위 화면과 같이 DMARC 리포팅이 수신되며, 여기엔 적용된 정책 및 DKIM, SPF 등 pass, fail 항목을 확인할 수 있습니다. 
+
+```
+<?xml version="1.0"?>
+<feedback>
+	<version>0.1</version>
+	<report_metadata>
+		<org_name>AMAZON-SES</org_name>
+		<email>postmaster@amazonses.com</email>
+		<report_id>d03e5d94-5e90-4245-8fd9-7c4984e6d193</report_id>
+		<date_range>
+			<begin>1741305600</begin>
+			<end>1741392000</end>
+		</date_range>
+	</report_metadata>
+	<policy_published>
+		<domain>example.org</domain>
+		<adkim>r</adkim>
+		<aspf>r</aspf>
+		<p>none</p>
+		<sp>none</sp>
+		<pct>100</pct>
+		<fo>0</fo>
+	</policy_published>
+	<record>
+		<row>
+			<source_ip>54.240.27.190</source_ip>
+			<count>1</count>
+			<policy_evaluated>
+				<disposition>none</disposition>
+				<dkim>pass</dkim>
+				<spf>fail</spf>
+			</policy_evaluated>
+		</row>
+		<identifiers>
+			<envelope_from>us-west-2.amazonses.com</envelope_from>
+			<header_from>example.org</header_from>
+		</identifiers>
+		<auth_results>
+			<dkim>
+				<domain>amazonses.com</domain>
+				<result>pass</result>
+			</dkim>
+			<dkim>
+				<domain>example.org</domain>
+				<result>pass</result>
+			</dkim>
+			<spf>
+				<domain>us-west-2.amazonses.com</domain>
+				<result>pass</result>
+			</spf>
+		</auth_results>
+	</record>
+...
+```
 
 ## Conclude 
 
