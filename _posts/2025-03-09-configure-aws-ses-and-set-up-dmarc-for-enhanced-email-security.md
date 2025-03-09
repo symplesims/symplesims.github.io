@@ -30,12 +30,12 @@ AWS 관리 콘솔에 로그인하여 Route53 서비스의 "Hosted Zones" 메뉴�
 
 - Public Hosted Zone 추가 
 
-![img_28.png](../assets/images/25q1/img_28.png)
+![img_28.png](/assets/images/25q1/img_28.png)
 
 
 - Public Hosted Zone 정보 확인 
 
-![img_29.png](../assets/images/25q1/img_29.png)
+![img_29.png](/assets/images/25q1/img_29.png)
 
 
 Public Hosted Zone 구성을 완료 하면, `Hosted zone name`, `Hosted zone ID`, 도메인 권한 시작을 알리는 `SOA`, 도메인 네임서버 권한을 어떤 Name Server 들이 가지는지 `NS` 레코드를 확인할 수 있습니다.
@@ -53,7 +53,7 @@ NS 레코드는 도메인 이름 해석을 하는 네임 서버의 권한을 어
 
 AWS SES 서비스는 각 리전에 대해 기본적으로 샌드박스 모드로 구성되어 있으며, 제한된 이메일 발송 권한만 제공합니다.
 
-![img_30.png](../assets/images/25q1/img_30.png)
+![img_30.png](/assets/images/25q1/img_30.png)
 
 `Get set up` 에서 보듯 기본으로 구성된 SendBox 는 이메일 발송 제한이 있으며, `Open Tasks`를 통해 주요 구성 정보를 설정 및 확인할 수 있습니다. 
 
@@ -62,7 +62,7 @@ AWS SES 서비스는 각 리전에 대해 기본적으로 샌드박스 모드로
 SES SendBox 구성은 `도메인 Identity` 를 시작으로 아래 주요 단계를 거쳤을 때 비로소 이메일을 발송할 준비가 됩니다. 
 
 
-![img_27.png](../assets/images/25q1/img_27.png)
+![img_27.png](/assets/images/25q1/img_27.png)
 
 
 
@@ -71,14 +71,14 @@ SES SendBox 구성은 `도메인 Identity` 를 시작으로 아래 주요 단계
 도메인 이메일 발송 신뢰성을 높이기 위해 SES에 도메인 `Identity`를 등록하고 `Route53`에서 검증할 수 있도록 관련 레코드를 추가합니다.
 
 
-![img_33.png](../assets/images/25q1/img_33.png)
+![img_33.png](/assets/images/25q1/img_33.png)
 
 
 ### MX 레코드 추가
 
 DMARC 피드백 리포트를 받기 위해 `use custom MAIL FROM domain`을 체크하고, MX 레코드를 입력합니다. 
 
-![img_34.png](../assets/images/25q1/img_34.png)
+![img_34.png](/assets/images/25q1/img_34.png)
 
 MX 레코드는 `mail`, 또는 `mx` 와 같은 도메인 접두어를 추천합니다.
 
@@ -91,13 +91,13 @@ DKIM(DomainKeys Identified Mail)은 이메일 위조 방지 및 신뢰성 확인
 다음은 도메인 검증 방식의 DKIM 구성의 주요 설정 정보 입니다. `Easy DKIM`, `RSA 암호화 방식`, `DKIM signatures` 등을 체크합니다.  
 - 참고로 Route53 DNS 레코드 자동추가 옵션은 별도 관리를 위해 체크하지 않았습니다.  
 
-![img_35.png](../assets/images/25q1/img_35.png)
+![img_35.png](/assets/images/25q1/img_35.png)
 
 
 `Identity 생성`을 완료 하면 Route53 Public Hosted zone (예: example.org)을 위한 SES 보안용 DKIM, MX, SPF, DMARC 관련 레코드를 확인할 수 있습니다. 
 
 
-![img_36.png](../assets/images/25q1/img_36.png)
+![img_36.png](/assets/images/25q1/img_36.png)
 
 
 ### `example.org` 도메인용 Route53(DKIM, MX, SPF, DMARC) 레코드 형식 참고 
@@ -135,14 +135,14 @@ DKIM(DomainKeys Identified Mail)은 이메일이 전송되는 동안 변조되�
 SES 도메인(예:example.org) Identity 생성에서 식별된 DKIM 도메인을 Route53 호스팅의 CNAME 레코드로 등록합니다. 
 - 일반적으로 TXT 타입의 rsa 암호화된 값으로 발급합니다. 반면 AWS SES의 경우, 3개의 CNAME 타입의 레코드로 발급합니다.
 
-![img_37.png](../assets/images/25q1/img_37.png)
+![img_37.png](/assets/images/25q1/img_37.png)
 
 
 #### DKIM 동작 방식의 이해 
 
 SES 샌드 박스를 통해 발송되는 시나리오 에서, 발송자 FROM 정보가 `no.reply@example.org` 이고, 수신자 `Rcpt-TO`가 `customer@honmail.com`인 경우 DKIM 에 대한 요청 및 검증 흐름은 다음과 같습니다. 
 
-![img_31.png](../assets/images/25q1/img_31.png)
+![img_31.png](/assets/images/25q1/img_31.png)
 
 이메일 발송 요청 시 FROM 주소에 `no.reply@example.org`이 지정 되고, SES 샌드박스는 발송자의 도메인(예: `example.org`)이 사전에 검증되어 메일 전송 전에 DKIM 서명(비밀 키)을 메일 헤더에 추가합니다.  
 `example.org` 도메인에 대해 미리 생성된 `DKIM`용 사설 키(private key)와 공개 키(public key)가 존재하며, 공개 키는 DNS에 TXT 레코드 형태로 등록되어 있으므로 `메일 수신자(Receiving Mail Server)`는 FROM 발송자 도메인의 DKIM Public Key를 조회하여 아래의 주요 단계로 검증 합니다.
@@ -213,7 +213,7 @@ SPF(Sender Policy Framework) 정책은 도메인 소유자가 해당 도메인�
 SES 샌드 박스를 통해 발송되는 시나리오 에서, 발송자 FROM 정보가 `no.reply@example.org`이고, 수신자 `Rcpt-TO`가 `customer@honmail.com`인 경우 SPF 에 대한 요청 및 검증 흐름은 다음과 같습니다.
 
 
-![img_32.png](../assets/images/25q1/img_32.png)
+![img_32.png](/assets/images/25q1/img_32.png)
 
 이메일 수신 서버(Receiving Mail)는 MAIL FROM 이메일 발송 도메인 `example.org`에 대해 TXT 레코드를 조회하여 SPF 정책을 확인합니다.   
 `example.org` 도메인에 대해 `v=spf1 ip4:192.0.2.0/24 include:amazonses.com ~all`와 같이 SPF 정책이 설정되었다고 가정하면,  
@@ -317,7 +317,7 @@ DMARC(Domain-based Message Authentication, Reporting & Conformance)는 도메인
 `DMARC`는 회사가 소유한 도메인(예: example.org)에 대해 `SPF`및 `DKIM`정책을 적용 하고, 메일이 발송될 때 `SPF` 및 `DKIM` 결과를 기반으로 승인 되지 않은 이메일을 SPAM으로 분류 하고, 리포팅 보고서를 제공합니다.
 
 
-![img_39.png](../assets/images/25q1/img_39.png)
+![img_39.png](/assets/images/25q1/img_39.png)
 
 `example.org` 도메인에 대해 `DMARC`정책이 아래와 같이 설정되어 있다면, `example.org` 도메인으로 발송되는 모든 이메일에 대해 DMARC1 버전의 정책으로 `SPF` 또는 `DKIM` 방식 둘 하나가 확인되지 않으면, SPAM 으로 간주 하여 `격리`하는것을 의미합니다. 집계 시간은 1 day(86400 secs)이며 관련 리포트를 `mail-master@example.org`으로 전송하도록 설정 합니다.   
 
@@ -394,7 +394,7 @@ _dmarc.example.org  TXT     "v=DMARC1; p=quarantine; pct=100; rua=mailto:mail-ma
 
 `SES Sendbox`를 실제 운영되는 서비스에 활용하기 위해서는 `Request production access`를 통해 Support 요청을 통해 AWS 확인을 받아야 합니다. 
 
-![img_38.png](../assets/images/25q1/img_38.png)
+![img_38.png](/assets/images/25q1/img_38.png)
 
 프로덕션 환경을 위해 SES 제한 해제를 위한 요청 에서 `Mail type`, `Website URL`, `Additional contacts`, `Preferred contact language` 등 주요 정보를 입력 및 요청 해야 합니다.
 
