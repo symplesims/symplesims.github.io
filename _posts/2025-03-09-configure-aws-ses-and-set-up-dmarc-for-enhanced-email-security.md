@@ -13,8 +13,9 @@ categories:
 
 ## DMARC 구성 배경
 
-최근 특정 도메인에 대해 DMARC 정책 누락 또는 정책 무시로 인해 리포팅이 보고된 적이 있습니다. 이런 유형의 보안 정책을 보완할 때마다 이전에 구성한 정보를 반복적으로 추적하고 확인하는데 
-이번 기회에 `SES`의 샌드박스 구성부터 `Route53`을 이용한 도메인 인증과 SMTP 설정, MX 레코드, DKIM, SPF 정책 설정, 그리고 Suppression list 구성 까지 단계별로 정리하려고 합니다.
+최근 특정 도메인에 대해 `DMARC` 정책 누락 또는 정책 무시로 인해 리포팅이 보고된 적이 있습니다. 이런 유형의 보안 정책을 보완할 때마다 이전에 구성한 정보를 반복적으로 추적하고 확인하는데 
+이번 기회에 `Route53`서비스의 Hosted Zone 과 `SES 샌드박스` 구성 부터 SES 도메인 Identity, MX 레코드, DKIM, SPF 정책 까지 단계별로 정리하고자 합니다.
+
 
 ## AWS SES?
 [AWS SES(Simple Email Service)](https://aws.amazon.com/ko/ses/)는 이메일 발송 및 관리에 최적화된 클라우드 서비스입니다. 
@@ -100,25 +101,6 @@ DKIM(DomainKeys Identified Mail)은 이메일 위조 방지 및 신뢰성 확인
 ![img_36.png](/assets/images/25q1/img_36.png)
 
 
-### `example.org` 도메인용 Route53(DKIM, MX, SPF, DMARC) 레코드 형식 참고 
-
-```
-# DKIM Route53 레코드 for example.org
-KEY                                         TYPE    VALUE
-6rqvauxt**********._domainkey.example.org   CNAME   6rqvauxt**********.dkim.amazonses.com
-df33aqu7**********._domainkey.example.org   CNAME   df33aqu7**********.dkim.amazonses.com
-wtm3rpjz**********._domainkey.example.org   CNAME   wtm3rpjz**********.dkim.amazonses.com
-
-# DMARC Route53 레코드 for example.org 
-_dmarc.example.org                          TXT     "v=DMARC1; p=none;"
-
-# MX Route53 레코드 for mail.example.org (feedback)
-mail.example.org                            MX      10 feedback-smtp.ap-northeast-2.amazonses.com
-
-# SPF Route53 레코드 for mail.example.org
-mail.example.org                            TXT     v=spf1 include:amazonses.com ~all
-```
-
 ## 이메일 인증 관련 보안 프로토콜 이해
 
 오랫동안 `DKIM`, `SPF`, `DMARC`는 강력히 권장되었지만 필수는 아니었습니다. 하지만 2024년 부터는 대량의 SMTP 발신자라면 이 세 가지 인증 방법을 모두 사용해야 합니다.
@@ -129,14 +111,6 @@ mail.example.org                            TXT     v=spf1 include:amazonses.com
 ### DKIM 정책
 
 DKIM(DomainKeys Identified Mail)은 이메일이 전송되는 동안 변조되지 않았음을 보증하기 위해 도메인 소유자가 메일에 디지털 서명을 추가하는 이메일 인증 기술입니다.
-
-#### DKIM 레코드
-
-SES 도메인(예:example.org) Identity 생성에서 식별된 DKIM 도메인을 Route53 호스팅의 CNAME 레코드로 등록합니다. 
-- 일반적으로 TXT 타입의 rsa 암호화된 값으로 발급합니다. 반면 AWS SES의 경우, 3개의 CNAME 타입의 레코드로 발급합니다.
-
-![img_37.png](/assets/images/25q1/img_37.png)
-
 
 #### DKIM 동작 방식의 이해 
 
@@ -387,16 +361,48 @@ _dmarc.example.org  TXT     "v=DMARC1; p=quarantine; pct=100; rua=mailto:mail-ma
 </table>
 
 
+### SES 도메인(예:example.org) 레코드 등록
+
+SES `Identity 도메인 생성`을 통해 식별된 `DKIM`, `SPF`, `DMARC` 및 `MX` 레코드를 Route53 Hosted Zoned 도메인(예:example.org)레코드에 등록 하면 `Identity status`가 `Verified`으로 바뀌며 메일 발송 시뮬레이션 테스트를 할 수 있게 됩니다.  
+
+- Route53(DKIM, MX, SPF, DMARC) 레코드 예시 
+
+![img_40.png](../assets/images/25q1/img_40.png)
+
+
+- 도메인(예: example.org)용 Route53(DKIM, MX, SPF, DMARC) 레코드 형식 참고
+
+```
+# DKIM Route53 레코드 for example.org
+KEY                                         TYPE    VALUE
+6rqvauxt**********._domainkey.example.org   CNAME   6rqvauxt**********.dkim.amazonses.com
+df33aqu7**********._domainkey.example.org   CNAME   df33aqu7**********.dkim.amazonses.com
+wtm3rpjz**********._domainkey.example.org   CNAME   wtm3rpjz**********.dkim.amazonses.com
+
+# DMARC Route53 레코드 for example.org 
+_dmarc.example.org                          TXT     "v=DMARC1; p=none;"
+
+# MX Route53 레코드 for mail.example.org (feedback)
+mail.example.org                            MX      10 feedback-smtp.ap-northeast-2.amazonses.com
+
+# SPF Route53 레코드 for mail.example.org
+mail.example.org                            TXT     v=spf1 include:amazonses.com ~all
+```
+
 ## Appendix
 부가적으로, 운영 환경 이라면 `Request production access`요청을 통해 SES 메일 발송 제한을 해제하고, `Suppression 목록`을 구성 하여 메일 Delivery 품질을 높일 수 있습니다.    
 
 ### Request production access
 
-`SES Sendbox`를 실제 운영되는 서비스에 활용하기 위해서는 `Request production access`를 통해 Support 요청을 통해 AWS 확인을 받아야 합니다. 
+`SES Sendbox`를 실제 운영되는 서비스에 활용하기 위해서는 `Request production access`를 통해 Support 요청을 통해 AWS 확인을 받아야 합니다.
+
+특히, AWS SES 샌드박스 모드에서는 발신자와 수신자 이메일 주소 모두가 AWS에서 검증된 주소여야 합니다.
+라서 Production 모드로 전환하지 않은 경우, 기본적으로 다른 도메인의 수신자에게 이메일을 보낼 수 없습니다.
+
 
 ![img_38.png](/assets/images/25q1/img_38.png)
 
-프로덕션 환경을 위해 SES 제한 해제를 위한 요청 에서 `Mail type`, `Website URL`, `Additional contacts`, `Preferred contact language` 등 주요 정보를 입력 및 요청 해야 합니다.
+프로덕션 환경을 위해 SES 제한 해제를 위한 요청 에서 `Mail type`, `Website URL`, `Additional contacts`, `Preferred contact language` 등 주요 정보를 입력하고 요청해야 합니다.  
 
 `Support Center`는 대게 24시간 이내에 `Request production access`요청 근거를 작성하여 회신을 요구합니다.
 
@@ -414,6 +420,9 @@ Suppression 유형
 
 Suppression 목록은 모니터링을 통해 주기적 검토하여 발송 성공률을 높이고, 불필요한 발송 시도를 줄여 전체 이메일 캠페인의 품질을 높일 수 있습니다.
 
+
+### DMARC 리포트 샘플
+![img_41.png](../assets/images/25q1/img_41.png)
 
 
 ## Conclude 
