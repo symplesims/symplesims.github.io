@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Security Threats and Response Strategies through AWS WAF"
+title: "Security Incident Response Strategy Leveraging AWS WAF"
 
-date:  2025-03-21 18:00:00 +0900
+date:  2025-05-11 22:00:00 +0900
 categories:
    - AWS WAF
    - Best Practices
@@ -269,5 +269,154 @@ curl -O https://ip-ranges.amazonaws.com/ip-ranges.json
 참고로 html 항목은 최대 4 K bytes 로 제한 됩니다.
 
 
+## WAF Web ACL 개요
+
+
+![img_6.png](../assets/images/25q2/img_6.png)
+
+
+<table>
+<thead>
+<tr>
+    <td>속성</td>
+    <td>설명</td>
+    <td>예시</td>
+</tr>
+</thead>
+<tbody>
+ <tr>
+      <td>v</td>
+      <td>SPF 버전을 지정합니다. 현재 SPF 레코드는 항상 "v=spf1"로 시작하며, 해당 레코드가 SPF 정책임을 나타냅니다.</td>
+      <td>v=spf1</td>
+    </tr>
+    <tr>
+      <td>ip4</td>
+      <td>도메인에서 발송을 허용하는 IPv4 주소 또는 주소 범위를 지정합니다.</td>
+      <td>ip4:192.0.2.0/24</td>
+    </tr>
+    <tr>
+      <td>ip6</td>
+      <td>도메인에서 발송을 허용하는 IPv6 주소 또는 주소 범위를 지정합니다.</td>
+      <td>ip6:2001:db8::/32</td>
+    </tr>
+    <tr>
+      <td>a</td>
+      <td>도메인의 A 레코드(IP 주소)를 기준으로 발송을 허용합니다. 선택적으로 다른 도메인을 지정할 수도 있습니다.</td>
+      <td>a 또는 a:example.org</td>
+    </tr>
+    <tr>
+      <td>mx</td>
+      <td>도메인의 MX 레코드에 명시된 메일 서버의 IP 주소를 기반으로 발송을 허용합니다.</td>
+      <td>mx 또는 mx:example.org</td>
+    </tr>
+    <tr>
+      <td>include</td>
+      <td>다른 도메인의 SPF 정책을 포함하여 해당 도메인의 허용 목록을 참조합니다.</td>
+      <td>include:_spf.google.com</td>
+    </tr>
+    <tr>
+      <td>exists</td>
+      <td>특정 도메인에 대한 DNS 조회 결과가 존재하는지를 확인하여 발송을 허용합니다. 주로 동적 IP나 복잡한 설정에 활용됩니다.</td>
+      <td>exists:%{i}.spf.example.org</td>
+    </tr>
+    <tr>
+      <td>all</td>
+      <td>앞에서 지정한 조건에 해당되지 않는 모든 IP에 대해 적용되는 메커니즘입니다. 보통 최종 정책으로 사용되며, qualifier에 따라 처리됩니다.</td>
+      <td>-all (미일치 IP 거부) 또는 ~all (소프트 실패)</td>
+    </tr>
+    <tr>
+      <td>redirect</td>
+      <td>현재 SPF 레코드에서 매칭되는 조건이 없을 경우, 다른 도메인의 SPF 정책을 대체로 적용하도록 지정합니다.</td>
+      <td>redirect=example.org</td>
+    </tr>
+    <tr>
+      <td>exp</td>
+      <td>SPF 검증에 실패한 경우, 수신자에게 제공할 추가 설명을 담은 도메인을 지정합니다.</td>
+      <td>exp=explain.example.org</td>
+    </tr>
+</tbody>
+</table>
+
+
+### DMARC 정책 구성
+
+DMARC(Domain-based Message Authentication, Reporting & Conformance)는 도메인 기반 메시지 인증, 보고 및 준수(DMARC)는 이메일 사기 및 피싱 공격에 대응하기 위해 설계된 이메일 인증 프로토콜입니다.
+
+#### DMARC 동작 방식의 이해
+
+`DMARC`는 회사가 소유한 도메인(예: example.org)에 대해 `SPF`및 `DKIM`정책을 적용 하고, 메일이 발송될 때 `SPF` 및 `DKIM` 결과를 기반으로 승인 되지 않은 이메일을 SPAM으로 분류 하고, 리포팅 보고서를 제공합니다.
+
+
+![img_39.png](/assets/images/25q1/img_39.png)
+
+`example.org` 도메인에 대해 `DMARC`정책이 아래와 같이 설정되어 있다면, `example.org` 도메인으로 발송되는 모든 이메일에 대해 DMARC1 버전의 정책으로 `SPF` 또는 `DKIM` 방식 둘 하나가 확인되지 않으면, SPAM 으로 간주 하여 `격리`하는것을 의미합니다. 집계 시간은 1 day(86400 secs)이며 관련 리포트를 `mail-master@example.org`으로 전송하도록 설정 합니다.
+
+```
+NAME                TYPE    VALUE
+_dmarc.example.org  TXT     "v=DMARC1; p=quarantine; pct=100; rua=mailto:mail-master@example.org; aspf=r; adkim=r; fo=0; ri=86400;"
+```
+
+
+#### DMARC TXT 레코드 주요 속성 참고
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Action</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>maintenance-rule-group</td>
+      <td>Use rule actions</td>
+      <td>개발팀 Network IP 를 제외한 모든 요청에 대해 공사중 페이지를 렌더링 합니다. </td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.aws.amazon.com/ko_kr/waf/latest/developerguide/aws-managed-rule-groups-use-case.html" target="_blank">AWSManagedRulesSQLiRule</a></td>
+      <td>Use rule actions</td>
+      <td>AWS 관리형 정책으로, SQL 명령어 주입 공격과 같은 SQL 데이터베이스 도용과 관련된 요청 패턴을 차단하는 규칙이 포함되어 있습니다.</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.aws.amazon.com/ko_kr/waf/latest/developerguide/aws-managed-rule-groups-use-case.html#aws-managed-rule-groups-use-case-linux-os" target="_blank">AWSManagedRulesLinuxRule</a></td>
+      <td>Use rule actions</td>
+      <td>Linux 운영 체제 규칙 그룹에는 Linux 관련 로컬 파일 포함(LFI, Local File Inclusion) 공격을 포함하여 Linux에 특정한 취약성 도용과 관련된 요청 패턴을 차단하는 규칙이 포함되어 있습니다.</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.aws.amazon.com/ko_kr/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-known-bad-inputs">AWSManagedRulesKnownBadInputsRule</a></td>
+      <td>Use rule actions</td>
+      <td>알려진 잘못된 입력 규칙 그룹에는 유효하지 않은 것으로 알려져 있으며 취약성의 도용 또는 발견과 관련된 요청 패턴을 차단하는 규칙이 포함되어 있습니다. 이렇게 하면 악성 액터가 취약한 애플리케이션을 발견하는 위험을 줄일 수 있습니다.</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.aws.amazon.com/ko_kr/waf/latest/developerguide/aws-managed-rule-groups-baseline.html#aws-managed-rule-groups-baseline-crs">AWSManagedRulesCommonRule</a></td>
+      <td>Use rule actions</td>
+      <td>핵심 규칙 집합(CRS, Core rule set) 규칙 그룹에는 일반적으로 웹 애플리케이션에 적용할 수 있는 규칙이 포함되어 있습니다. 이를 통해 OWASP Top 10과 같은 OWASP 게시물에 설명된 자주 발생하고 위험성 높은 일부 취약성을 비롯한 광범위한 취약성 도용을 막을 수 있습니다.</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.aws.amazon.com/ko_kr/waf/latest/developerguide/aws-managed-rule-groups-ip-rep.html#aws-managed-rule-groups-ip-rep-anonymous">AWSManagedRulesAnonymousIpList</a></td>
+      <td>Use rule actions</td>
+      <td>익명 IP 목록 규칙 그룹에는 최종 사용자 ID 난독화를 허용하는 서비스의 요청을 차단하는 규칙이 포함되어 있습니다. 여기에는 VPN, 프록시, Tor 노드 및 웹 호스팅 공급자의 요청이 포함됩니다.</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.aws.amazon.com/ko_kr/waf/latest/developerguide/aws-managed-rule-groups-ip-rep.html#aws-managed-rule-groups-ip-rep-amazon">AWSManagedRulesAmazonIpReputationList</a></td>
+      <td>Use rule actions</td>
+      <td>Amazon IP 신뢰도 목록 규칙 그룹에는 Amazon 내부 위협 인텔리전스를 기반으로 하는 규칙이 포함되어 있습니다. 이는 일반적으로 봇이나 다른 위협과 연결된 IP 주소를 차단하려는 경우에 유용합니다. 이러한 IP 주소를 차단하면 봇을 완화하고 악성 액터가 취약한 애플리케이션을 발견하는 위험을 줄일 수 있습니다.</td>
+    </tr>
+    <tr>
+      <td>front-rule-group</td>
+      <td>Use rule actions</td>
+      <td>AWS 관리형 규칙 외에 서비스 워크로드를 위한 커스텀 방화벽 규칙을 구성할 수 있습니다. 여기엔 cloudfront IP 대역을 허용 하는 규칙, 서비스 도메인 (예: *.example.com) Host 패턴만 허용 하는 규칙, 
+고객 및 개발 조직에 대한 NAT IP 대역 허용 규칙 등 필요한 규칙을 추가 할 수 있습니다.</td>
+    </tr>
+  </tbody>
+</table>
+
+
 ## Conclude
+
+AWS WAF를 핵심 방어 수단으로 삼아, 간단하면서도 효과적인 웹서비스 보안 아키텍처와 운영 전략을 살펴보았습니다.    
+
+여러분의 AWS 클라우드 환경에서, 여기서 소개한 아키텍처와 WAF를 적용함으로써 서비스의 가용성 및 신뢰성을 확보하고, 
+대규모 유지보수 시에도 안전하게 운영을 이어갈 수 있기를 희망 합니다.
 
