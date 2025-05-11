@@ -43,13 +43,13 @@ VPC Managed prefix lists 목록에서 [global.cloudfront.origin-facing](https://
 
 ## WAF + Application Load Balancer (ALB)를 통합한 아키텍처
 
-위의 ALB 보안 그룹 방어 전략은 Hacker 의 공격이 보안 그룹에 의해 차단 될 수 있겠지만, 해커의 공격 트래픽이 Backend ALB 영역 까지 도달 하게 된다는 것 입니다. 
+위의 ALB 보안 그룹 방어 전략은 Hacker 의 공격이 보안 그룹에 의해 차단 되지만, 문제는 해커의 공격 트래픽이 Backend ALB 영역 까지 도달 하게 된다는 것 입니다. 
 
-이 것 자체가 DDoS 공격을 하게 되면 직접 적인 피해를 입게 되므로 보다 앞서서 해커의 공격을 방어할 필요가 있습니다. 
+이렇게 되면 해커는 DDoS 공격을 통해 서비스 환경에 직접 적인 피해를 가할 수 있으므로, 이 것 역시 방어할 수 있는 아키텍처가 필요합니다. 
 
 아래 다이어그램은 [ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) 와 [WAF Reginal](https://aws.amazon.com/waf/) 를 통합한 아키텍처 입니다.
 
-AWS 클라우드가 제공하는 관리형 WAF 방화벽을 Backend 서비스 레이어 앞쪽에 배치함으로써 대부분의 침입자 공격을 차단할 수 있습니다.
+여기서는, AWS 클라우드가 제공하는 관리형 WAF 방화벽을 Backend 서비스 레이어 앞쪽에 배치함으로써 대부분의 침입자 공격을 차단할 수 있습니다.
 
 
 ![img_1.png](/assets/images/25q2/img_1.png)
@@ -58,10 +58,12 @@ AWS 클라우드가 제공하는 관리형 WAF 방화벽을 Backend 서비스 �
 
 ### CloudFront HTTP 헤더를 이용한 WAF 방화벽 전략
 
-`CloudFront`액세스만 허용하도록 WAF 방화벽 규칙을 구성할 수 있습니다.  
+`CloudFront`액세스만 허용하도록 WAF 방화벽 규칙을 구성하려면 먼저, `CloudFront`를 특정할 수 있어야 합니다.   
 
-`CloudFront`의 Behavior 설정 중 `Cache policy and origin request policy` 정책 에서 `AllViewerAndCloudFrontHeaders`를 설정 하면 CloudFront의 Geo-Location 정보가 아래와 같이 HTTP 헤더로 제공됩니다.
+`CloudFront`의 Behavior 설정 중 `Cache policy and origin request policy` 정책 에서 `AllViewerAndCloudFrontHeaders`를 설정 하면 
+`CloudFront`에 의해 제공 되는 모든 요청은 Geo-Location 정보가 아래와 같이 HTTP 헤더로 제공됩니다.
 
+-  `Cache policy and origin request policy` 정책 설정 화면 예시  
 ![img_2.png](/assets/images/25q2/img_2.png)
 
 - [cloudfront-geolocation-headers](https://aws.amazon.com/ko/about-aws/whats-new/2020/07/cloudfront-geolocation-headers/) 샘플
@@ -159,7 +161,7 @@ fields @timestamp, @message
 
 
 
-### CloudFront `IPSet`을 이용한 WAF 방화벽 전략
+### WAF `IPSet`을 규칙을 통한 방어 전략
 
 경험 많은 해커의 경우 HTTP 헤더를 변조 하여 WAF 방화벽을 무력화 할 수 있습니다.
 
@@ -178,14 +180,15 @@ AWS는 주요 서비스에 대해 `VPC Managed prefix list`의 [global.cloudfron
 curl -O https://ip-ranges.amazonaws.com/ip-ranges.json 
 ```
 
-우리는 `WAF & Shield` 의 `IP sets` 을 통해 Global 및 Regional 에 대한 CloudFront IP 를 구성할 수 있습니다.
+
+우리는 아래 화면과 같이 `WAF & Shield` 의 `IP sets` 을 통해 Global 및 Regional 에 대한 CloudFront IP 를 구성할 수 있습니다.
 
 - `cloudfront-ipsets` WAF Rule 예시
 
 ![img_4.png](/assets/images/25q2/img_4.png)
 
-위 AWS IP Sets 으로 관리 되는 `cloudfront-ipsets` 의 ARN 값이 `arn:aws:wafv2:us-east-1:111122223333:regional/ipset/cloudfront-ipsets/a5a6` 이라면 
-아래와 같이 WAF Rule Group 을 생성할 수있습니다. 
+WAF IP Sets 으로 관리 되는 `cloudfront-ipsets` 의 ARN 값이 `arn:aws:wafv2:us-east-1:111122223333:regional/ipset/cloudfront-ipsets/a5a6` 이라면 
+아래와 같이 WAF Rule Group 을 생성할 수 있습니다. 
 
 - cloudfront-rule-group Rule Group 예시
 
@@ -217,12 +220,13 @@ curl -O https://ip-ranges.amazonaws.com/ip-ranges.json
 이를 위해 Route53 도메인 부터 ALB 라우팅 등 프로덕션 환경을 대상 으로 여러 리소스를 수정 하는 것은 운영 환경에 변경이 일어 나는 위험한 작업일 뿐만아니라, 
 몇몇 리소스의 설정을 변경해야 하는 부담스러운 작업이 됩니다.
 
-하지만 ₩WAF`를 이용 하여 `maintenance-rule` 과 같은 단순한 규칙 으로 아주 쉽고 안전 하게 공사중 페이지를 작업할 수 있습니다. 
+하지만 `WAF`를 활용 하여 `maintenance-rule` 과 같은 단순한 규칙 으로 아주 쉽고 안전 하게 공사중 페이지를 작업할 수 있습니다. 
 
-그리고 작업을 위한 내부 개발팀의 담당자에 대한 IP 들은 WAF 에 차단 되지 않도록 예외 처리를 하는 IP sets `deny-not-included-ipsets` 를 두어 패치 및 검증을 위해 허용할 수 있습니다. 
+또한, 내부 개발팀의 IP 들은 작업을 위해 WAF 에 위해 차단 되지 않도록 IP sets `deny-not-included-ipsets` 정책으로 예외 처리를 할 수 있습니다. 
 
 
 ### 공사중 페이지를 위한 `maintenance-rule` WAF Rule  
+
 `maintenance-rule` Rule Group 을 아래와 같이 `deny-not-included-ipsets` 에 포함된 IP 가 아니 라면 차단(Block) 하도록 규칙을 생성 하고, 
 그 이외의 모든 클라이언트의 Action은 `maintenance-html` 키에 대한 CustomResponse HTML 컨텐츠를 응답하도록 구현할 수 있습니다.   
 
@@ -269,95 +273,17 @@ curl -O https://ip-ranges.amazonaws.com/ip-ranges.json
 참고로 html 항목은 최대 4 K bytes 로 제한 됩니다.
 
 
-## WAF Web ACL 개요
+## WAF Web ACL 정책 적용 예시
 
+아래 그림은 [AWS 관리형 WAF 규칙](https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups.html) 과 고객 서비스를 위한 커스텀 규칙을 조합한 예시 입니다.  
 
-![img_6.png](../assets/images/25q2/img_6.png)
+AWS 관리형 WAF 규칙을 적용하는 것 만으로 상당히 많은 공격으로부터 방어를 할 수 있으므로 제공 서비스 환경에 `Count`로 모니터링 하며 가능 하면 많은 규칙을 `Block` 으로 설정 하길 권고합니다.    
 
+여기서는 `maintenance-rule-group`와 같은 그룹 규칙은 공사중 페이지로 필요한 경우에만 추가 하고, 작업이 완료 되면 쉽게 제거 하여 원래의 방화벽 규칙으로 빠르게 복원 할 수 있습니다.
 
-<table>
-<thead>
-<tr>
-    <td>속성</td>
-    <td>설명</td>
-    <td>예시</td>
-</tr>
-</thead>
-<tbody>
- <tr>
-      <td>v</td>
-      <td>SPF 버전을 지정합니다. 현재 SPF 레코드는 항상 "v=spf1"로 시작하며, 해당 레코드가 SPF 정책임을 나타냅니다.</td>
-      <td>v=spf1</td>
-    </tr>
-    <tr>
-      <td>ip4</td>
-      <td>도메인에서 발송을 허용하는 IPv4 주소 또는 주소 범위를 지정합니다.</td>
-      <td>ip4:192.0.2.0/24</td>
-    </tr>
-    <tr>
-      <td>ip6</td>
-      <td>도메인에서 발송을 허용하는 IPv6 주소 또는 주소 범위를 지정합니다.</td>
-      <td>ip6:2001:db8::/32</td>
-    </tr>
-    <tr>
-      <td>a</td>
-      <td>도메인의 A 레코드(IP 주소)를 기준으로 발송을 허용합니다. 선택적으로 다른 도메인을 지정할 수도 있습니다.</td>
-      <td>a 또는 a:example.org</td>
-    </tr>
-    <tr>
-      <td>mx</td>
-      <td>도메인의 MX 레코드에 명시된 메일 서버의 IP 주소를 기반으로 발송을 허용합니다.</td>
-      <td>mx 또는 mx:example.org</td>
-    </tr>
-    <tr>
-      <td>include</td>
-      <td>다른 도메인의 SPF 정책을 포함하여 해당 도메인의 허용 목록을 참조합니다.</td>
-      <td>include:_spf.google.com</td>
-    </tr>
-    <tr>
-      <td>exists</td>
-      <td>특정 도메인에 대한 DNS 조회 결과가 존재하는지를 확인하여 발송을 허용합니다. 주로 동적 IP나 복잡한 설정에 활용됩니다.</td>
-      <td>exists:%{i}.spf.example.org</td>
-    </tr>
-    <tr>
-      <td>all</td>
-      <td>앞에서 지정한 조건에 해당되지 않는 모든 IP에 대해 적용되는 메커니즘입니다. 보통 최종 정책으로 사용되며, qualifier에 따라 처리됩니다.</td>
-      <td>-all (미일치 IP 거부) 또는 ~all (소프트 실패)</td>
-    </tr>
-    <tr>
-      <td>redirect</td>
-      <td>현재 SPF 레코드에서 매칭되는 조건이 없을 경우, 다른 도메인의 SPF 정책을 대체로 적용하도록 지정합니다.</td>
-      <td>redirect=example.org</td>
-    </tr>
-    <tr>
-      <td>exp</td>
-      <td>SPF 검증에 실패한 경우, 수신자에게 제공할 추가 설명을 담은 도메인을 지정합니다.</td>
-      <td>exp=explain.example.org</td>
-    </tr>
-</tbody>
-</table>
+그리고 하단의 `front-rule-group`그룹 규칙은 Allow 및 Block 정책을 Host 이름 패턴, 개발팀 Office IP 대역, CloudFront 소스 대역 등 사용자 커스텀 특화된 규칙으로 설정 합니다.  
 
-
-### DMARC 정책 구성
-
-DMARC(Domain-based Message Authentication, Reporting & Conformance)는 도메인 기반 메시지 인증, 보고 및 준수(DMARC)는 이메일 사기 및 피싱 공격에 대응하기 위해 설계된 이메일 인증 프로토콜입니다.
-
-#### DMARC 동작 방식의 이해
-
-`DMARC`는 회사가 소유한 도메인(예: example.org)에 대해 `SPF`및 `DKIM`정책을 적용 하고, 메일이 발송될 때 `SPF` 및 `DKIM` 결과를 기반으로 승인 되지 않은 이메일을 SPAM으로 분류 하고, 리포팅 보고서를 제공합니다.
-
-
-![img_39.png](/assets/images/25q1/img_39.png)
-
-`example.org` 도메인에 대해 `DMARC`정책이 아래와 같이 설정되어 있다면, `example.org` 도메인으로 발송되는 모든 이메일에 대해 DMARC1 버전의 정책으로 `SPF` 또는 `DKIM` 방식 둘 하나가 확인되지 않으면, SPAM 으로 간주 하여 `격리`하는것을 의미합니다. 집계 시간은 1 day(86400 secs)이며 관련 리포트를 `mail-master@example.org`으로 전송하도록 설정 합니다.
-
-```
-NAME                TYPE    VALUE
-_dmarc.example.org  TXT     "v=DMARC1; p=quarantine; pct=100; rua=mailto:mail-master@example.org; aspf=r; adkim=r; fo=0; ri=86400;"
-```
-
-
-#### DMARC TXT 레코드 주요 속성 참고
+![img_6.png](/assets/images/25q2/img_6.png)
 
 <table>
   <thead>
